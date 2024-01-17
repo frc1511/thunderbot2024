@@ -39,21 +39,22 @@
 
 SwerveModule::SwerveModule(int driveID, int turningID, int canCoderID, bool driveInverted)
 : driveMotor(driveID,rev::CANSparkMax::MotorType::kBrushless),
- driveEncoder(driveMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
- drivePIDController(driveMotor.GetPIDController()),
-turningMotor(turningID, rev::CANSparkMax::MotorType::kBrushless), 
-turningEncoder(turningMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
-turningPIDController(turningMotor.GetPIDController()),
-turningAbsEncoder(canCoderID), 
-driveInverted(driveInverted) {
+  driveEncoder(driveMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  drivePIDController(driveMotor.GetPIDController()),
+  turningMotor(turningID, rev::CANSparkMax::MotorType::kBrushless), 
+  turningEncoder(turningMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  turningPIDController(turningMotor.GetPIDController()),
+  turningAbsEncoder(canCoderID), 
+  driveInverted(driveInverted) {
     
     configureMotors();
 
     // --- CANCoder configuration ---
+
     ctre::phoenix6::configs::CANcoderConfiguration config;
-    config.MagnetSensor.WithAbsoluteSensorRange (ctre::phoenix6::signals::AbsoluteSensorRangeValue::Signed_PlusMinusHalf);
+    config.MagnetSensor.WithAbsoluteSensorRange(ctre::phoenix6::signals::AbsoluteSensorRangeValue::Signed_PlusMinusHalf);
+
     turningAbsEncoder.GetConfigurator().Apply(config);
-    
 }
 
 SwerveModule::~SwerveModule() = default;
@@ -76,11 +77,11 @@ void SwerveModule::configureMotors() {
     driveMotor.SetClosedLoopRampRate(DRIVE_RAMP_TIME.value());
 
     // PID Values.
-    drivePIDController.SetP(DRIVE_P,0);
-    drivePIDController.SetI(DRIVE_I,0);
-    drivePIDController.SetD(DRIVE_D,0);
-    drivePIDController.SetIZone(DRIVE_I_ZONE,0);
-    drivePIDController.SetFF(DRIVE_FF,0);
+    drivePIDController.SetP(DRIVE_P, 0);
+    drivePIDController.SetI(DRIVE_I, 0);
+    drivePIDController.SetD(DRIVE_D, 0);
+    drivePIDController.SetIZone(DRIVE_I_ZONE, 0);
+    drivePIDController.SetFF(DRIVE_FF, 0);
 
     // --- Turning motor config ---
 
@@ -114,6 +115,7 @@ void SwerveModule::doPersistentConfiguration() {
 void SwerveModule::stop() {
     turningMotor.Set(0.0);
     driveMotor.Set(0.0);
+
     resetDrivePosition();
 }
 
@@ -163,7 +165,6 @@ void SwerveModule::resetDrivePosition() {
 
 units::radian_t SwerveModule::getRawRotation() {
     return turningAbsEncoder.GetAbsolutePosition().GetValue();
-
 }
 
 void SwerveModule::setTurningMotor(units::radian_t angle) {
