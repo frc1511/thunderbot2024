@@ -31,12 +31,13 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override;
 
  private:
-  frc::SendableChooser<std::string> m_chooser;
-  const std::string kAutoNameDefault = "Default";
-  const std::string kAutoNameCustom = "My Auto";
-  std::string m_autoSelected;
   Shooter shooter;
-  Drive drive;
-  frc::Joystick joystick1{1};
+  //Drive drive;
+  frc::Joystick joystick1{0};
+  double shooterspeed = 0.2; // .2 is good for amp
+  double outtakespeed = 0.8;
+  double feederspeed = 0.5
+  ;
+  int lastdpad = -1;
 
 };

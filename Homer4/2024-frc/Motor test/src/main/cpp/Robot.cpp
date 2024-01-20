@@ -1,6 +1,5 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 #include <Robot.h>
 
@@ -9,9 +8,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+  
 }
 
 /**
@@ -36,47 +33,79 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
-  fmt::print("Auto selected: {}\n", m_autoSelected);
-
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
+  
 }
 
 void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
+ 
 }
 
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
- 
-  drive.move();
+  printf("Intake: %f, Outtake: %f, Shooter: %f\n", feederspeed, outtakespeed, shooterspeed);
+  double rightTrigger = joystick1.GetRawAxis(3);
+  bool rightBumper = joystick1.GetRawButton(6);
+  bool leftBumper = joystick1.GetRawButton(5);
+  bool outtakeDownButton = joystick1.GetRawButtonPressed(7);
+  bool outtakeUpButton = joystick1.GetRawButtonPressed(8);
+  int dpad = joystick1.GetPOV(0);
+  
+  if (rightTrigger >= .5) {
+    shooter.shooter(shooterspeed);
+  } else {
+    shooter.stopShooter();
+  }
+
+  if (rightBumper) {
+    shooter.intake(feederspeed);
+  } else if (leftBumper) {
+    shooter.intake(-outtakespeed);
+  } else {
+    shooter.stopIntake();
+  }
+  
+  if (outtakeUpButton) {
+    outtakespeed = outtakespeed + 0.1;
+  } else if (outtakeDownButton) {
+    outtakespeed = outtakespeed - 0.1;
+  }
+
+
+  if (lastdpad == -1){
+    if (dpad == 0) {
+      shooterspeed = shooterspeed + 0.1;
+    }
+    else if (dpad == 180) {
+      shooterspeed = shooterspeed - 0.1;
+    }
+    else if (dpad == 90) {
+      feederspeed = feederspeed + 0.1;
+    }
+    else if (dpad == 270) {
+      feederspeed = feederspeed - 0.1;
+    }
+  }
+  
+  lastdpad = dpad;
+
+  //drive.move();
   //shooter.shoot();
   //double rightTrigger = joystick1.GetRawAxis(3);
-  double leftTrigger = joystick1.GetRawAxis(2);
-  bool rightBumper = joystick1.GetRawButton(6);
-  if (leftTrigger >= .5) { //50% deadzone for safety :)
-    shooter.shoot(-.6); //Intake
-  } else if (joystick1.GetRawAxis(3) || joystick1.GetRawButton(6)) {
-    if (joystick1.GetRawAxis(3)) { //pre heat (for better distance/height)
-      shooter.shootTop(1);
-    } 
-    if (joystick1.GetRawButton(6)) { // shoot (hold this and the input above)
-      shooter.shootBottom(1);
-    }
-  } else {
-    shooter.stop();
-  }
+  // double leftTrigger = joystick1.GetRawAxis(2);
+  // bool rightBumper = joystick1.GetRawButton(6);
+  // if (leftTrigger >= .5) { //50% deadzone for safety :)
+  //   shooter.shoot(-.6); //Intake
+  // } else if (joystick1.GetRawAxis(3) || joystick1.GetRawButton(6)) {
+  //   if (joystick1.GetRawAxis(3)) { //pre heat (for better distance/height)
+  //     shooter.shootTop(1);
+  //   } 
+  //   if (joystick1.GetRawButton(6)) { // shoot (hold this and the input above)
+  //     shooter.shootBottom(1);
+  //   }
+  // } else {
+  //   shooter.stop();
+  // }
 
 /*
 // implementing smoother driving
