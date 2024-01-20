@@ -13,7 +13,7 @@
 
 class SwerveModule : public Mechanism {
 public:
-    SwerveModule(int driveID, int turningID, int canCoderID, bool driveInverted);
+    SwerveModule(int driveID, int turningID, int canCoderID, units::degree_t offset);
     ~SwerveModule();
 
     void sendFeedback(std::size_t moduleIndex);
@@ -54,11 +54,6 @@ public:
      * Sets the angle of the swerve module.
      */
     void setTurningMotor(units::radian_t angle);
-
-    /**
-     * Applies an offset to the turning magnetic encoder.
-     */
-    void setOffset(units::radian_t offset);
 
     /**
      * Sets the idle mode of the drive motor controller.
@@ -120,6 +115,4 @@ private:
     // The target rotation of the swerve module.
     units::degree_t targetRotation = 0_deg;
 
-    // Whether the drive motor is inverted.
-    bool driveInverted = false;
 };
