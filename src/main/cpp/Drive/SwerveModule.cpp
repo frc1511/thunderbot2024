@@ -37,7 +37,7 @@
 #define DRIVE_ENCODER_TO_METER_FACTOR (1 / (DRIVE_METER_TO_ENCODER_FACTOR))
 
 
-SwerveModule::SwerveModule(int driveID, int turningID, int canCoderID, bool driveInverted)
+SwerveModule::SwerveModule(int driveID, int turningID, int canCoderID, units::degree_t offset)
 : driveMotor(driveID,rev::CANSparkMax::MotorType::kBrushless),
   driveEncoder(driveMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
   drivePIDController(driveMotor.GetPIDController()),
@@ -45,7 +45,7 @@ SwerveModule::SwerveModule(int driveID, int turningID, int canCoderID, bool driv
   turningEncoder(turningMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
   turningPIDController(turningMotor.GetPIDController()),
   turningAbsEncoder(canCoderID), 
-  driveInverted(driveInverted) {
+  absEncoderOffset(offset) {
     
     configureMotors();
 
@@ -70,7 +70,7 @@ void SwerveModule::configureMotors() {
     // Amperage limiting.
     driveMotor.SetSmartCurrentLimit(DRIVE_MAX_AMPERAGE.value());
 
-    driveMotor.SetInverted(driveInverted);
+    driveMotor.SetInverted(false);
 
     // Ramping.
     driveMotor.SetOpenLoopRampRate(DRIVE_RAMP_TIME.value());
@@ -193,10 +193,6 @@ void SwerveModule::setTurningMotor(units::radian_t angle) {
 
     // Set the PID reference to the desired position.
     turningPIDController.SetReference(output,rev::CANSparkMax::ControlType::kPosition);
-}
-
-void SwerveModule::setOffset(units::radian_t offset) {
-    absEncoderOffset = offset;
 }
 
 void SwerveModule::setIdleMode(rev::CANSparkMax::IdleMode idleMode) {
