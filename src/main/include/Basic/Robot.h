@@ -5,24 +5,35 @@
 #pragma once
 
 #include <frc/TimedRobot.h>
+#include <Controls/Controls.h>
+#include <Drive/Drive.h>
 
 class Robot : public frc::TimedRobot {
- public:
-  void RobotInit() override;
-  void RobotPeriodic() override;
+public:
+    void RobotInit() override;
+    void RobotPeriodic() override;
 
-  void AutonomousInit() override;
-  void AutonomousPeriodic() override;
+    void AutonomousInit() override;
+    void AutonomousPeriodic() override;
 
-  void TeleopInit() override;
-  void TeleopPeriodic() override;
+    void TeleopInit() override;
+    void TeleopPeriodic() override;
 
-  void DisabledInit() override;
-  void DisabledPeriodic() override;
+    void DisabledInit() override;
+    void DisabledPeriodic() override;
 
-  void TestInit() override;
-  void TestPeriodic() override;
+    void TestInit() override;
+    void TestPeriodic() override;
 
-  void SimulationInit() override;
-  void SimulationPeriodic() override;
+private:
+    void reset(Mechanism::MatchMode mode);
+
+    Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
+
+    Drive drive;
+    Controls controls {&drive};
+
+    std::vector<Mechanism*> allMechanisms {
+        &drive, &controls
+    };
 };

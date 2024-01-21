@@ -4,26 +4,50 @@
 
 #include <Basic/Robot.h>
 
-void Robot::RobotInit() {}
+void Robot::RobotInit() {
+    AddPeriodic([&]() {
+        for (Mechanism* mech : allMechanisms) {
+            mech->sendFeedback();
+        }
+    }, 40_ms);
+}
 void Robot::RobotPeriodic() {}
 
-void Robot::AutonomousInit() {}
+void Robot::AutonomousInit() {
+    reset(Mechanism::MatchMode::AUTO);
+}
 void Robot::AutonomousPeriodic() {}
 
-void Robot::TeleopInit() {}
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopInit() {
+    reset(Mechanism::MatchMode::TELEOP);
+}
+void Robot::TeleopPeriodic() {
+    controls.process();
+    drive.process();
+}
 
-void Robot::DisabledInit() {}
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledInit() {
+    reset(Mechanism::MatchMode::DISABLED);
+}
+void Robot::DisabledPeriodic() {
+    controls.processInDisabled();
+}
 
-void Robot::TestInit() {}
+void Robot::TestInit() {
+    reset(Mechanism::MatchMode::TEST);
+}
 void Robot::TestPeriodic() {}
 
-void Robot::SimulationInit() {}
-void Robot::SimulationPeriodic() {}
+void Robot::reset(Mechanism::MatchMode mode) {
+    for (Mechanism* mech : allMechanisms) {
+        mech->callResetToMode(lastMode);
+    }
+
+    lastMode = mode;
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+    return frc::StartRobot<Robot>();
 }
 #endif

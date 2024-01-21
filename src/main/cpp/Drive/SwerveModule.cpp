@@ -24,16 +24,22 @@
 #define TURN_I_ZONE 0
 #define TURN_FF 0
 
-// The coeffieient used to convert a radian value into rotations of the NEO 550 turning motor.
-#define TURN_RADIAN_TO_ENCODER_FACTOR 10.1859
+#define NEW_TURN_P 0.0001
+#define NEW_TURN_I 0
+#define NEW_TURN_D 10
+#define NEW_TURN_I_ZONE 0
+#define NEW_TURN_FF 0
 
-// Drive encoder value after one foot.
-#define DRIVE_FOOT_TO_ENDODER_FACTOR 6.52051607
+// Turning encoder rotations per radian turn of the module.
+#define TURN_RADIAN_TO_ENCODER_FACTOR 2.03362658302
 
-// The coefficient used to convert a distance in meters into a number of rotations of the NEO drive motors.
+// Drive encoder rotations per foot traveled.
+#define DRIVE_FOOT_TO_ENDODER_FACTOR 7.76033972
+
+// Drive encoder rotations per meter traveled.
 #define DRIVE_METER_TO_ENCODER_FACTOR (DRIVE_FOOT_TO_ENDODER_FACTOR * 3.28084)
 
-// The coefficient used to convert rotations of the NEO drive motors into a distance traveled in meters.
+// Meters traveled per drive encoder rotation.
 #define DRIVE_ENCODER_TO_METER_FACTOR (1 / (DRIVE_METER_TO_ENCODER_FACTOR))
 
 
@@ -88,13 +94,13 @@ void SwerveModule::configureMotors() {
     turningMotor.RestoreFactoryDefaults();
 
     // Coast when idle so that people can turn the module.
-    turningMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
+    turningMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 
     // Amperage limiting.
     turningMotor.SetSmartCurrentLimit(TURN_MAX_AMPERAGE.value());
 
     // It is not inverted!
-    turningMotor.SetInverted(true);
+    turningMotor.SetInverted(false);
 
     // PID Values.
     turningPIDController.SetP(TURN_P);
@@ -176,23 +182,20 @@ void SwerveModule::setTurningMotor(units::radian_t angle) {
      * If the value is above π rad or below -π rad...
      */
     if(units::math::abs(angleDelta).value() > std::numbers::pi) {
-        int sign = std::signbit(angleDelta.value()) ? -1 : 1;
+        const int sign = std::signbit(angleDelta.value()) ? -1 : 1;
         
         // Subtract 2π rad, or add 2π rad depending on the sign.
         angleDelta = units::radian_t(angleDelta.value() - (2 * std::numbers::pi) * sign);
     }
-
-    // Add back the absolute rotation to get the desired angle.
-    targetRotation = angleDelta + getAbsoluteRotation().Degrees();
     
-    // Convert the angle (radians) to a NEO 550 encoder value.
+    // Convert the angle (radians) to a NEO encoder value.
     double output = angleDelta.value() * TURN_RADIAN_TO_ENCODER_FACTOR;
     
     // Add the current relative rotation to get the position to reference.
     output += getRelativeRotation();
 
     // Set the PID reference to the desired position.
-    turningPIDController.SetReference(output,rev::CANSparkMax::ControlType::kPosition);
+    turningPIDController.SetReference(output, rev::CANSparkMax::ControlType::kPosition);
 }
 
 void SwerveModule::setIdleMode(rev::CANSparkMax::IdleMode idleMode) {
@@ -201,10 +204,10 @@ void SwerveModule::setIdleMode(rev::CANSparkMax::IdleMode idleMode) {
 
 void SwerveModule::setDriveMotor(units::meters_per_second_t velocity) {
     // Convert the velocity value (meters per second) into RPM.
-    double rpm = velocity.value() * 60 * DRIVE_METER_TO_ENCODER_FACTOR;
+    const double rpm = velocity.value() * 60 * DRIVE_METER_TO_ENCODER_FACTOR;
 
     // Set the PID reference to the desired RPM.
-    drivePIDController.SetReference(rpm,rev::CANSparkMax::ControlType::kVelocity);
+    drivePIDController.SetReference(rpm, rev::CANSparkMax::ControlType::kVelocity);
 }
 
 double SwerveModule::getRelativeRotation() {
@@ -227,14 +230,14 @@ double SwerveModule::getRawDriveEncoder() {
 
 units::meters_per_second_t SwerveModule::getDriveVelocity() {
     // Convert the RPM to a velocity value (meters per second).
-    double mps = (driveEncoder.GetVelocity() / 60) * DRIVE_ENCODER_TO_METER_FACTOR;
+    const double mps = (driveEncoder.GetVelocity() / 60) * DRIVE_ENCODER_TO_METER_FACTOR;
     
     return units::meters_per_second_t(mps);
 }
 
 units::meter_t SwerveModule::getDrivePosition() {
     // Convert the rotations to meters.
-    double m = driveEncoder.GetPosition() * DRIVE_ENCODER_TO_METER_FACTOR;
+    const double m = driveEncoder.GetPosition() * DRIVE_ENCODER_TO_METER_FACTOR;
 
     return units::meter_t(m);
 }
@@ -244,14 +247,15 @@ void SwerveModule::sendFeedback(std::size_t moduleIndex) {
     frc::SmartDashboard::PutNumber(fmt::format("Module_{}_Rotation_deg",       moduleIndex), getAbsoluteRotation().Degrees().value());
     frc::SmartDashboard::PutNumber(fmt::format("Module_{}_EncoderOffset_deg",  moduleIndex), units::degree_t(absEncoderOffset).value());
     frc::SmartDashboard::PutNumber(fmt::format("Module_{}_EncoderOffset_rad",  moduleIndex), units::radian_t(absEncoderOffset).value());
-    frc::SmartDashboard::PutNumber(fmt::format("Module_{}_TargetRotation_deg", moduleIndex), units::degree_t(targetRotation).value());
 
     frc::SmartDashboard::PutNumber(fmt::format("Module_{}_EncoderRotation",    moduleIndex), getRelativeRotation());
     frc::SmartDashboard::PutNumber(fmt::format("Module_{}_EncoderDrive",       moduleIndex), getRawDriveEncoder());
 
     frc::SmartDashboard::PutNumber(fmt::format("Module_{}_Velocity_mps",       moduleIndex), getDriveVelocity().value());
-    frc::SmartDashboard::PutNumber(fmt::format("Module_{}_TempRotation_C",     moduleIndex), turningMotor.GetMotorTemperature());
+    frc::SmartDashboard::PutNumber(fmt::format("Module_{}_TempTurning_C",      moduleIndex), turningMotor.GetMotorTemperature());
     frc::SmartDashboard::PutNumber(fmt::format("Module_{}_TempDrive_C",        moduleIndex), driveMotor.GetMotorTemperature());
+    frc::SmartDashboard::PutNumber(fmt::format("Module_{}_CurrentDrive_A",     moduleIndex), driveMotor.GetOutputCurrent());
+    frc::SmartDashboard::PutNumber(fmt::format("Module_{}_CurrentTurning_A",   moduleIndex), turningMotor.GetOutputCurrent());
 
     // hi jeff
 }

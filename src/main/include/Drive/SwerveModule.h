@@ -11,6 +11,8 @@
 #include <rev/CANSparkMax.h>
 #include <ctre/phoenix6/CANcoder.hpp>
 
+#include <frc/controller/PIDController.h>
+
 class SwerveModule : public Mechanism {
 public:
     SwerveModule(int driveID, int turningID, int canCoderID, units::degree_t offset);
@@ -111,8 +113,4 @@ private:
 
     // The offset of the turning absolute encoder.
     units::radian_t absEncoderOffset = 0_rad;
-
-    // The target rotation of the swerve module.
-    units::degree_t targetRotation = 0_deg;
-
 };

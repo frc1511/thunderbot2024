@@ -33,16 +33,10 @@
 #include <algorithm>
 #include <filesystem>
 
-#define ROBOT_WIDTH 17.25_in // Distences from center of each swerve module
-#define ROBOT_LENGTH 25.25_in
+#define ROBOT_WIDTH 20.1875_in // Distences from center of each swerve module
+#define ROBOT_LENGTH 20.1875_in 
 
-
-#define DRIVE_AUTO_MAX_VEL         1.5_mps
-#define DRIVE_AUTO_MAX_ACCEL       3_mps_sq
-#define DRIVE_AUTO_MAX_ANG_VEL     6.28_rad_per_s
-#define DRIVE_AUTO_MAX_ANG_ACCEL   3.14_rad_per_s_sq
-
-#define DRIVE_MANUAL_MAX_VEL       4_mps
+#define DRIVE_MANUAL_MAX_VEL       3.8_mps
 #define DRIVE_MANUAL_MAX_ANG_VEL   360_deg_per_s
 #define DRIVE_MANUAL_MAX_ANG_ACCEL 6.28_rad_per_s_sq
 // Drivetrain X and Y PID values.
@@ -202,10 +196,10 @@ private:
 
     // The swerve modules on the robot.
     wpi::array<SwerveModule*, 4> swerveModules {
-        new SwerveModule(CAN_SWERVE_DRIVE_FL, CAN_SWERVE_ROTATION_FL, CAN_SWERVE_CANCODER_FL, 0_deg),
-        new SwerveModule(CAN_SWERVE_DRIVE_BL, CAN_SWERVE_ROTATION_BL, CAN_SWERVE_CANCODER_BL, 0_deg),
-        new SwerveModule(CAN_SWERVE_DRIVE_BR, CAN_SWERVE_ROTATION_BR, CAN_SWERVE_CANCODER_BR, 0_deg),
-        new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, 0_deg)
+        new SwerveModule(CAN_SWERVE_DRIVE_FL, CAN_SWERVE_ROTATION_FL, CAN_SWERVE_CANCODER_FL, -123.134766_deg+180_deg - 90_deg),
+        new SwerveModule(CAN_SWERVE_DRIVE_BL, CAN_SWERVE_ROTATION_BL, CAN_SWERVE_CANCODER_BL, -17.666016_deg+180_deg - 90_deg),
+        new SwerveModule(CAN_SWERVE_DRIVE_BR, CAN_SWERVE_ROTATION_BR, CAN_SWERVE_CANCODER_BR, -62.753906_deg - 90_deg),
+        new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, -126.298828_deg - 90_deg)
     };
 
     ctre::phoenix6::hardware::Pigeon2 pigeon { CAN_PIGEON };
