@@ -40,30 +40,43 @@ void Robot::AutonomousPeriodic() {
  
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopInit() {
+}
 
 void Robot::TeleopPeriodic() {
-  printf("Intake: %f, Outtake: %f, Shooter: %f\n", feederspeed, outtakespeed, shooterspeed);
-  double rightTrigger = joystick1.GetRawAxis(3);
-  bool rightBumper = joystick1.GetRawButton(6);
-  bool leftBumper = joystick1.GetRawButton(5);
+  double shooterFire = joystick1.GetRawAxis(3);
+  bool runIntake = joystick1.GetRawButton(6);
+  bool runOuttake = joystick1.GetRawButton(5);
   bool outtakeDownButton = joystick1.GetRawButtonPressed(7);
   bool outtakeUpButton = joystick1.GetRawButtonPressed(8);
   int dpad = joystick1.GetPOV(0);
-  
-  if (rightTrigger >= .5) {
+  bool canRunIntake = true;
+  // Can Run Intake?
+  // Has Note + Shooter Button Pressed = Can Run Intake
+  // Has Note + Shooter Button Not Pressed = CAN'T Run Intake
+  // Doesn't Have Note + Shooter Button Pressed = Can Run Intake
+  // Doesn't Have Note + Shooter Button Not Pressed =  Can Run Intake
+  canRunIntake = intakeNoteSensor.Get();
+  if (shooterFire >= .5) {
     shooter.shooter(shooterspeed);
+    canRunIntake = true;
   } else {
     shooter.stopShooter();
   }
-
-  if (rightBumper) {
-    shooter.intake(feederspeed);
-  } else if (leftBumper) {
+  
+  if (runIntake && !intakeNoteSensor.Get()) {
+    shooter.stopIntake();
+  }
+  if (runIntake && canRunIntake && shooterFire >= .5) {
+    shooter.intake(1);
+  } else if (runIntake && canRunIntake) {
+    shooter.intake(intakespeed);
+  } else if (runOuttake) {
     shooter.intake(-outtakespeed);
   } else {
     shooter.stopIntake();
   }
+
   
   if (outtakeUpButton) {
     outtakespeed = outtakespeed + 0.1;
@@ -74,16 +87,16 @@ void Robot::TeleopPeriodic() {
 
   if (lastdpad == -1){
     if (dpad == 0) {
-      shooterspeed = shooterspeed + 0.1;
+      shooterspeed += 0.1;
     }
     else if (dpad == 180) {
-      shooterspeed = shooterspeed - 0.1;
+      shooterspeed -= 0.1;
     }
     else if (dpad == 90) {
-      feederspeed = feederspeed + 0.1;
+      intakespeed += 0.1;
     }
     else if (dpad == 270) {
-      feederspeed = feederspeed - 0.1;
+      intakespeed -= 0.1;
     }
   }
   

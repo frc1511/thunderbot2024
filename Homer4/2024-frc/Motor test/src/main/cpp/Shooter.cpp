@@ -23,6 +23,7 @@ void Shooter::stop() {
 Shooter::Shooter() {
     intakeMotor1.SetInverted(false);
     intakeMotor2.SetInverted(false);
+    feederMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
 }
 
 
