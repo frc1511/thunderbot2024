@@ -36,8 +36,8 @@ class Robot : public frc::TimedRobot {
   frc::Joystick joystick1{0};
   frc::DigitalInput intakeNoteSensor{5};
   double shooterspeed = 0.5; // .2 is good for amp
-  double outtakespeed = 0.8;
+  double outtakespeed = 0.6;
   double intakespeed = 0.6;
   int lastdpad = -1;
-  
+
 };
