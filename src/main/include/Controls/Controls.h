@@ -32,7 +32,7 @@ private:
     bool manualAux = false;
     bool doUltraBrickMode = false;
     bool shouldStrobe = false;
-
+    bool hangModeControls = false;
     bool driveRobotCentric = false;
     unsigned driveCtrlFlags = 0;
 
@@ -41,5 +41,5 @@ private:
 
     // CHANGE NAMES!
     bool callaDisable = false;
-    bool auxDisable = false;
+    bool sashaDisable = false;
 };

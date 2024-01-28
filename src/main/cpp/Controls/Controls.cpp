@@ -24,7 +24,7 @@ void Controls::process() {
         doDrive();
     }
 
-    if (!auxDisable) {
+    if (!sashaDisable) {
         if (manualAux) {
             doAuxManual();
         }
@@ -205,18 +205,20 @@ void Controls::doAuxManual() {
 
 #define SWITCH_LED_DISABLE 1
 #define SWITCH_ROBOT_CENTRIC 2
-#define SWITCH_CALLA_DISABLE 3
-#define SWITCH_AUX_DISABLE 4
-#define SWITCH_MANUAL_AUX 5
-#define SWITCH_CRATER_MODE 6
+#define SWITCH_HANG_MODE 3
+#define SWITCH_CALLA_DISABLE 4
+#define SWITCH_SASHA_DISABLE 5
+#define SWITCH_MANUAL_AUX 6
+#define SWITCH_CRATER_MODE 7
 
 void Controls::doSwitchPanel() {
     bool ledDisable = switchPanel.GetRawButton(SWITCH_LED_DISABLE);
     driveRobotCentric = switchPanel.GetRawButton(SWITCH_ROBOT_CENTRIC);
     callaDisable = switchPanel.GetRawButton(SWITCH_CALLA_DISABLE);
-    auxDisable = switchPanel.GetRawButton(SWITCH_AUX_DISABLE);
+    sashaDisable = switchPanel.GetRawButton(SWITCH_SASHA_DISABLE);
     manualAux = switchPanel.GetRawButton(SWITCH_MANUAL_AUX);
     settings.isCraterMode = switchPanel.GetRawButton(SWITCH_CRATER_MODE);
+    hangModeControls = switchPanel.GetRawButton(SWITCH_HANG_MODE);
 
 
     int ledMode = frc::SmartDashboard::GetNumber("thunderdashboard_led_mode", 0.0);
