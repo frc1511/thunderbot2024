@@ -206,10 +206,11 @@ void Controls::doAuxManual() {
 #define SWITCH_LED_DISABLE 1
 #define SWITCH_ROBOT_CENTRIC 2
 #define SWITCH_HANG_MODE 3
-#define SWITCH_CALLA_DISABLE 4
-#define SWITCH_SASHA_DISABLE 5
-#define SWITCH_MANUAL_AUX 6
-#define SWITCH_CRATER_MODE 7
+#define SWITCH_BALANCE_CONTROL 4
+#define SWITCH_CALLA_DISABLE 5
+#define SWITCH_SASHA_DISABLE 6
+#define SWITCH_MANUAL_AUX 7
+#define SWITCH_CRATER_MODE 8
 
 void Controls::doSwitchPanel() {
     bool ledDisable = switchPanel.GetRawButton(SWITCH_LED_DISABLE);
@@ -219,6 +220,7 @@ void Controls::doSwitchPanel() {
     manualAux = switchPanel.GetRawButton(SWITCH_MANUAL_AUX);
     settings.isCraterMode = switchPanel.GetRawButton(SWITCH_CRATER_MODE);
     hangModeControls = switchPanel.GetRawButton(SWITCH_HANG_MODE);
+    balanceControlOff = switchPanel.GetRawButton(SWITCH_BALANCE_CONTROL);
 
 
     int ledMode = frc::SmartDashboard::GetNumber("thunderdashboard_led_mode", 0.0);

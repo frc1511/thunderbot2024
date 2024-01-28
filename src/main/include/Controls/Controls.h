@@ -34,6 +34,7 @@ private:
     bool shouldStrobe = false;
     bool hangModeControls = false;
     bool driveRobotCentric = false;
+    bool balanceControlOff = false;
     unsigned driveCtrlFlags = 0;
 
     bool driveAbsRotation = false;
