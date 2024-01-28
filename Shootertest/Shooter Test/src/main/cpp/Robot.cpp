@@ -2,13 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 
 #include <Robot.h>
+#include <Mechanisms.h>
+#include <Shooter2.h>
 
 #include <fmt/core.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
-  
+  mechanisms.Init(&shooter2);
 }
 
 /**
@@ -41,7 +43,6 @@ void Robot::AutonomousPeriodic() {
 }
 
 void Robot::TeleopInit() {
-  int shooterMode; //0 is normal, 1 is spin
 }
 
 void Robot::TeleopPeriodic() {
@@ -60,31 +61,31 @@ void Robot::TeleopPeriodic() {
   // Doesn't Have Note + Shooter Button Not Pressed =  Can Run Intake
 
   if (shooterSwitchButton) {
-    Mechanisms.ShooterSwitch();
+    mechanisms.ShooterSwitch();
   }
 
   //feedback for shooter switch
-  printf("%f", shooterMode);
+  printf("Shooter mode: %i \n", shooter2.shooterMode);
 
-  if (shooterMode == 0) { 
+  if (shooter2.shooterMode == Shooter2::ShooterMode::DEFAULT) { 
     canRunIntake = intakeNoteSensor.Get();
     if (shooterFire >= .5) {
-      shooter.shooter(shooterspeed);
+      shooter2.shooter2(shooterspeed);
       canRunIntake = true;
     } else {
-      shooter.stopShooter();
+      shooter2.stopShooter2();
     }
     if (runIntake && !intakeNoteSensor.Get()) {
-      shooter.stopIntake();
+      shooter2.stopIntake();
     }
     if (runIntake && canRunIntake && shooterFire >= .5) {
-      shooter.intake(1);
+      shooter2.intake(1);
     } else if (runIntake && canRunIntake) {
-      shooter.intake(intakespeed);
+      shooter2.intake(intakespeed);
     } else if (runOuttake) {
-      shooter.intake(-outtakespeed);
+      shooter2.intake(-outtakespeed);
     } else {
-      shooter.stopIntake();
+      shooter2.stopIntake();
     }
 
     
@@ -111,13 +112,13 @@ void Robot::TeleopPeriodic() {
     }
     
     lastdpad = dpad;
-  } else if (shooterMode == 1) {
+  } else if (shooter2.shooterMode == Shooter2::ShooterMode::CURVED) {
     canRunIntake = intakeNoteSensor.Get();
     if (shooterFire >= .5) {
-      shooter2.shooter(shooterspeed);
+      shooter2.shooter2(shooterspeed);
       canRunIntake = true;
     } else {
-      shooter2.stopShooter();
+      shooter2.stopShooter2();
     }
     if (runIntake && !intakeNoteSensor.Get()) {
       shooter2.stopIntake();

@@ -8,11 +8,9 @@
 
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <ctre/Phoenix.h>
+//#include <ctre/phoenix6.h>
 #include <frc/Joystick.h>
 #include <frc/DigitalInput.h>
-#include <Shooter.h>
-#include <Drive.h>
 #include <Shooter2.h>
 #include <Mechanisms.h>
 
@@ -33,13 +31,15 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override;
 
  private:
-  Shooter shooter;
+  Shooter2 shooter2;
+  Mechanisms mechanisms;
   //Drive drive;
   frc::Joystick joystick1{0};
   frc::DigitalInput intakeNoteSensor{5};
   double shooterspeed = 0.5; // .2 is good for amp
   double outtakespeed = 0.8;
   double intakespeed = 0.6;
+
   int lastdpad = -1;
   
 };

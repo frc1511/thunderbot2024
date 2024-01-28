@@ -6,18 +6,12 @@
 
 #include <string>
 
+#include <rev/CANSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <ctre/Phoenix.h>
-#include <frc/Joystick.h>
-#include <frc/DigitalInput.h>
-#include <Shooter.h>
-#include <Drive.h>
-#include <Shooter2.h>
-#include <Mechanisms.h>
+#include <encoder.h>
 
 class Robot : public frc::TimedRobot {
-
  public:
   void RobotInit() override;
   void RobotPeriodic() override;
@@ -33,13 +27,9 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override;
 
  private:
-  Shooter shooter;
-  //Drive drive;
-  frc::Joystick joystick1{0};
-  frc::DigitalInput intakeNoteSensor{5};
-  double shooterspeed = 0.5; // .2 is good for amp
-  double outtakespeed = 0.8;
-  double intakespeed = 0.6;
-  int lastdpad = -1;
-  
+  frc::SendableChooser<std::string> m_chooser;
+  const std::string kAutoNameDefault = "Default";
+  const std::string kAutoNameCustom = "My Auto";
+  std::string m_autoSelected;
+  rev::AbsoluteEncoder::CANSensor encoder;
 };
