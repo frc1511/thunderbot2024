@@ -41,7 +41,11 @@ void Robot::AutonomousPeriodic() {
 }
 
 void Robot::TeleopInit() {
+<<<<<<< HEAD
   int shooterMode; //0 is normal, 1 is spin
+=======
+  printf("%f%\n", (shooterspeed*100.0));
+>>>>>>> 3b872e9a83db73e016c7c3eebd9b2e78810a8f8f
 }
 
 void Robot::TeleopPeriodic() {
@@ -58,9 +62,39 @@ void Robot::TeleopPeriodic() {
   // Has Note + Shooter Button Not Pressed = CAN'T Run Intake
   // Doesn't Have Note + Shooter Button Pressed = Can Run Intake
   // Doesn't Have Note + Shooter Button Not Pressed =  Can Run Intake
+<<<<<<< HEAD
 
   if (shooterSwitchButton) {
     Mechanisms.ShooterSwitch();
+=======
+  canRunIntake = intakeNoteSensor.Get();
+  if (shooterFire >= .5) {
+    shooter.shooter(shooterspeed);
+    canRunIntake = true;
+  } else {
+    shooter.stopShooter();
+  }
+
+/*
+  if (runIntake) {
+    shooter.intake(intakespeed);
+  } else {
+    shooter.stopIntake();
+  }
+  */
+
+  if (runIntake && !intakeNoteSensor.Get()) {
+    shooter.stopIntake();
+  }
+  if (runIntake && canRunIntake && shooterFire >= .5) {
+    shooter.intake(0.6);
+  } else if (runIntake && canRunIntake) {
+    shooter.intake(intakespeed);
+  } else if (runOuttake) {
+    shooter.intake(-outtakespeed);
+  } else {
+    shooter.stopIntake();
+>>>>>>> 3b872e9a83db73e016c7c3eebd9b2e78810a8f8f
   }
 
   //feedback for shooter switch
@@ -95,6 +129,7 @@ void Robot::TeleopPeriodic() {
     }
 
 
+<<<<<<< HEAD
     if (lastdpad == -1){
       if (dpad == 0) {
         shooterspeed += 0.1;
@@ -118,6 +153,16 @@ void Robot::TeleopPeriodic() {
       canRunIntake = true;
     } else {
       shooter2.stopShooter();
+=======
+  if (lastdpad == -1){
+    if (dpad == 0) {
+      shooterspeed += 0.01;
+      printf("%f%\n", (shooterspeed*100.0));
+    }
+    else if (dpad == 180) {
+      shooterspeed -= 0.01;
+      printf("%f%\n", (shooterspeed*100.0));
+>>>>>>> 3b872e9a83db73e016c7c3eebd9b2e78810a8f8f
     }
     if (runIntake && !intakeNoteSensor.Get()) {
       shooter2.stopIntake();
