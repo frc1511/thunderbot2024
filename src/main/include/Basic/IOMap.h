@@ -15,6 +15,8 @@
 #define CAN_SWERVE_CANCODER_BR 12
 #define CAN_SWERVE_CANCODER_BL 13
 
+
+//number for this isnt actually on IOMap yet so change as needed based on what makes sense once we've finalized sensors more
 #define PWM_BLINKY_BLINKY 2
 
 
