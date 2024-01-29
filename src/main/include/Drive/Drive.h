@@ -139,16 +139,36 @@ public:
      * Resets all drive PID controllers.
      */
     void resetPIDControllers();
+
+    /**
+     * Executes instructions for when the robot is stopped.
+     */
+    void execStopped();
+
+    /**
+     * Move the robot a distance (in feet) at a speed 
+     */
+    void moveDistance(double distance, units::meters_per_second_t speed);
+
+
+    enum class DriveMode {
+        STOPPED,
+        VELOCITY,
+    };
+    
+    /**
+     * Set the drive mode
+     */
+
+    void setMode(DriveMode mode) {
+        driveMode = mode;
+    };
 private:
     /**
      * Updates the position and rotation of the drivetrain on the field.
      */
     void updateOdometry();
 
-    /**
-     * Executes instructions for when the robot is stopped.
-     */
-    void execStopped();
 
     /**
      * Executes the instructions for when the robot is in velocity control.
@@ -180,8 +200,6 @@ private:
      * Returns the positions of the swerve modules.
      */
     wpi::array<frc::SwerveModulePosition, 4> getModulePositions();
-
-
 
 
     bool imuCalibrated = false;
@@ -221,11 +239,6 @@ private:
         frc::Pose2d(),
         { 0.0, 0.0, 0.0 }, // Standard deviations of model states.
         { 1.0, 1.0, 1.0 } // Standard deviations of the vision measurements.
-    };
-
-    enum class DriveMode {
-        STOPPED,
-        VELOCITY,
     };
 
     // The current drive mode.

@@ -7,6 +7,7 @@
 #include <frc/TimedRobot.h>
 #include <Controls/Controls.h>
 #include <Drive/Drive.h>
+#include <Auto/Auto.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -32,7 +33,7 @@ private:
 
     Drive drive;
     Controls controls {&drive};
-
+    Auto autoCode{&drive};
     std::vector<Mechanism*> allMechanisms {
         &drive, &controls
     };

@@ -101,8 +101,8 @@ private:
 
     // The drive motor.
     rev::CANSparkMax driveMotor;
-    rev::SparkRelativeEncoder driveEncoder;
     rev::SparkPIDController drivePIDController;
+    rev::SparkRelativeEncoder driveEncoder;
     // The turning motor.
     rev::CANSparkMax turningMotor;
     rev::SparkRelativeEncoder turningEncoder;

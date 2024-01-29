@@ -1,6 +1,7 @@
 #include <Drive/Drive.h>
 #include <frc/DriverStation.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+
 Drive::Drive() {
     manualThetaPIDController.EnableContinuousInput(units::radian_t(-180_deg), units::radian_t(180_deg));
 
@@ -197,6 +198,11 @@ void Drive::resetPIDControllers() {
 
     manualThetaPIDController.Reset(rotation);
 }
+
+void Drive::moveDistance(double distance, units::meters_per_second_t speed) {
+    setModuleStates({ speed, speed, 0_deg_per_s });
+}
+
 
 void Drive::updateOdometry() {
     /**

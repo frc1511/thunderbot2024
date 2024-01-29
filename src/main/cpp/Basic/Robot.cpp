@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <Basic/Robot.h>
+#include <Auto/Auto.h>
 
 void Robot::RobotInit() {
     AddPeriodic([&]() {
@@ -15,8 +16,12 @@ void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {
     reset(Mechanism::MatchMode::AUTO);
+    autoCode.doAuto();
 }
-void Robot::AutonomousPeriodic() {}
+void Robot::AutonomousPeriodic() {
+    //controls.process();
+    drive.process();
+}
 
 void Robot::TeleopInit() {
     reset(Mechanism::MatchMode::TELEOP);
