@@ -194,6 +194,51 @@ void Controls::doDrive() {
 void Controls::doAux() {
     using AuxButton = AuxControllerType::Button;
     using AuxAxis = AuxControllerType::Axis;
+    
+    if (hangModeControls == true){
+        /* hang and trap controls 
+
+
+        */
+       
+    } else {
+
+    }
+        if (auxController.getButton(AuxButton::TRIANGLE)){
+            //  SUBWOOFER preset
+        } 
+        else if (auxController.getButton(AuxButton::CIRCLE)){
+            //  LINE preset
+        }
+        else if (auxController.getButton(AuxButton::CROSS)){
+            //other reserved preset
+        }
+        else if (auxController.getButton(AuxButton::SQUARE)){
+            //amp preset
+        } 
+
+        bool overrideGamePieceNo = auxController.getButton(AuxButton::SHARE, ThunderGameController::ButtonState::PRESSED);
+        bool overrideGamePieceYes = auxController.getButton(AuxButton::OPTIONS, ThunderGameController::ButtonState::PRESSED);
+
+        if (auxController.getButton(AuxButton::LEFT_BUMPER)){
+            if (auxController.getButton(AuxButton::LEFT_TRIGGER_BUTTON)){
+                //warm up and then shoot
+            } 
+            else {
+                // just continue warming up
+            }
+        }
+
+        //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
+        if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
+            //set arm low enough to get under the stage
+        } else if (auxController.getDPad() == ThunderGameController::DPad::UP){
+            //set arm back to normal position
+        }
+
+        double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
+    
+
 
 }
 

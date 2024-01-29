@@ -22,6 +22,8 @@ public:
 
         LEFT_BUMPER = 5,
         RIGHT_BUMPER = 6,
+        LEFT_TRIGGER_BUTTON = 7,
+        RIGHT_TRIGGER_BUTTON = 8,
 
         SHARE = 9,
         OPTIONS = 10,
