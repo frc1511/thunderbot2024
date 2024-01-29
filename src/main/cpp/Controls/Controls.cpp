@@ -228,6 +228,16 @@ void Controls::doAux() {
                 // just continue warming up
             }
         }
+        
+        if (auxController.getButton(AuxButton::RIGHT_TRIGGER_BUTTON)){
+            //activate intake
+        }
+        else if (auxController.getButton(AuxButton::RIGHT_BUMPER)){
+            //activate outtake
+        }
+
+
+
 
         //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
         if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
