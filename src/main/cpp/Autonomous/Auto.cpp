@@ -1,9 +1,47 @@
-#include <Auto/Auto.h>
+#include <Autonomous/Auto.h>
+#include <frc/trajectory/TrajectoryConfig.h>
+#include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Rotation2d.h>
+#include <frc/geometry/Transform2d.h>
+#include <frc2/command/SwerveControllerCommand.h>
+#include <Drive/Drive.h>
 
 Auto::Auto(Drive* drive)
     : drive(drive) {
 
     }
+void Auto::getAutonomousCommand() {
+    frc::TrajectoryConfig trajectoryConfig{(units::meters_per_second_t)AUTO_MAX_SPEED,
+                                           (units::meters_per_second_squared_t)AUTO_MAX_ANGLE_SPEED};
+    trajectoryConfig.SetKinematics(drive->kinematics);
+
+    frc::PIDController xController = frc::PIDController(1.5, 0, 0);
+    frc::PIDController yController = frc::PIDController(1.5, 0, 0);
+    
+
+    auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+        // Start at the origin facing the +X direction
+        frc::Pose2d{0_m, 0_m, 0_deg},
+        // Pass through these two interior waypoints, making an 's' curve path
+        {frc::Translation2d{1_m, 1_m}, frc::Translation2d{2_m, -1_m}},
+        // End 3 meters straight ahead of where we started, facing forward
+        frc::Pose2d{3_m, 0_m, 0_deg},
+        // Pass the config
+        trajectoryConfig);
+    
+    frc2::CommandPtr swerveControllerCommand = frc2::SwerveControllerCommand<4>(
+        exampleTrajectory,
+        [this]() {return drive->getEstimatedPose();},
+        drive->kinematics,
+        xController,
+        yController,
+        drive->manualThetaPIDController,
+        [this](auto moduleStates) {drive->setModuleStates(moduleStates);},
+        {}).ToPtr();
+    
+    
+}
 
 void Auto::doAuto() { //called during auto
     if (autoDone) { //don't do auto if you are done with auto
@@ -53,3 +91,24 @@ void Auto::doNothing() {
 
     // Well technically it's doing something - chris(2023)
 }
+
+// DriveDistanceProfiled::DriveDistanceProfiled(units::meter_t distance,
+//                                              Drive* drive)
+//     : CommandHelper{
+//           frc::TrapezoidProfile<units::meters>{
+//               // Limit the max acceleration and velocity
+//               {AUTO_MAX_SPEED, AUTO_MAX_ACCELERATION}},
+//           // Pipe the profile state to the drive
+//           [drive](auto setpointState) {
+//             drive->setModuleStates(setpointState, setpointState);
+//           },
+//           // End at desired position in meters; implicitly starts at 0
+//           [distance] {
+//             return frc::TrapezoidProfile<units::meters>::State{distance, 0_mps};
+//           },
+//           [] { return frc::TrapezoidProfile<units::meters>::State{}; },
+//           // Require the drive
+//           {drive}} {
+//   // Reset drive encoders since we're starting at 0
+//   drive->resetOdometry();
+// }

@@ -7,7 +7,7 @@
 #include <frc/TimedRobot.h>
 #include <Controls/Controls.h>
 #include <Drive/Drive.h>
-#include <Auto/Auto.h>
+#include <Autonomous/Auto.h>
 
 class Robot : public frc::TimedRobot {
 public:

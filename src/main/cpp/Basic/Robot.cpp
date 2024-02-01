@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <Basic/Robot.h>
-#include <Auto/Auto.h>
+#include <Autonomous/Auto.h>
 
 void Robot::RobotInit() {
     AddPeriodic([&]() {
