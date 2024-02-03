@@ -84,6 +84,17 @@ void Drive::process() {
         case DriveMode::VELOCITY:
             execVelocityControl();
             break;
+        case DriveMode::TRAJECTORY:
+            if (trajectoryFinished()) {
+                driveMode = DriveMode::TRAJECTORY_FINISHED;
+                break;
+            }
+            // Execute the follow trajectory command.
+            exeFollowTrajectory();
+            break;
+        case DriveMode::TRAJECTORY_FINISHED:
+            execStopped();
+            break;
     }
 }
 
@@ -110,6 +121,39 @@ void Drive::manualControlAbsRotation(double xPct, double yPct, units::radian_t a
 
     // Pass the velocities to the velocity control function.
     velocityControlAbsRotation(xVel, yVel, angle, flags);
+}
+
+void Drive::exeFollowTrajectory() {
+    // Calculate chassis velocities that are required in order to reach the
+    // desired state.
+    frc::ChassisSpeeds targetChassisSpeeds = trajectoryController.getVelocities(getEstimatedPose());
+
+    // Drive!
+    setModuleStates(targetChassisSpeeds);
+
+    //hi ishan
+    //hi jeff
+    //hi trevor
+    //hi nevin
+    //hi josh
+    //hi byers
+    //hi calla
+    //hi nadia
+    //hi homer 2.0
+    //hi charlie
+    //hi yaqoub
+    //hi mason
+    //hi ben
+}
+
+bool Drive::trajectoryFinished() {
+    if (driveMode == DriveMode::TRAJECTORY) {
+        if (trajectoryController.atReference(getEstimatedPose())) {
+            return true;
+        }
+        return false;
+    }
+    return true;
 }
 
 void Drive::velocityControlRelRotation(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radians_per_second_t angVel, unsigned flags) {
@@ -199,10 +243,11 @@ void Drive::resetPIDControllers() {
     manualThetaPIDController.Reset(rotation);
 }
 
-void Drive::moveDistance(double distance, units::meters_per_second_t speed) {
-    setModuleStates({ speed, speed, 0_deg_per_s });
-}
+void Drive::cmdDriveToPose(units::meter_t x, units::meter_t y, frc::Rotation2d angle, YaqoubsTrajectoryConfig config) {
+    driveMode = DriveMode::TRAJECTORY;
 
+    trajectoryController.setTrajectory(getEstimatedPose(), { x, y, units::math::fmod(angle.Degrees(), 360_deg) }, config);
+}
 
 void Drive::updateOdometry() {
     /**

@@ -2,6 +2,7 @@
 
 #include <Basic/Mechanism.h>
 #include <Basic/IOMap.h>
+#include <Drive/Trajectory.h>
 #include <Drive/SwerveModule.h>
 #include <ctre/phoenix6/Pigeon2.hpp>
 
@@ -16,6 +17,9 @@
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <frc/trajectory/Trajectory.h>
+#include <frc/trajectory/TrajectoryUtil.h>
+#include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/controller/HolonomicDriveController.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/Timer.h>
@@ -109,6 +113,7 @@ public:
      */
     void velocityControlAbsRotation(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radian_t angle, unsigned flags);
 
+
     /**
      * Calibrates the IMU (Pauses the robot for 4 seconds while it calibrates).
      */
@@ -154,6 +159,8 @@ public:
     enum class DriveMode {
         STOPPED,
         VELOCITY,
+        TRAJECTORY,
+        TRAJECTORY_FINISHED
     };
     
     /**
@@ -163,7 +170,55 @@ public:
     void setMode(DriveMode mode) {
         driveMode = mode;
     };
+    /**
+     * The helper class that it used to convert chassis speeds into swerve
+     * module states.
+     */
+    frc::SwerveDriveKinematics<4> kinematics { locations };
+    /**
+     * The helper class that it used to convert swerve
+     * module states into chassis speeds.
+     */
+    frc::SwerveDriveKinematics<4> moduleStates { kinematics };
+
+    /**
+     * The class that handles tracking the position of the robot on the field
+     * during the match.
+     */
+    frc::SwerveDrivePoseEstimator<4> poseEstimator {
+        kinematics,
+        getRotation(),
+        getModulePositions(),
+        frc::Pose2d(),
+        { 0.0, 0.0, 0.0 }, // Standard deviations of model states.
+        { 1.0, 1.0, 1.0 } // Standard deviations of the vision measurements.
+    };
+    // PID Controller for angular drivetrain movement.
+    frc::ProfiledPIDController<units::radians> manualThetaPIDController {
+        DRIVE_THETA_P, DRIVE_THETA_I, DRIVE_THETA_D,
+        frc::TrapezoidProfile<units::radians>::Constraints(DRIVE_MANUAL_MAX_ANG_VEL, DRIVE_MANUAL_MAX_ANG_ACCEL)
+    };
+    /**
+     * Sets the velocities of the drivetrain.
+     */
+    void setModuleStates(frc::ChassisSpeeds speeds);
+
+    /**
+     * Begins a command to drive and rotate to a specified pose.
+     */
+    void cmdDriveToPose(units::meter_t x, units::meter_t y, frc::Rotation2d angle, YaqoubsTrajectoryConfig config = YaqoubsTrajectoryConfig());
+
 private:
+
+    /**
+     * Executes the current follow trajectory command.
+    */
+    void exeFollowTrajectory();
+
+    /**
+     * Returns whether the trajectory has finished and sets the drive mode to TRAJECTORY_FINISHED if finished.
+     */
+    bool trajectoryFinished();
     /**
      * Updates the position and rotation of the drivetrain on the field.
      */
@@ -186,13 +241,9 @@ private:
      */
     void setIdleMode(rev::CANSparkMax::IdleMode mode);
 
-    /**
-     * Sets the velocities of the drivetrain.
-     */
-    void setModuleStates(frc::ChassisSpeeds speeds);
 
     /**
-     * Returns the states of the swerve modules.
+     * Returns the states of the swerve modules. (velocity and rotatation)
      */
     wpi::array<frc::SwerveModuleState, 4> getModuleStates();
 
@@ -222,24 +273,6 @@ private:
 
     ctre::phoenix6::hardware::Pigeon2 pigeon { CAN_PIGEON };
 
-    /**
-     * The helper class that it used to convert chassis speeds into swerve
-     * module states.
-     */
-    frc::SwerveDriveKinematics<4> kinematics { locations };
-
-    /**
-     * The class that handles tracking the position of the robot on the field
-     * during the match.
-     */
-    frc::SwerveDrivePoseEstimator<4> poseEstimator {
-        kinematics,
-        getRotation(),
-        getModulePositions(),
-        frc::Pose2d(),
-        { 0.0, 0.0, 0.0 }, // Standard deviations of model states.
-        { 1.0, 1.0, 1.0 } // Standard deviations of the vision measurements.
-    };
 
     // The current drive mode.
     DriveMode driveMode = DriveMode::STOPPED;
@@ -254,14 +287,11 @@ private:
     // The data concerning velocity control.
     VelocityControlData controlData {};
     
-    // PID Controller for angular drivetrain movement.
-    frc::ProfiledPIDController<units::radians> manualThetaPIDController {
-        DRIVE_THETA_P, DRIVE_THETA_I, DRIVE_THETA_D,
-        frc::TrapezoidProfile<units::radians>::Constraints(DRIVE_MANUAL_MAX_ANG_VEL, DRIVE_MANUAL_MAX_ANG_ACCEL)
-    };
+    // The trajectory controller.
+    YaqoubsTrajectoryController trajectoryController {};
+    
 
     // Feedback variables.
     frc::ChassisSpeeds chassisSpeeds { 0_mps, 0_mps, 0_rad_per_s };
     frc::Pose2d targetPose;
-
 };

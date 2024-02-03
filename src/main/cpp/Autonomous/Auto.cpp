@@ -12,7 +12,7 @@ Auto::Auto(Drive* drive)
 
     }
 void Auto::getAutonomousCommand() {
-    frc::TrajectoryConfig trajectoryConfig{(units::meters_per_second_t)AUTO_MAX_SPEED,
+    /*frc::TrajectoryConfig trajectoryConfig{(units::meters_per_second_t)AUTO_MAX_SPEED,
                                            (units::meters_per_second_squared_t)AUTO_MAX_ANGLE_SPEED};
     trajectoryConfig.SetKinematics(drive->kinematics);
 
@@ -37,9 +37,8 @@ void Auto::getAutonomousCommand() {
         xController,
         yController,
         drive->manualThetaPIDController,
-        [this](auto moduleStates) {drive->setModuleStates(moduleStates);},
-        {}).ToPtr();
-    
+        [this](auto kinematics moduleStates) {drive->setModuleStates(kinematics moduleStates);},
+        {}).ToPtr();   */
     
 }
 
@@ -61,8 +60,9 @@ void Auto::doAuto() { //called during auto
 
 void Auto::testAuto() { //test auto, leave
     printf("Auto Running\n");
-    drive->setMode(Drive::DriveMode::VELOCITY);
-    drive->moveDistance(5, 1_mps);
+    drive->cmdDriveToPose(1_m, 0_m, 0_deg);
+       // drive->setMode(Drive::DriveMode::VELOCITY);
+   // drive->moveDistance(5, 1_mps);
     //drive->execStopped();
     //autoDone = true;
 
