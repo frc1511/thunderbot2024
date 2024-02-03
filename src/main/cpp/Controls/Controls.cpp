@@ -4,8 +4,9 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #define AXIS_DEADZONE 0.1
-Controls::Controls(Drive* _drive)
-:drive(_drive){
+Controls::Controls(Drive* _drive, Shamptake* _shamptake)
+:drive(_drive),
+ shamptake(_shamptake) {
 
 }
 
@@ -201,53 +202,61 @@ void Controls::doAux() {
 
         */
        
-    } else {
-
     }
-        if (auxController.getButton(AuxButton::TRIANGLE)){
-            //  SUBWOOFER preset
+    if (auxController.getButton(AuxButton::TRIANGLE)){
+        //  SUBWOOFER preset
+    } 
+    else if (auxController.getButton(AuxButton::CIRCLE)){
+        //  LINE preset
+    }
+    else if (auxController.getButton(AuxButton::CROSS)){
+        //other reserved preset
+    }
+    else if (auxController.getButton(AuxButton::SQUARE)){
+        //amp preset
+    } 
+
+    bool overrideGamePieceNo = auxController.getButton(AuxButton::SHARE, ThunderGameController::ButtonState::PRESSED);
+    bool overrideGamePieceYes = auxController.getButton(AuxButton::OPTIONS, ThunderGameController::ButtonState::PRESSED);
+    bool toggleCurve = auxController.getButton(AuxButton::A);
+    bool shooter = auxController.getButton(AuxButton::LEFT_BUMPER);
+    bool fire = auxController.getButton(AuxButton::LEFT_TRIGGER_BUTTON);
+    bool intake = auxController.getButton(AuxButton::RIGHT_TRIGGER_BUTTON);
+    bool outtake = auxController.getButton(AuxButton::RIGHT_BUMPER);
+    if (toggleCurve) {
+        shamptake->shooterSwitch();
+        printf("Shooter curved: %d\n", shamptake->shooterMode == shamptake->CURVED);
+    }
+
+    if (!intake) {
+        shamptake->intakeSpeed = shamptake->STOP;
+    }
+
+    if (shooter) {
+        if (fire){
+            shamptake->intakeSpeed = shamptake->FIRE;
         } 
-        else if (auxController.getButton(AuxButton::CIRCLE)){
-            //  LINE preset
-        }
-        else if (auxController.getButton(AuxButton::CROSS)){
-            //other reserved preset
-        }
-        else if (auxController.getButton(AuxButton::SQUARE)){
-            //amp preset
-        } 
-
-        bool overrideGamePieceNo = auxController.getButton(AuxButton::SHARE, ThunderGameController::ButtonState::PRESSED);
-        bool overrideGamePieceYes = auxController.getButton(AuxButton::OPTIONS, ThunderGameController::ButtonState::PRESSED);
-
-        if (auxController.getButton(AuxButton::LEFT_BUMPER)){
-            if (auxController.getButton(AuxButton::LEFT_TRIGGER_BUTTON)){
-                //warm up and then shoot
-            } 
-            else {
-                // just continue warming up
-            }
-        }
-        
-        if (auxController.getButton(AuxButton::RIGHT_TRIGGER_BUTTON)){
-            //activate intake
-        }
-        else if (auxController.getButton(AuxButton::RIGHT_BUMPER)){
-            //activate outtake
-        }
-
-
-
-
-        //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
-        if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
-            //set arm low enough to get under the stage
-        } else if (auxController.getDPad() == ThunderGameController::DPad::UP){
-            //set arm back to normal position
-        }
-
-        double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
+        shamptake->shooter(1);
+    } else {
+        shamptake->shooter(0);
+    }
     
+    if (outtake) {
+        shamptake->intakeSpeed = shamptake->OUTTAKE;
+        if (shamptake->sensorDetected) {
+            shamptake->trippedBefore = false;
+        }
+    }
+
+    //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
+    if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
+        //set arm low enough to get under the stage
+    } else if (auxController.getDPad() == ThunderGameController::DPad::UP){
+        //set arm back to normal position
+    }
+
+    double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
+
 
 
 }

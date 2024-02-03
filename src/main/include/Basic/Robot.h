@@ -7,6 +7,7 @@
 #include <frc/TimedRobot.h>
 #include <Controls/Controls.h>
 #include <Drive/Drive.h>
+#include <GamEpiece/Shamptake.h>
 #include <Autonomous/Auto.h>
 
 class Robot : public frc::TimedRobot {
@@ -32,8 +33,9 @@ private:
     Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
 
     Drive drive;
-    Controls controls {&drive};
-    Auto autoCode{&drive};
+    Shamptake shampTake;
+    Controls controls {&drive, &shampTake};
+    Auto autoCode {&drive};
     std::vector<Mechanism*> allMechanisms {
         &drive, &controls
     };

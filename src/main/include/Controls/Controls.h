@@ -4,13 +4,17 @@
 #include <Basic/IOMap.h>
 #include <Controls/PS4Controller.h>
 #include <Controls/XboxController.h>
+#include <Hanger/Hang.h>
+#include <GamEpiece/Arm.h>
+#include <GamEpiece/Shamptake.h>
+
 
 using DriveControllerType = ThunderPS4Controller;
 using AuxControllerType = ThunderPS4Controller;
 
 class Controls : public Mechanism {
 public:
-    Controls(Drive* drive);
+    Controls(Drive* drive, Shamptake* _shamptake);
 
     void resetToMode(MatchMode mode) override;
     void process() override;
@@ -22,6 +26,7 @@ public:
 private:
     Drive* drive;
     DriveControllerType driveController{ThunderGameController::Controller::DRIVER};
+    Shamptake* shamptake;
     AuxControllerType auxController{ThunderGameController::Controller::AUX};
     frc::GenericHID switchPanel{2};
     
