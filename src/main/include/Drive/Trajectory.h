@@ -1,29 +1,13 @@
 #pragma once
 
-#include <Basic/Mechanism.h>
-#include <Basic/IOMap.h>
-#include <Drive/SwerveModule.h>
-#include <ctre/phoenix6/Pigeon2.hpp>
-
-#include <frc/geometry/Translation2d.h>
-#include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Pose2d.h>
-#include <frc/kinematics/SwerveDriveKinematics.h>
-#include <frc/estimator/SwerveDrivePoseEstimator.h>
-#include <frc/kinematics/SwerveModulePosition.h>
-#include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
-#include <frc/trajectory/TrapezoidProfile.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryUtil.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc/controller/HolonomicDriveController.h>
-#include <frc/filter/SlewRateLimiter.h>
 #include <frc/Timer.h>
 #include <units/angle.h>
-#include <units/length.h>
 #include <units/angular_velocity.h>
 #include <units/velocity.h>
 #include <units/angular_acceleration.h>

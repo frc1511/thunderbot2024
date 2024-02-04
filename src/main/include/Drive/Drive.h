@@ -35,7 +35,6 @@
 #include <fstream>
 #include <map>
 #include <algorithm>
-#include <filesystem>
 
 #define ROBOT_WIDTH 20.1875_in // Distences from center of each swerve module
 #define ROBOT_LENGTH 20.1875_in 

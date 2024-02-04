@@ -5,8 +5,8 @@
 #include <Basic/Mechanism.h>
 class Shamptake : public Mechanism{
   
-  rev::CANSparkMax shooterMotor1 {3, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
-  rev::CANSparkMax shooterMotor2 {4, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
+  rev::CANSparkMax shooterMotorRight {9, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
+  rev::CANSparkMax shooterMotorLeft {10, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
   rev::CANSparkMax intakeMotor1 {1, rev::CANSparkMax::MotorType::kBrushless};
   rev::CANSparkMax intakeMotor2 {2, rev::CANSparkMax::MotorType::kBrushless};
   

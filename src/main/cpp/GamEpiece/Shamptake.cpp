@@ -13,7 +13,7 @@ void Shamptake::sendFeedback() {
 }
 
 void Shamptake::doPersistentConfiguration() {
-    shooterMotor1.SetInverted(true);
+    shooterMotorRight.SetInverted(true);
 }
 
 void Shamptake::resetToMode(MatchMode mode) {
@@ -31,17 +31,17 @@ void Shamptake::stopIntake() {
     runIntake = false;
 }
 void Shamptake::shooter(double Power) {
-    double motor1power = 0;
-    double motor2power = 0;
+    double motorRightpower = 0;
+    double motorLeftpower = 0;
     if (shooterMode == Shamptake::ShooterMode::CURVED) { 
-        motor1power = Power * .95;// this should eventually be 6000 rpm
-        motor2power = Power * .8;// this should eventually be 4000 rpm
+        motorRightpower = Power * .95;// this should eventually be 6000 rpm
+        motorLeftpower = Power * .8;// this should eventually be 4000 rpm
     } else {
-        motor1power = Power * .8;// base speeds
-        motor2power = Power * .8;
+        motorRightpower = Power * .8;// base speeds
+        motorLeftpower = Power * .8;
     }
-    shooterMotor1.Set(motor1power); 
-    shooterMotor2.Set(motor2power); 
+    shooterMotorRight.Set(motorRightpower); 
+    shooterMotorLeft.Set(motorLeftpower); 
 }
 void Shamptake::stop() {
     intake(0);

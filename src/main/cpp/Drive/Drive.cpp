@@ -4,7 +4,6 @@
 
 Drive::Drive() {
     manualThetaPIDController.EnableContinuousInput(units::radian_t(-180_deg), units::radian_t(180_deg));
-
 }
 
 Drive::~Drive() {
