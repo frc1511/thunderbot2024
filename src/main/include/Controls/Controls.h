@@ -9,8 +9,8 @@
 #include <GamEpiece/Shamptake.h>
 
 
-using DriveControllerType = ThunderPS4Controller;
-using AuxControllerType = ThunderPS4Controller;
+using DriveControllerType = ThunderXboxController;
+using AuxControllerType = ThunderXboxController;
 
 class Controls : public Mechanism {
 public:

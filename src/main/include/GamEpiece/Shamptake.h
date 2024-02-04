@@ -2,24 +2,29 @@
 
 #include <rev/CANSparkMax.h>
 #include <frc/DigitalInput.h>
-
-class Shamptake {
+#include <Basic/Mechanism.h>
+class Shamptake : public Mechanism{
   
-  rev::CANSparkMax shooterMotor1 {1, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
-  rev::CANSparkMax shooterMotor2 {2, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
-  rev::CANSparkMax intakeMotor1 {3, rev::CANSparkMax::MotorType::kBrushless};
-  rev::CANSparkMax intakeMotor2 {4, rev::CANSparkMax::MotorType::kBrushless};
+  rev::CANSparkMax shooterMotor1 {3, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
+  rev::CANSparkMax shooterMotor2 {4, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
+  rev::CANSparkMax intakeMotor1 {1, rev::CANSparkMax::MotorType::kBrushless};
+  rev::CANSparkMax intakeMotor2 {2, rev::CANSparkMax::MotorType::kBrushless};
   
   public:
+    Shamptake();
+    ~Shamptake();
+
+    void process() override;
+    void sendFeedback() override;
+    void doPersistentConfiguration() override;
+    void resetToMode(MatchMode mode) override;
+    
     void intake(double Power);
     void stopIntake();
     void shooter(double Power);
     void stop();
     void shooterSwitch();//change mode between basic shooting and curved shooting
-    void shamptakeProcess();
     void runIntakeMotors();
-    double motor1power;
-    double motor2power;
     bool runIntake;
     bool runOuttake;
 

@@ -13,16 +13,16 @@ Controls::Controls(Drive* _drive, Shamptake* _shamptake)
 void Controls::resetToMode(MatchMode mode) { }
 
 void Controls::process() {
-    driveController.process();
+    //driveController.process();
     auxController.process();
 
 
-    doSwitchPanel();
+    //doSwitchPanel();
     if (callaDisable) {
-        drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
+        //drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
     }
     else {
-        doDrive();
+        //doDrive();
     }
 
     if (!sashaDisable) {
@@ -36,7 +36,7 @@ void Controls::process() {
 }
 
 void Controls::processInDisabled() {
-    doSwitchPanel();
+    //doSwitchPanel();
 
     using DriveButton = DriveControllerType::Button;
 
@@ -44,16 +44,16 @@ void Controls::processInDisabled() {
     bool calIMU = driveController.getButton(DriveButton::SHARE, ThunderGameController::ButtonState::PRESSED);
 
     if (resetOdometry) {
-        drive->resetOdometry();
+        //drive->resetOdometry();
     }
 
     if (calIMU) {
-        drive->calibrateIMU();
+        //drive->calibrateIMU();
     }
 }
 
 bool Controls::getShouldPersistConfig() {
-    doSwitchPanel();
+    //doSwitchPanel();
 
     using DriveButton = DriveControllerType::Button;
     using AuxButton = AuxControllerType::Button;
@@ -220,9 +220,9 @@ void Controls::doAux() {
     bool overrideGamePieceYes = auxController.getButton(AuxButton::OPTIONS, ThunderGameController::ButtonState::PRESSED);
     bool toggleCurve = auxController.getButton(AuxButton::A);
     bool shooter = auxController.getButton(AuxButton::LEFT_BUMPER);
-    bool fire = auxController.getButton(AuxButton::LEFT_TRIGGER_BUTTON);
-    bool intake = auxController.getButton(AuxButton::RIGHT_TRIGGER_BUTTON);
-    bool outtake = auxController.getButton(AuxButton::RIGHT_BUMPER);
+    bool fire = auxController.getButton(AuxButton::Y);
+    bool intake = auxController.getButton(AuxButton::B);
+    bool outtake = auxController.getButton(AuxButton::X);
     if (toggleCurve) {
         shamptake->shooterSwitch();
         printf("Shooter curved: %d\n", shamptake->shooterMode == shamptake->CURVED);
@@ -235,8 +235,11 @@ void Controls::doAux() {
     if (shooter) {
         if (fire){
             shamptake->intakeSpeed = shamptake->FIRE;
-        } 
-        shamptake->shooter(1);
+            shamptake->shooter(1);
+            shamptake->trippedBefore = false;
+        } else {
+            shamptake->shooter(0.6);
+        }
     } else {
         shamptake->shooter(0);
     }
