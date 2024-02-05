@@ -237,6 +237,7 @@ void Controls::doAux() {
             shamptake->intakeSpeed = shamptake->FIRE;
             shamptake->shooter(1);
             shamptake->trippedBefore = false;
+            printf("RESET\n");
         } else {
             shamptake->shooter(0.6);
         }
@@ -246,9 +247,8 @@ void Controls::doAux() {
     
     if (outtake) {
         shamptake->intakeSpeed = shamptake->OUTTAKE;
-        if (shamptake->sensorDetected) {
-            shamptake->trippedBefore = false;
-        }
+        shamptake->trippedBefore = false;
+        printf("RESET\n");
     }
 
     //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
