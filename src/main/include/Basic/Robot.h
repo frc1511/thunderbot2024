@@ -33,7 +33,7 @@ private:
     Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
     Drive drive;
     Shamptake shampTake;
-    Controls controls {&drive, &shampTake};
+    //Controls controls {&drive, &shampTake};
     //Auto autoCode {&drive};
     std::vector<Mechanism*> allMechanisms {
         //&drive, &controls

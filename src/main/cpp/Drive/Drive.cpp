@@ -7,15 +7,15 @@ Drive::Drive() {
 }
 
 Drive::~Drive() {
-    for (SwerveModule* module : swerveModules) {
-        delete module;
-    }
+    // for (SwerveModule* module : swerveModules) {
+    //    delete module;
+    // }
 }
 
 void Drive::doPersistentConfiguration() {
-    for (SwerveModule* module : swerveModules) {
-        module->doPersistentConfiguration();
-    }
+    // for (SwerveModule* module : swerveModules) {
+    //     module->doPersistentConfiguration();
+    // }
 }
 
 void Drive::resetToMode(MatchMode mode) {
@@ -28,9 +28,9 @@ void Drive::resetToMode(MatchMode mode) {
     controlData = { 0_mps, 0_mps, 0_rad_per_s, ControlFlag::NONE };
 
     // This seems to be necessary. Don't ask me why.
-    for (SwerveModule* module : swerveModules) {
-        module->stop();
-    }
+    // for (SwerveModule* module : swerveModules) {
+    //     module->stop();
+    // }
 
     if (mode == MatchMode::DISABLED) {
         /**
@@ -216,17 +216,18 @@ void Drive::resetOdometry(frc::Pose2d pose) {
      * while ofsetting for the IMU's recorded rotation.
      */
 
-    poseEstimator.ResetPosition(getRotation(), getModulePositions(), pose);
+    //poseEstimator.ResetPosition(getRotation(), getModulePositions(), pose);
 
     pigeon.SetYaw(0_deg);
 
-    for (SwerveModule* module : swerveModules) {
-        module->resetDrivePosition();
-    }
+    // for (SwerveModule* module : swerveModules) {
+    //     module->resetDrivePosition();
+    // }
 }
 
 frc::Pose2d Drive::getEstimatedPose() {
-    return poseEstimator.GetEstimatedPosition();
+    return frc::Pose2d(0_m, 0_m, 0_deg);
+    //return poseEstimator.GetEstimatedPosition();
 }
 
 frc::Rotation2d Drive::getRotation() {
@@ -253,7 +254,7 @@ void Drive::updateOdometry() {
      * Update the pose estimator with encoder measurements from
      * the swerve modules.
      */
-    poseEstimator.Update(getRotation(), getModulePositions());
+    //poseEstimator.Update(getRotation(), getModulePositions());
 }
 
 void Drive::execStopped() {
@@ -294,29 +295,29 @@ void Drive::execVelocityControl() {
 }
 
 void Drive::makeBrick() {
-    for (std::size_t i = 0; i < swerveModules.size(); i++) {
-        units::degree_t angle;
-        // If the index is even.
-        if (i % 2 == 0) {
-            angle = -45_deg;
-        }
-        // If the index is odd.
-        else {
-            angle = 45_deg;
-        }
+    // for (std::size_t i = 0; i < swerveModules.size(); i++) {
+    //     units::degree_t angle;
+    //     // If the index is even.
+    //     if (i % 2 == 0) {
+    //         angle = -45_deg;
+    //     }
+    //     // If the index is odd.
+    //     else {
+    //         angle = 45_deg;
+    //     }
         
-        // Stop the robot. It should already be stopped tho.
-        driveMode = DriveMode::STOPPED;
+    //     // Stop the robot. It should already be stopped tho.
+    //     driveMode = DriveMode::STOPPED;
         
-        // Turn the swerve module to point towards the center of the robot.
-        swerveModules.at(i)->setTurningMotor(angle);
-    }
+    //     // Turn the swerve module to point towards the center of the robot.
+    //     swerveModules.at(i)->setTurningMotor(angle);
+    // }
 }
 
 void Drive::setIdleMode(rev::CANSparkMax::IdleMode mode) {
-    for (SwerveModule* module : swerveModules) {
-        module->setIdleMode(mode);
-    }
+    // for (SwerveModule* module : swerveModules) {
+    //     module->setIdleMode(mode);
+    // }
 }
 
 void Drive::setModuleStates(frc::ChassisSpeeds speeds) {
@@ -324,29 +325,29 @@ void Drive::setModuleStates(frc::ChassisSpeeds speeds) {
     chassisSpeeds = speeds;
 
     // Generate individual module states using the chassis velocities.
-    wpi::array<frc::SwerveModuleState, 4> moduleStates(kinematics.ToSwerveModuleStates(speeds));
+    //wpi::array<frc::SwerveModuleState, 4> moduleStates(kinematics.ToSwerveModuleStates(speeds));
     
     // Set the states of the individual modules.
-    for(std::size_t i = 0; i < swerveModules.size(); i++) {
-        swerveModules.at(i)->setState(moduleStates.at(i));
-    }
+    // for(std::size_t i = 0; i < swerveModules.size(); i++) {
+    //     swerveModules.at(i)->setState(moduleStates.at(i));
+    // }
 }
 
-wpi::array<frc::SwerveModuleState, 4> Drive::getModuleStates() {
-    return { swerveModules.at(0)->getState(), swerveModules.at(1)->getState(),
-             swerveModules.at(2)->getState(), swerveModules.at(3)->getState() };
-}
+// wpi::array<frc::SwerveModuleState, 4> Drive::getModuleStates() {
+//     return { swerveModules.at(0)->getState(), swerveModules.at(1)->getState(),
+//              swerveModules.at(2)->getState(), swerveModules.at(3)->getState() };
+// }
 
-wpi::array<frc::SwerveModulePosition, 4> Drive::getModulePositions() {
-    return { swerveModules.at(0)->getPosition(), swerveModules.at(1)->getPosition(),
-             swerveModules.at(2)->getPosition(), swerveModules.at(3)->getPosition() };
-}
+// wpi::array<frc::SwerveModulePosition, 4> Drive::getModulePositions() {
+//     return { swerveModules.at(0)->getPosition(), swerveModules.at(1)->getPosition(),
+//              swerveModules.at(2)->getPosition(), swerveModules.at(3)->getPosition() };
+// }
 
 void Drive::sendFeedback() {
     // Module feedback.
-    for (std::size_t i = 0; i < swerveModules.size(); i++) {
-        swerveModules.at(i)->sendFeedback(i);
-    }
+    // for (std::size_t i = 0; i < swerveModules.size(); i++) {
+    //     swerveModules.at(i)->sendFeedback(i);
+    // }
 
     frc::Pose2d pose(getEstimatedPose());
 

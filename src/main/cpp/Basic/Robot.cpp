@@ -25,12 +25,12 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {
 //    reset(Mechanism::MatchMode::TELEOP);
-    shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
+    //shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
 }
 void Robot::TeleopPeriodic() {
-    shampTake.process();
-    controls.process();
-    shampTake.runIntakeMotors();
+    //shampTake.process();
+    //controls.process();
+    //shampTake.runIntakeMotors();
     //drive.process();
 }
 
@@ -47,11 +47,11 @@ void Robot::TestInit() {
 void Robot::TestPeriodic() {}
 
 void Robot::reset(Mechanism::MatchMode mode) {
-    for (Mechanism* mech : allMechanisms) {
+    //for (Mechanism* mech : allMechanisms) {
     //    mech->callResetToMode(lastMode);
-    }
+   // }
 
-    lastMode = mode;
+    //lastMode = mode;
 }
 
 #ifndef RUNNING_FRC_TESTS
