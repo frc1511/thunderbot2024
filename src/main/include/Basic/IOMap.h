@@ -17,7 +17,7 @@
 
 
 //number for this isnt actually on IOMap yet so change as needed based on what makes sense once we've finalized sensors more
-#define PWM_BLINKY_BLINKY 2
+#define PWM_BLINKY_BLINKY 0
 
 
 
