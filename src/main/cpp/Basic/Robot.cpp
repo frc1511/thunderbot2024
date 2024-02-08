@@ -25,12 +25,13 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {
 //    reset(Mechanism::MatchMode::TELEOP);
-    //shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
+    shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
+    shampTake.doPersistentConfiguration();
 }
 void Robot::TeleopPeriodic() {
-    //shampTake.process();
-    //controls.process();
-    //shampTake.runIntakeMotors();
+    shampTake.process();
+    controls.process();
+    shampTake.runIntakeMotors();
     //drive.process();
 }
 

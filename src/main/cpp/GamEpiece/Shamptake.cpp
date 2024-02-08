@@ -23,7 +23,7 @@ void Shamptake::resetToMode(MatchMode mode) {
 
 void Shamptake::intake(double Power) {
     intakeMotor1.Set(Power);
-    intakeMotor2.Set(Power);
+    //intakeMotor2.Set(Power);
     runIntake = true;
 }
 void Shamptake::stopIntake() {
@@ -34,7 +34,7 @@ void Shamptake::shooter(double Power) {
     double motorRightpower = 0;
     double motorLeftpower = 0;
     if (shooterMode == Shamptake::ShooterMode::CURVED) { 
-        motorRightpower = Power * .95;// this should eventually be 6000 rpm
+        motorRightpower = Power * .6;// this should eventually be 6000 rpm
         motorLeftpower = Power * .8;// this should eventually be 4000 rpm
     } else {
         motorRightpower = Power * .8;// base speeds
@@ -71,6 +71,7 @@ void Shamptake::process() {
     
     if (!sensorDetected) {
         if (trippedBefore) { // Past Sensor
+            sleep(0.7);
             intakeSpeed = IntakeSpeed::STOP;
         } else { // Before Sensor
             intakeSpeed = IntakeSpeed::NORMAL;
@@ -85,7 +86,7 @@ void Shamptake::runIntakeMotors() {
     switch (intakeSpeed)
     {
     case IntakeSpeed::NORMAL:
-        speed = 0.7;
+        speed = 0.5;
         break;
     case IntakeSpeed::STOP:
         speed = 0;
@@ -94,7 +95,7 @@ void Shamptake::runIntakeMotors() {
         speed = 0.5;
         break;
     case IntakeSpeed::FIRE:
-        speed = 0.8;
+        speed = 0.1;
         break;
     case IntakeSpeed::OUTTAKE:
         speed = -0.4;
