@@ -1,15 +1,28 @@
 #pragma once
 
 #include <rev/CANSparkMax.h>
+#include <rev/SparkPIDController.h>
+#include <rev/ControlType.h>
 #include <frc/DigitalInput.h>
 #include <Basic/Mechanism.h>
+
+#define SHAMPTANK_RIGHT_MOTOR_P 0.0002
+#define SHAMPTANK_RIGHT_MOTOR_I 0.0
+#define SHAMPTANK_RIGHT_MOTOR_D 0.0
+#define SHAMPTANK_RIGHT_MOTOR_FEED_FOWARD 0.000170
+
+
+#define SHAMPTANK_LEFT_MOTOR_P 0.0002
+#define SHAMPTANK_LEFT_MOTOR_I 0.0
+#define SHAMPTANK_LEFT_MOTOR_D 0.0
+#define SHAMPTANK_LEFT_MOTOR_FEED_FOWARD 0.000170
 class Shamptake : public Mechanism{
   
   rev::CANSparkMax shooterMotorRight {9, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
   rev::CANSparkMax shooterMotorLeft {10, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
   rev::CANSparkMax intakeMotor1 {15, rev::CANSparkMax::MotorType::kBrushless};
   //rev::CANSparkMax intakeMotor2 {2, rev::CANSparkMax::MotorType::kBrushless};
-  
+
   public:
     Shamptake();
     ~Shamptake();
@@ -46,6 +59,9 @@ class Shamptake : public Mechanism{
     bool trippedBefore = false;
 
     Shamptake::ShooterMode shooterMode = Shamptake::ShooterMode::DEFAULT;
+  private:
+    rev::SparkPIDController shooterMotorRightPIDController;
+    rev::SparkPIDController shooterMotorLeftPIDController;
 };
 
 

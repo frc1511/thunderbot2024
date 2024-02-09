@@ -1,7 +1,22 @@
 #include <GamEpiece/Shamptake.h>
 
-Shamptake::Shamptake() {
+Shamptake::Shamptake()
+: shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
+  shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()) {
+    shooterMotorRightPIDController.SetP(SHAMPTANK_RIGHT_MOTOR_P);
+    shooterMotorRightPIDController.SetI(SHAMPTANK_RIGHT_MOTOR_I);
+    shooterMotorRightPIDController.SetD(SHAMPTANK_RIGHT_MOTOR_D);
+    shooterMotorRightPIDController.SetIZone(SHAMPTANK_RIGHT_MOTOR_I);
+    shooterMotorRightPIDController.SetFF(SHAMPTANK_RIGHT_MOTOR_FEED_FOWARD);
+    shooterMotorRightPIDController.SetOutputRange(-1, 1);
 
+    shooterMotorLeftPIDController.SetP(SHAMPTANK_LEFT_MOTOR_P);
+    shooterMotorLeftPIDController.SetI(SHAMPTANK_LEFT_MOTOR_I);
+    shooterMotorLeftPIDController.SetD(SHAMPTANK_LEFT_MOTOR_D);
+    shooterMotorLeftPIDController.SetIZone(SHAMPTANK_LEFT_MOTOR_I);
+    shooterMotorLeftPIDController.SetFF(SHAMPTANK_LEFT_MOTOR_FEED_FOWARD);
+    shooterMotorLeftPIDController.SetOutputRange(-1, 1);
+    shooter(0);
 }
 
 Shamptake::~Shamptake() {
@@ -31,18 +46,19 @@ void Shamptake::stopIntake() {
     runIntake = false;
 }
 void Shamptake::shooter(double Power) {
-    double motorRightpower = 0;
-    double motorLeftpower = 0;
-    if (shooterMode == Shamptake::ShooterMode::CURVED) { 
-        motorRightpower = Power * .6;// this should eventually be 6000 rpm
-        motorLeftpower = Power * .8;// this should eventually be 4000 rpm
-    } else {
-        motorRightpower = Power * .8;// base speeds
-        motorLeftpower = Power * .8;
-        motorLeftpower = Power * .8;
-    }
-    shooterMotorRight.Set(motorRightpower); 
-    shooterMotorLeft.Set(motorLeftpower); 
+    // double motorRightpower = 0;
+    // double motorLeftpower = 0;
+    // if (shooterMode == Shamptake::ShooterMode::CURVED) { 
+    //     motorRightpower = Power * .6;// this should eventually be 6000 rpm
+    //     motorLeftpower = Power * .8;// this should eventually be 4000 rpm
+    // } else {
+    //     motorRightpower = Power * .8;// base speeds
+    //     motorLeftpower = Power * .8;
+    // }
+    //shooterMotorRight.Set(motorRightpower); 
+    //shooterMotorLeft.Set(motorLeftpower); 
+    shooterMotorLeftPIDController.SetReference(Power, rev::ControlType::kVelocity);
+    shooterMotorRightPIDController.SetReference(Power, rev::ControlType::kVelocity);
 }
 void Shamptake::stop() {
     intake(0);
