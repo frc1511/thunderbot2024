@@ -71,7 +71,7 @@ void Shamptake::process() {
     
     if (!sensorDetected) {
         if (trippedBefore) { // Past Sensor
-            sleep(0.7);
+            //sleep(0.7);
             intakeSpeed = IntakeSpeed::STOP;
         } else { // Before Sensor
             intakeSpeed = IntakeSpeed::NORMAL;
@@ -96,7 +96,7 @@ void Shamptake::runIntakeMotors() {
         break;
     case IntakeSpeed::SLOW:
         printf("SLOW\n");
-        speed = 0.5;
+        speed = 0.2;
         break;
     case IntakeSpeed::FIRE:
         speed = 0.1;
