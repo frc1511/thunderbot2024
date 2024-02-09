@@ -9,12 +9,12 @@
 #include <GamEpiece/Shamptake.h>
 
 
-using DriveControllerType = ThunderXboxController;
-using AuxControllerType = ThunderXboxController;
+using DriveControllerType = ThunderPS4Controller;
+using AuxControllerType = ThunderPS4Controller;
 
 class Controls : public Mechanism {
 public:
-    Controls(Drive* drive, Shamptake* _shamptake);
+    Controls(Drive* drive, Shamptake* _shampjtake);
 
     void resetToMode(MatchMode mode) override;
     void process() override;
