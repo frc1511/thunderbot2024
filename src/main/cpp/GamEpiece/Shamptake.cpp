@@ -39,6 +39,7 @@ void Shamptake::shooter(double Power) {
     } else {
         motorRightpower = Power * .8;// base speeds
         motorLeftpower = Power * .8;
+        motorLeftpower = Power * .8;
     }
     shooterMotorRight.Set(motorRightpower); 
     shooterMotorLeft.Set(motorLeftpower); 
@@ -65,8 +66,7 @@ void Shamptake::process() {
         //intake previously tripped = true (So we stop when past)
     //if outtaking
         //Outtake (Handled in controls)
-        //intake previously tripped == true and sensor tripped (In sensor and outtaking)
-            //intake previously tripped = false (So we don't stop when inkaing next time)
+        //intake previously tripped = false (So we don't stop when inkaing next time)
     sensorDetected = !noteSensor.Get();
     
     if (!sensorDetected) {
@@ -79,6 +79,7 @@ void Shamptake::process() {
     } else { // Sensor Tripped
         intakeSpeed = IntakeSpeed::SLOW;
         trippedBefore = true;
+        printf("SET\n");
     }
 }
 void Shamptake::runIntakeMotors() {
@@ -87,17 +88,22 @@ void Shamptake::runIntakeMotors() {
     {
     case IntakeSpeed::NORMAL:
         speed = 0.5;
+        printf("NORMAL\n");
         break;
     case IntakeSpeed::STOP:
+        printf("STOP\n");
         speed = 0;
         break;
     case IntakeSpeed::SLOW:
+        printf("SLOW\n");
         speed = 0.5;
         break;
     case IntakeSpeed::FIRE:
         speed = 0.1;
+        printf("FIRE\n");
         break;
     case IntakeSpeed::OUTTAKE:
+        printf("OUTTAKE\n");
         speed = -0.4;
         break;
     default:
