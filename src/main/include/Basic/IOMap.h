@@ -15,10 +15,11 @@
 #define CAN_SWERVE_CANCODER_BR 12
 #define CAN_SWERVE_CANCODER_BL 13
 
+#define CAN_SHOOTER_INTAKE 15
+#define CAN_SHOOTER_LEFT 16
+#define CAN_SHOOTER_RIGHT 17
 
 //number for this isnt actually on IOMap yet so change as needed based on what makes sense once we've finalized sensors more
 #define PWM_BLINKY_BLINKY 2
-
-
 
 #define CAN_PIGEON 14

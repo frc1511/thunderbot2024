@@ -5,6 +5,7 @@
 #include <rev/ControlType.h>
 #include <frc/DigitalInput.h>
 #include <Basic/Mechanism.h>
+#include <Basic/IOMap.h>
 
 #define SHAMPTANK_RIGHT_MOTOR_P 0.0002
 #define SHAMPTANK_RIGHT_MOTOR_I 0.0
@@ -18,9 +19,9 @@
 #define SHAMPTANK_LEFT_MOTOR_FEED_FOWARD 0.000170
 class Shamptake : public Mechanism{
   
-  rev::CANSparkMax shooterMotorRight {9, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
-  rev::CANSparkMax shooterMotorLeft {10, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
-  rev::CANSparkMax intakeMotor1 {15, rev::CANSparkMax::MotorType::kBrushless};
+  rev::CANSparkMax shooterMotorRight {CAN_SHOOTER_RIGHT, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
+  rev::CANSparkMax shooterMotorLeft {CAN_SHOOTER_RIGHT, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
+  rev::CANSparkMax intakeMotor1 {CAN_SHOOTER_INTAKE, rev::CANSparkMax::MotorType::kBrushless};
   //rev::CANSparkMax intakeMotor2 {2, rev::CANSparkMax::MotorType::kBrushless};
 
   public:
