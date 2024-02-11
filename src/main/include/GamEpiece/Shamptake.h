@@ -11,16 +11,18 @@
 #define SHAMPTANK_RIGHT_MOTOR_I 0.0
 #define SHAMPTANK_RIGHT_MOTOR_D 0.0
 #define SHAMPTANK_RIGHT_MOTOR_FEED_FOWARD 0.000170
+#define SHAMPTANK_RIGHT_MOTOR_I_ZONE 0.0
 
 
 #define SHAMPTANK_LEFT_MOTOR_P 0.0002
 #define SHAMPTANK_LEFT_MOTOR_I 0.0
 #define SHAMPTANK_LEFT_MOTOR_D 0.0
 #define SHAMPTANK_LEFT_MOTOR_FEED_FOWARD 0.000170
+#define SHAMPTANK_LEFT_MOTOR_I_ZONE 0.0
 class Shamptake : public Mechanism{
   
   rev::CANSparkMax shooterMotorRight {CAN_SHOOTER_RIGHT, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)
-  rev::CANSparkMax shooterMotorLeft {CAN_SHOOTER_RIGHT, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
+  rev::CANSparkMax shooterMotorLeft {CAN_SHOOTER_LEFT, rev::CANSparkMax::MotorType::kBrushless}; //left side (bottom)
   rev::CANSparkMax intakeMotor1 {CAN_SHOOTER_INTAKE, rev::CANSparkMax::MotorType::kBrushless};
   //rev::CANSparkMax intakeMotor2 {2, rev::CANSparkMax::MotorType::kBrushless};
 

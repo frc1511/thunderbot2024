@@ -218,11 +218,11 @@ void Controls::doAux() {
 
     bool overrideGamePieceNo = auxController.getButton(AuxButton::SHARE, ThunderGameController::ButtonState::PRESSED);
     bool overrideGamePieceYes = auxController.getButton(AuxButton::OPTIONS, ThunderGameController::ButtonState::PRESSED);
-    bool toggleCurve = auxController.getButton(AuxButton::A);
+    bool toggleCurve = auxController.getButton(AuxButton::B);
     bool shooter = auxController.getButton(AuxButton::LEFT_BUMPER);
-    bool fire = auxController.getButton(AuxButton::Y);
-    bool intake = auxController.getButton(AuxButton::B);
-    bool outtake = auxController.getButton(AuxButton::X);
+    bool fire = auxController.getButton(AuxButton::X);
+    bool intake = auxController.getButton(AuxButton::Y);
+    bool outtake = auxController.getButton(AuxButton::A);
     if (toggleCurve) {
         shamptake->shooterSwitch();
         printf("Shooter curved: %d\n", shamptake->shooterMode == shamptake->CURVED);

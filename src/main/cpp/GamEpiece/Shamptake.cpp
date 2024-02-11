@@ -6,16 +6,16 @@ Shamptake::Shamptake()
     shooterMotorRightPIDController.SetP(SHAMPTANK_RIGHT_MOTOR_P);
     shooterMotorRightPIDController.SetI(SHAMPTANK_RIGHT_MOTOR_I);
     shooterMotorRightPIDController.SetD(SHAMPTANK_RIGHT_MOTOR_D);
-    shooterMotorRightPIDController.SetIZone(SHAMPTANK_RIGHT_MOTOR_I);
+    shooterMotorRightPIDController.SetIZone(SHAMPTANK_RIGHT_MOTOR_I_ZONE);
     shooterMotorRightPIDController.SetFF(SHAMPTANK_RIGHT_MOTOR_FEED_FOWARD);
-    shooterMotorRightPIDController.SetOutputRange(-1, 1);
+    shooterMotorRightPIDController.SetOutputRange(0, 1);
 
     shooterMotorLeftPIDController.SetP(SHAMPTANK_LEFT_MOTOR_P);
     shooterMotorLeftPIDController.SetI(SHAMPTANK_LEFT_MOTOR_I);
     shooterMotorLeftPIDController.SetD(SHAMPTANK_LEFT_MOTOR_D);
-    shooterMotorLeftPIDController.SetIZone(SHAMPTANK_LEFT_MOTOR_I);
+    shooterMotorLeftPIDController.SetIZone(SHAMPTANK_LEFT_MOTOR_I_ZONE);
     shooterMotorLeftPIDController.SetFF(SHAMPTANK_LEFT_MOTOR_FEED_FOWARD);
-    shooterMotorLeftPIDController.SetOutputRange(-1, 1);
+    shooterMotorLeftPIDController.SetOutputRange(0, 1);
     shooter(0);
 }
 
@@ -28,7 +28,8 @@ void Shamptake::sendFeedback() {
 }
 
 void Shamptake::doPersistentConfiguration() {
-    shooterMotorRight.SetInverted(true);
+    shooterMotorRight.SetInverted(false);
+    shooterMotorLeft.SetInverted(true);
 }
 
 void Shamptake::resetToMode(MatchMode mode) {
@@ -57,8 +58,8 @@ void Shamptake::shooter(double Power) {
     // }
     //shooterMotorRight.Set(motorRightpower); 
     //shooterMotorLeft.Set(motorLeftpower); 
-    shooterMotorLeftPIDController.SetReference(Power, rev::ControlType::kVelocity);
-    shooterMotorRightPIDController.SetReference(Power, rev::ControlType::kVelocity);
+    shooterMotorLeftPIDController.SetReference(Power * 5000, rev::ControlType::kVelocity);
+    shooterMotorRightPIDController.SetReference(Power * 5000, rev::ControlType::kVelocity);
 }
 void Shamptake::stop() {
     intake(0);
@@ -115,7 +116,7 @@ void Shamptake::runIntakeMotors() {
         speed = 0.2;
         break;
     case IntakeSpeed::FIRE:
-        speed = 0.1;
+        speed = 0.5;
         printf("FIRE\n");
         break;
     case IntakeSpeed::OUTTAKE:
