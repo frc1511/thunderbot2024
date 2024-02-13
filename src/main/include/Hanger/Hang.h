@@ -1,8 +1,9 @@
 #pragma once
 #include <frc/DigitalInput.h>
-#include <IOMap/IOMap.h>
+#include <Basic/IOMap.h>
 #include <rev/CANSparkMax.h>
-
+#include <ThunderSparkMax/ThunderSparkMax.h>
+#include <Feedback/Feedback.h>
 
 class Hang {
     public:
@@ -38,7 +39,7 @@ class Hang {
     void setHangIdleMode(bool idleModeEnabled);
 
     private:
-    ThunderSparkMax *winch; // NOT NEEDED
+    ThunderSparkMax *winch;    
     //frc::Servo ratchet{PWM_HANG_RATCHET}; ---NOT NEEDED
 
     frc::DigitalInput zeroSensor{DIO_HANG_RESET}; // ?????

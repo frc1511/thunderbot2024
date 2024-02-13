@@ -1,4 +1,5 @@
 #include <Hanger/Hang.h>
+#include <Feedback/Feedback.h>
 
 // Height Thresholds, using neo shaft rotations
 //UP
@@ -22,19 +23,18 @@ const double kNormalUpSpeed = .5; // normal up speeed .5
 
 const double kPrecisionDownSpeed = .2;
 const double kFastDownSpeed = 1; // fast down speed until off the ground 1
-const double kParkDownSpeed = .1;
 
 // const double kServoEngaged = .3; // .75
 // const double kServoDisengaged = .72; // .2
 
 
-Hang::Hang() : winch(ThunderSparkMax::create(ThunderSparkMax::MotorID::Hang)) { // ???
+Hang::Hang() : winch(ThunderSparkMax::create(ThunderSparkMax::MotorID::Hang)) {
     setRatchetPawlMarried(true);
     winch->SetEncoder(0);
     winch->SetInverted(true);
     winch->SetIdleMode(ThunderSparkMax::BRAKE);
     winch->SetOpenLoopRampRate(.5);
-} // look into
+}
 
 void Hang::process() {
     switch(currentState) { // if the current state any of these, then call do whichever process is in the body
@@ -89,7 +89,7 @@ void Hang::process() {
             }
             else if(winch->GetEncoder() > kMaxRetractHeight) {
                 if(winch->GetEncoder() < kParkHeight) {
-                    winch->Set(-kParkDownSpeed);
+                    // winch->Set(-kParkDownSpeed);
                 }
                 else {
                     winch->Set(-kRetractSpeed);

@@ -39,6 +39,7 @@
 //number for this isnt actually on IOMap yet so change as needed based on what makes sense once we've finalized sensors more
 #define PWM_BLINKY_BLINKY 0
 
+#define DIO_HANG_RESET 0
 
 
 #define CAN_PIGEON 14
