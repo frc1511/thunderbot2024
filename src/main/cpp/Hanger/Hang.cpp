@@ -24,8 +24,9 @@ const double kNormalUpSpeed = .5; // normal up speeed .5
 const double kPrecisionDownSpeed = .2;
 const double kFastDownSpeed = 1; // fast down speed until off the ground 1
 
-// const double kServoEngaged = .3; // .75
-// const double kServoDisengaged = .72; // .2
+const double kSolenoidEngaged = .3; // .75
+const double kSolenoidDisengaged = .72; // .2
+
 
 
 Hang::Hang() : winch(ThunderSparkMax::create(ThunderSparkMax::MotorID::Hang)) {
@@ -108,16 +109,14 @@ void Hang::process() {
     }
 
     if(!zeroSensorBroke) {
-        if(lastSensorReading == true && zeroSensor.Get() == false) {
+        if(lastSensorReading == true && leafSensor.Get() == false) {
             winch->SetEncoder(0);
         }
-        lastSensorReading = zeroSensor.Get(); // look into
+        lastSensorReading = leafSensor.Get(); // look into
     }
 }
 
 void Hang::reset() {
-
-
 
 }
 
@@ -128,21 +127,21 @@ void Hang::move(Hang::HangMovement position) {
 void Hang::setRatchetPawlMarried(bool engaged) {
     ratchetPawlMarried = engaged;
     if(engaged) {
-        //ratchet.Set(kServoEngaged);
+        //ratchet.Set(kSolenoidEngaged);
     }
     else {
-        //ratchet.Set(kServoDisengaged);
+        //ratchet.Set(kSolenoidDisengaged);
     }
 }
-/*
+
 void Hang::debug(Feedback* feedback) {
 
     feedback->sendDouble("thunderdashboard", "hang_pos", 100 * (winch->GetEncoder() / kMaxHeight));
 
     feedback->sendDouble("hang", "speed", winch->Get());
     feedback->sendDouble("hang", "encoder", winch->GetEncoder());
-    feedback->sendDouble("hang", "ratchet", ratchetEngaged);
-    feedback->sendString("hang", "zero sensor", zeroSensor.Get() ? "true" : "false");
+    feedback->sendDouble("hang", "ratchet", ratchetPawlMarried);
+    feedback->sendString("hang", "zero sensor", leafSensor.Get() ? "true" : "false");
 
     const char* stateName = "";
     switch(currentState) {
@@ -175,25 +174,29 @@ void Hang::debug(Feedback* feedback) {
     }
     feedback->sendString("hang", "direction", directionName);
     feedback->sendBoolean("hang", "sensor broken", zeroSensorBroke);
+    feedback->sendBoolean("hang", "reflective sensor tripped", hangSensorTripped);
 }
-
+/*
 void Hang::lights(Lights* lights) {
     lights->setHangerZeroTripped(zeroSensor.Get());
 }
-
+*/
 void Hang::zeroSensorBroken(bool broke){
     zeroSensorBroke = broke;
 }
-*/
+
+void Hang::reflectiveHangSensorTripped(bool reflectiveHangSensorisTripped){
+    hangSensorTripped = reflectiveHangSensorisTripped;
+}
 void Hang::enableSlowRetract(bool enable) {
     slowRetract = enable;
 }
 
 void Hang::setHangIdleMode(bool enabled) {
         if(enabled){
-        //winch->SetIdleMode(ThunderSparkMax::BRAKE);
+        winch->SetIdleMode(ThunderSparkMax::BRAKE);
     }
     else{
-        //winch->SetIdleMode(ThunderSparkMax::COAST);
+        winch->SetIdleMode(ThunderSparkMax::COAST);
     }
 }

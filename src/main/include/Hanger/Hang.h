@@ -4,6 +4,7 @@
 #include <rev/CANSparkMax.h>
 #include <ThunderSparkMax/ThunderSparkMax.h>
 #include <Feedback/Feedback.h>
+#include <BlinkyBlinky/BlinkyBlinky.h>
 
 class Hang {
     public:
@@ -17,7 +18,7 @@ class Hang {
 
     void reset();
     void process();
-    //void debug(Feedback* feedback);
+    void debug(Feedback* feedback);
     //void lights(Lights* lights);
 
     /**
@@ -36,13 +37,17 @@ class Hang {
      */
     void zeroSensorBroken(bool broke); // NOT NEEDED
 
+    void reflectiveHangSensorTripped(bool reflectiveHangSensorisTripped);
+
     void setHangIdleMode(bool idleModeEnabled);
 
     private:
     ThunderSparkMax *winch;    
     //frc::Servo ratchet{PWM_HANG_RATCHET}; ---NOT NEEDED
 
-    frc::DigitalInput zeroSensor{DIO_HANG_RESET}; // ?????
+    frc::DigitalInput reflectiveHangSensor{REFLECTIVE_HANG_SENSOR};
+
+    frc::DigitalInput leafSensor{HANG_LEAF_SENSOR};
     bool lastSensorReading = false; 
 
     HangMovement moveDirection = STOP; // Default movement is stop
@@ -62,7 +67,9 @@ class Hang {
     void setRatchetPawlMarried(bool married);
     bool ratchetPawlMarried = false; // Default is not engaged
 
-    double preEngageEncoder = 0; // ???
+    double preEngageEncoder = 0;
 
-    bool zeroSensorBroke = false; // ???
+    bool zeroSensorBroke = false;
+
+    bool hangSensorTripped = false;
 };

@@ -39,7 +39,9 @@
 //number for this isnt actually on IOMap yet so change as needed based on what makes sense once we've finalized sensors more
 #define PWM_BLINKY_BLINKY 0
 
-#define DIO_HANG_RESET 0
+// Hang Sensors, not really numbers at the moment, just used as substitutes for now
+#define HANG_LEAF_SENSOR 0
+#define REFLECTIVE_HANG_SENSOR 1
 
 
 #define CAN_PIGEON 14
