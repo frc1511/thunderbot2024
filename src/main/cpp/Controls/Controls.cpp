@@ -4,9 +4,10 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #define AXIS_DEADZONE 0.1
-Controls::Controls(Drive* _drive, Shamptake* _shamptake)
+Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm)
 :drive(_drive),
- shamptake(_shamptake) {
+ shamptake(_shamptake),
+ arm(_arm) {
 
 }
 
@@ -223,44 +224,56 @@ void Controls::doAux() {
     bool fire = auxController.getButton(AuxButton::X);
     bool intake = auxController.getButton(AuxButton::Y);
     bool outtake = auxController.getButton(AuxButton::A);
-    if (toggleCurve) {
-        shamptake->shooterSwitch();
-        printf("Shooter curved: %d\n", shamptake->shooterMode == shamptake->CURVED);
-    }
+    // if (toggleCurve) {
+    //     shamptake->shooterSwitch();
+    //     printf("Shooter curved: %d\n", shamptake->shooterMode == shamptake->CURVED);
+    // }
 
-    if (!intake) {
-        shamptake->intakeSpeed = shamptake->STOP;
-    }
+    // if (!intake) {
+    //     shamptake->intakeSpeed = shamptake->STOP;
+    // }
 
-    if (shooter) {
-        if (fire){
-            shamptake->intakeSpeed = shamptake->FIRE;
-            shamptake->shooter(1);
-            shamptake->trippedBefore = false;
-            printf("RESET\n");
-        } else {
-            shamptake->shooter(0.6);
-        }
-    } else {
-        shamptake->shooter(0);
-    }
+    // if (shooter) {
+    //     if (fire){
+    //         shamptake->intakeSpeed = shamptake->FIRE;
+    //         shamptake->shooter(1);
+    //         shamptake->trippedBefore = false;
+    //         printf("RESET\n");
+    //     } else {
+    //         shamptake->shooter(0.6);
+    //     }
+    // } else {
+    //     shamptake->shooter(0);
+    // }
     
-    if (outtake) {
-        shamptake->intakeSpeed = shamptake->OUTTAKE;
-        shamptake->trippedBefore = false;
-        printf("RESET\n");
-    }
+    // if (outtake) {
+    //     shamptake->intakeSpeed = shamptake->OUTTAKE;
+    //     shamptake->trippedBefore = false;
+    //     printf("RESET\n");
+    // }
 
-    //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
-    if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
-        //set arm low enough to get under the stage
-    } else if (auxController.getDPad() == ThunderGameController::DPad::UP){
-        //set arm back to normal position
-    }
+    // //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
+    // if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
+    //     //set arm low enough to get under the stage
+    // } else if (auxController.getDPad() == ThunderGameController::DPad::UP){
+    //     //set arm back to normal position
+    // }
 
     double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
 
+    if (std::fabs(armPivot) < AXIS_DEADZONE) {
+        armPivot = 0;
+    }
 
+    if (armPivot > 0.2) {
+        armPivot = 0.2;
+    }
+    
+    if (armPivot < -0.2) {
+        armPivot = -0.2;
+    }
+    if (arm != nullptr)
+        arm->setPower(armPivot);
 
 }
 
