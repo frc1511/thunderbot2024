@@ -45,9 +45,9 @@ class Hang {
     ThunderSparkMax *winch;    
     //frc::Servo ratchet{PWM_HANG_RATCHET}; ---NOT NEEDED
 
-    frc::DigitalInput reflectiveHangSensor{REFLECTIVE_HANG_SENSOR};
+    frc::DigitalInput reflectiveHangSensor{DIO_HANG_RR_SENSOR_LEFT};
 
-    frc::DigitalInput leafSensor{HANG_LEAF_SENSOR};
+    frc::DigitalInput leafSensor{DIO_HANG_LIMIT_SWITCH_LEFT};
     bool lastSensorReading = false; 
 
     HangMovement moveDirection = STOP; // Default movement is stop
