@@ -17,8 +17,7 @@ class Auto {
 
         enum AutoMode {
             NONE,
-            TEST,
-            SIX_NOTE
+            TEST
         };
 
         bool isAutoDone() {  
