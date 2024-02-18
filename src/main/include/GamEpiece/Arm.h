@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Basic/IOMap.h>
 #include <Basic/Mechanism.h>
 #include <frc/DigitalInput.h>
 #include <rev/CANSparkMax.h>
-
 #define ARM_MINIMUM_ENCODER -42.309
 #define ARM_MINIMUM_ENCODER_SLOW -35.000
 #define ARM_MAXIMUM_ENCODER -3.000 // Approx.
@@ -33,9 +33,22 @@ private:
 
     double getRawMotorRotationPosition();
 
-    frc::DigitalInput limitSwitch {6};
-    rev::CANSparkMax armMotor {18, rev::CANSparkMax::MotorType::kBrushless};
-    rev::SparkRelativeEncoder armEncoder;
+    double getRawBorePosition();
+
+    std::string getMotorModeString();
+
+    frc::DigitalInput limitSwitch {DIO_ARM_LIMIT_SWITCH};
+    rev::CANSparkMax armMotor {CAN_PIVOT_ARM, rev::CANSparkMax::MotorType::kBrushless};
+    rev::SparkRelativeEncoder armEncoder; // Encoder Inside of Motor
+
+    /**
+    * An alternate encoder object is constructed using the GetAlternateEncoder()
+    * method on an existing CANSparkMax object. If using a REV Through Bore
+    * Encoder, the type should be set to quadrature and the counts per
+    * revolution set to 8192
+    */
+    rev::SparkMaxAlternateEncoder boreEncoder;
+    //rev::SparkRelativeEncoder boreEncoder; // Quadrature Resolution: 2048 Cycles per Revolution (8192 Counts per Revolution)
 
     bool backingOffMinimum = false;
     bool backingOffMaximum = false;

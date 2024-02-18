@@ -4,10 +4,15 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #define AXIS_DEADZONE 0.1
-Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm)
-:drive(_drive),
- shamptake(_shamptake),
- arm(_arm) {
+
+
+Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang) :
+    drive(_drive),
+    shamptake(_shamptake),
+    arm(_arm),
+    hang(_hang),
+    armMode(true) 
+{
 
 }
 
@@ -18,22 +23,22 @@ void Controls::process() {
     auxController.process();
 
 
-    //doSwitchPanel();
-    if (callaDisable) {
-        //drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
-    }
-    else {
-        //doDrive();
-    }
+    // //doSwitchPanel();
+    // if (callaDisable) {
+    //     //drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
+    // }
+    // else {
+    //     //doDrive();
+    // }
 
-    if (!sashaDisable) {
-        if (manualAux) {
-            doAuxManual();
-        }
-        else {
-            doAux();
-        }
-    }
+    // if (!sashaDisable) {
+    //     if (manualAux) {
+    //         doAuxManual();
+    //     }
+    //     else {
+    //         doAux();
+    //     }
+    // }
 }
 
 void Controls::processInDisabled() {
@@ -259,22 +264,57 @@ void Controls::doAux() {
     //     //set arm back to normal position
     // }
 
-    double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
+    if (armMode){
+        // Arm stuff- ALSO  A FUNCTIONNNN OUTTA DIS STUFF 2
+        double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
 
-    if (std::fabs(armPivot) < AXIS_DEADZONE) {
-        armPivot = 0;
-    }
+        if (std::fabs(armPivot) < AXIS_DEADZONE) {
+            armPivot = 0;
+        }
 
-    if (armPivot > 0.2) {
-        armPivot = 0.2;
-    }
-    
-    if (armPivot < -0.2) {
-        armPivot = -0.2;
-    }
-    if (arm != nullptr)
-        arm->setPower(armPivot);
+        if (armPivot > MAX_ARM_SPEED) {
+            armPivot = MAX_ARM_SPEED;
+        }
+        
+        if (armPivot < -MAX_ARM_SPEED) {
+            armPivot = -MAX_ARM_SPEED;
+        }
+        if (arm != nullptr)
+            arm->setPower(armPivot);
 
+    }
+    else{
+        // Hang stuff - MAKE A FUNCTION OUTTA THIS STUFF
+        double hangLeft = -auxController.getAxis(AuxAxis::LEFT_Y);
+        double hangRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
+
+        if (std::fabs(hangLeft) < AXIS_DEADZONE) {
+            hangLeft = 0;
+        }
+
+        if (hangLeft > MAX_ARM_SPEED) {
+            hangLeft = MAX_ARM_SPEED;
+        }
+        if (hangLeft < -MAX_ARM_SPEED) {
+            hangLeft = -MAX_ARM_SPEED;
+        }
+        if (hang != nullptr)
+            hang->setSpeed(hangLeft);
+
+        // Right Side
+
+        if (std::fabs(hangRight) < AXIS_DEADZONE) {
+            hangRight = 0;
+        }
+        if (hangRight > MAX_ARM_SPEED) {
+            hangRight = MAX_ARM_SPEED;
+        }
+        if (hangRight < -MAX_ARM_SPEED) {
+            hangRight = -MAX_ARM_SPEED;
+        }
+        if (hang != nullptr)
+            hang->setSpeed(hangRight);
+    }
 }
 
 void Controls::doAuxManual() {

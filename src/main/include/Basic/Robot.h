@@ -10,6 +10,7 @@
 #include <GamEpiece/Shamptake.h>
 #include <Autonomous/Auto.h>
 #include <GamEpiece/Arm.h>
+#include <Hanger/Hang.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -35,10 +36,11 @@ private:
     //Drive drive;
     Shamptake shampTake;
     Arm arm;
-    Controls controls {nullptr, &shampTake, &arm};
+    Hang hang;
+    Controls controls {nullptr, &shampTake, &arm, &hang};
     //Auto autoCode {&drive};
     std::vector<Mechanism*> allMechanisms {
         //&drive, &controls
-        &arm
+        &arm, &hang
     };
 };

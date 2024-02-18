@@ -1,14 +1,19 @@
 #pragma once
 #include <frc/DigitalInput.h>
+#include <frc/Relay.h>
 #include <Basic/IOMap.h>
 #include <rev/CANSparkMax.h>
-#include <ThunderSparkMax/ThunderSparkMax.h>
-#include <Feedback/Feedback.h>
-#include <BlinkyBlinky/BlinkyBlinky.h>
+#include <Basic/Mechanism.h>
 
-class Hang {
+// #include <ThunderSparkMax/ThunderSparkMax.h>
+// #include <Feedback/Feedback.h>
+// #include <BlinkyBlinky/BlinkyBlinky.h>
+
+class Hang : public Mechanism {
     public:
     Hang();
+    ~Hang();
+
 
     enum HangMovement {
         UP, 
@@ -18,58 +23,86 @@ class Hang {
 
     void reset();
     void process();
-    void debug(Feedback* feedback);
-    //void lights(Lights* lights);
+//     void debug(Feedback* feedback);
+//     //void lights(Lights* lights);
 
     /**
      *  Moves the mechanism to the target position 
      */
     void move(HangMovement direction);
 
-    /**
-     * When retracting, move slower for precision
-     */
-    void enableSlowRetract(bool slowModeEnabled);
+    void setMotorLeftSpeed(double speed);
+    void setMotorRightSpeed(double speed);
+    void setSpeed(double speed);
 
-    /**
-     * broke is true if the zero sensor is broken
-     * broke is false if the zero sensor isnt broken
-     */
-    void zeroSensorBroken(bool broke); // NOT NEEDED
+    void enableBrakeMode(bool enabled);
 
-    void reflectiveHangSensorTripped(bool reflectiveHangSensorisTripped);
+    double getLeftMotorPosition();
+    double getRightMotorPosition();
 
-    void setHangIdleMode(bool idleModeEnabled);
+    std::string getMotorLeftModeString();
+    std::string getMotorRightModeString();
 
-    private:
-    ThunderSparkMax *winch;    
-    //frc::Servo ratchet{PWM_HANG_RATCHET}; ---NOT NEEDED
+    std::string ConvertTemperatureToString(double temp);
+    void sendFeedback() override;
 
-    frc::DigitalInput reflectiveHangSensor{DIO_HANG_RR_SENSOR_LEFT};
 
-    frc::DigitalInput leafSensor{DIO_HANG_LIMIT_SWITCH_LEFT};
-    bool lastSensorReading = false; 
+//     /**
+//      * When retracting, move slower for precision
+//      */
+//     void enableSlowRetract(bool slowModeEnabled);
 
-    HangMovement moveDirection = STOP; // Default movement is stop
-    bool slowRetract = false; 
+//     /**
+//      * broke is true if the zero sensor is broken
+//      * broke is false if the zero sensor isnt broken
+//      */
+//     void zeroSensorBroken(bool broke); // NOT NEEDED
 
-    enum HangState {
-        STOPPED,
-        DIVORCED,
-        MOVING_UP,
-        MOVING_DOWN
-    };
+//     void reflectiveHangSensorTripped(bool reflectiveHangSensorisTripped);
 
-    HangState currentState = STOPPED; // Default state is stopped
+//     void setHangIdleMode(bool idleModeEnabled);
 
-    double moveDownRamp = 0; // ???
+private:
+    rev::CANSparkMax hangMotorLeft {CAN_HANG_ARM_LEFT, rev::CANSparkMax::MotorType::kBrushless};
+    rev::SparkRelativeEncoder hangLeftEncoder;
+    rev::CANSparkMax hangMotorRight {CAN_HANG_ARM_RIGHT, rev::CANSparkMax::MotorType::kBrushless};
+    rev::SparkRelativeEncoder hangRightEncoder;
 
-    void setRatchetPawlMarried(bool married);
-    bool ratchetPawlMarried = false; // Default is not engaged
+    frc::Relay solenoidLeft {RELAY_HANG_GEAR_LOCK, frc::Relay::kBothDirections};
+    frc::Relay solenoidRight {RELAY_HANG_GEAR_LOCK, frc::Relay::kBothDirections};
 
-    double preEngageEncoder = 0;
+    frc::DigitalInput reflectiveHangSensorLeft {DIO_HANG_RR_SENSOR_LEFT};
+    frc::DigitalInput reflectiveHangSensorRight {DIO_HANG_RR_SENSOR_RIGHT};
 
-    bool zeroSensorBroke = false;
+    frc::DigitalInput leafSensorLeft {DIO_HANG_LIMIT_SWITCH_LEFT};
+    frc::DigitalInput leafSensorRight {DIO_HANG_LIMIT_SWITCH_RIGHT};
 
-    bool hangSensorTripped = false;
+    double hangEncoderLeftPosition;
+    double hangEncoderRightPosition;
+
+//     bool lastSensorReading = false; 
+
+//     HangMovement moveDirection = STOP; // Default movement is stop
+//     bool slowRetract = false; 
+
+//     enum HangState {
+//         STOPPED,
+//         DIVORCED,
+//         MOVING_UP,
+//         MOVING_DOWN
+//     };
+
+//     HangState currentState = STOPPED; // Default state is stopped
+
+//     double moveDownRamp = 0; // ???
+
+//     void setRatchetPawlMarried(bool married);
+//     bool ratchetPawlMarried = false; // Default is not engaged
+
+//     double preEngageEncoder = 0;
+
+//     bool zeroSensorBroke = false;
+
+//     bool hangSensorTripped = false;
+//
 };

@@ -1,6 +1,7 @@
 #include <GamEpiece/Arm.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-Arm::Arm(): armEncoder(armMotor.GetEncoder(rev::RelativeEncoder::EncoderType::kHallSensor, 42)) {
+Arm::Arm(): armEncoder(armMotor.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42)),
+            boreEncoder(armMotor.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)) {
     
 }
 
@@ -15,8 +16,12 @@ void Arm::process()
 
 void Arm::sendFeedback() {
     frc::SmartDashboard::PutBoolean("Arm_isOnLowerLimit", isOnLowerLimit());
-    frc::SmartDashboard::PutNumber("Arm_rawMotorPosition", getRawMotorPosition());
+    frc::SmartDashboard::PutNumber("Arm_borePosition", getRawBorePosition());
     frc::SmartDashboard::PutNumber("Arm_angleMotorPosition", getRawMotorRotationPosition());
+    frc::SmartDashboard::PutNumber("Arm_rawMotorPosition", getRawMotorPosition());
+    frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
+    frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
+    frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());
 }
 
 void Arm::doPersistentConfiguration() {
@@ -32,7 +37,8 @@ bool Arm::isOnLowerLimit() {
     return !limitSwitch.Get(); // Get the limit switch reading (it's inverted)
 }
 bool Arm::init() {
-
+    bool isInit = true;
+    return isInit;
 }
 double Arm::getRawMotorPosition() {
     double position = -armEncoder.GetPosition(); // Encoders are reversed
@@ -42,6 +48,19 @@ double Arm::getRawMotorPosition() {
 double Arm::getRawMotorRotationPosition() {
     double rotation = -armEncoder.GetPosition();
     return rotation;
+}
+
+double Arm::getRawBorePosition() {
+    double rotations = boreEncoder.GetPosition();
+    return rotations;
+}
+
+std::string Arm::getMotorModeString() {
+    std::string motorMode = "Coast";
+    if (armMotor.GetIdleMode() == rev::CANSparkBase::IdleMode::kBrake) {
+        motorMode = "Brake";
+    }
+    return motorMode;
 }
 
 void Arm::setPower(double power) {
