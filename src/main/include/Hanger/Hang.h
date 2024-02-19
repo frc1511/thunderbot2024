@@ -68,8 +68,8 @@ private:
     rev::CANSparkMax hangMotorRight {CAN_HANG_ARM_RIGHT, rev::CANSparkMax::MotorType::kBrushless};
     rev::SparkRelativeEncoder hangRightEncoder;
 
-    frc::Relay solenoidLeft {RELAY_HANG_GEAR_LOCK, frc::Relay::kBothDirections};
-    frc::Relay solenoidRight {RELAY_HANG_GEAR_LOCK, frc::Relay::kBothDirections};
+    // frc::Relay solenoidLeft {RELAY_HANG_GEAR_LOCK, frc::Relay::kBothDirections};
+    // frc::Relay solenoidRight {RELAY_HANG_GEAR_LOCK, frc::Relay::kBothDirections};
 
     frc::DigitalInput reflectiveHangSensorLeft {DIO_HANG_RR_SENSOR_LEFT};
     frc::DigitalInput reflectiveHangSensorRight {DIO_HANG_RR_SENSOR_RIGHT};

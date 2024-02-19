@@ -13,9 +13,10 @@ using AuxControllerType = ThunderPS4Controller;
 
 class Controls : public Mechanism {
 public:
-    double MAX_ARM_SPEED = 0.2;
+    double MAX_ARM_SPEED = 0.5;
 
-    Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
+    //Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
+ Controls(Drive* drive, Arm* _arm, Hang* _hang);
 
     void resetToMode(MatchMode mode) override;
     void process() override;
@@ -27,12 +28,13 @@ public:
 private:
     Drive* drive;
     DriveControllerType driveController{ThunderGameController::Controller::DRIVER};
-    Shamptake* shamptake;
+    //Shamptake* shamptake;
     Arm* arm;
     Hang* hang;
     AuxControllerType auxController{ThunderGameController::Controller::AUX};
     frc::GenericHID switchPanel{2};
     bool armMode;
+    double currentSpeed;
     
     void doDrive();
     void doAux();

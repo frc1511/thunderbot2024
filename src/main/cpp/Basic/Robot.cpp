@@ -28,13 +28,13 @@ void Robot::TeleopInit() {
     //shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
     //shampTake.doPersistentConfiguration();
     arm.doPersistentConfiguration();
-    hang.doPersistentConfiguration();
+    //hang.doPersistentConfiguration();
 }
 void Robot::TeleopPeriodic() {
     //shampTake.process();
-    // controls.process();
+    controls.process();
     arm.process();
-    hang.process();
+    //hang.process();
     //shampTake.runIntakeMotors();
 
     //drive.process();
