@@ -33,7 +33,7 @@ private:
     void reset(Mechanism::MatchMode mode);
 
     Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
-    //Drive drive;
+    Drive drive;
     //Shamptake shampTake;
     Arm arm;
     Hang hang;
