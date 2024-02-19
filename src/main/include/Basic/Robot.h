@@ -36,12 +36,12 @@ private:
     //Drive drive;
     //Shamptake shampTake;
     Arm arm;
-    //Hang hang;
+    Hang hang;
     //Controls controls {nullptr, &shampTake, &arm, &hang};
-    Controls controls {nullptr, &arm, nullptr};
+    Controls controls {nullptr, &arm, &hang};
     //Auto autoCode {&drive};
     std::vector<Mechanism*> allMechanisms {
         //&drive, &controls
-        &arm
+        &arm, &hang
     };
 };

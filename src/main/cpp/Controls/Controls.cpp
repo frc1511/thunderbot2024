@@ -10,8 +10,8 @@ Controls::Controls(Drive* _drive, Arm* _arm, Hang* _hang) :
     drive(_drive),
     //shamptake(nullptr),
     arm(_arm),
-    hang(nullptr),
-    armMode(true) 
+    hang(_hang),
+    armMode(false) 
 {
 
 }
@@ -321,7 +321,16 @@ void Controls::doAux() {
         }
         if (hang != nullptr)
         {
-            hang->setSpeed(hangLeft);
+            if (intake && outtake) {
+                hang->setSolenoids(Hang::SolenoidStates::BOTH);
+            } else if (intake) {
+                hang->setSolenoids(Hang::SolenoidStates::LEFT);
+            } else if (outtake) {
+                hang->setSolenoids(Hang::SolenoidStates::RIGHT);
+            } else {
+                hang->setSolenoids(Hang::SolenoidStates::OFF);
+            }
+            //hang->setSpeed(hangLeft);
         }
 
         // Right Side
@@ -335,8 +344,9 @@ void Controls::doAux() {
         if (hangRight < -MAX_ARM_SPEED) {
             hangRight = -MAX_ARM_SPEED;
         }
-        if (hang != nullptr)
-            hang->setSpeed(hangRight);
+        if (hang != nullptr) {
+            //hang->setSpeed(hangRight);
+        }
     }
 }
 

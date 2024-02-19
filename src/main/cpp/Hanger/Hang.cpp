@@ -236,15 +236,38 @@ std::string Hang::getMotorRightModeString() {
 }
 
 void Hang::sendFeedback() {
-    // frc::SmartDashboard::PutBoolean("Arm_isOnLowerLimit", isOnLowerLimit());
-    // frc::SmartDashboard::PutNumber("Arm_borePosition", getRawBorePosition());
     frc::SmartDashboard::PutNumber("Hang_Left_Position", getLeftMotorPosition());
     frc::SmartDashboard::PutNumber("Hang_Right_Position", getRightMotorPosition());
-    frc::SmartDashboard::PutString("Hang_LeftMotorTemp", ConvertTemperatureToString(hangMotorLeft.GetMotorTemperature()));
-    frc::SmartDashboard::PutString("Hang_RightMotorTemp", ConvertTemperatureToString(hangMotorRight.GetMotorTemperature()));
+    // frc::SmartDashboard::PutString("Hang_LeftMotorTemp", ConvertTemperatureToString(hangMotorLeft.GetMotorTemperature()));
+    // frc::SmartDashboard::PutString("Hang_RightMotorTemp", ConvertTemperatureToString(hangMotorRight.GetMotorTemperature()));
     frc::SmartDashboard::PutString("Hang_LeftmotorMode", getMotorLeftModeString());
     frc::SmartDashboard::PutString("Hang_RightmotorMode", getMotorRightModeString());
+    frc::SmartDashboard::PutString("Hang_SolenoidStates", getSolenoidState());
 }
+
+void Hang::setSolenoids(Hang::SolenoidStates state) {
+    solenoidRelay.Set((frc::Relay::Value)state);
+}
+
+std::string Hang::getSolenoidState() {
+    std::string solenoidState = "Off";
+    switch (solenoidRelay.Get())
+    {
+    case SolenoidStates::BOTH:
+        solenoidState = "Both";
+        break;
+    case SolenoidStates::LEFT:
+        solenoidState = "Left Only";
+        break;
+    case SolenoidStates::RIGHT:
+        solenoidState = "Right Only";
+        break;
+    default:
+        break;
+    }
+    return solenoidState;
+}
+
 std::string Hang::ConvertTemperatureToString(double temp){
     char temperature[16];
     sprintf(temperature, "%lf C/%lf F", temp, temp * 1.8 + 32);
