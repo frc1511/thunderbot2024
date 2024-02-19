@@ -58,8 +58,8 @@ void Shamptake::shooter(double Power) {
     // }
     //shooterMotorRight.Set(motorRightpower); 
     //shooterMotorLeft.Set(motorLeftpower); 
-    shooterMotorLeftPIDController.SetReference(Power * 5000, rev::ControlType::kVelocity);
-    shooterMotorRightPIDController.SetReference(Power * 5000, rev::ControlType::kVelocity);
+    shooterMotorLeftPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
+    shooterMotorRightPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
 }
 void Shamptake::stop() {
     intake(0);

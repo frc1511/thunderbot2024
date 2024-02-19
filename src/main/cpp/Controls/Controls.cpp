@@ -4,10 +4,15 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #define AXIS_DEADZONE 0.1
-Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm)
-:drive(_drive),
- shamptake(_shamptake),
- arm(_arm) {
+
+
+Controls::Controls(Drive* _drive, Arm* _arm, Hang* _hang) :
+    drive(_drive),
+    //shamptake(nullptr),
+    arm(_arm),
+    hang(nullptr),
+    armMode(true) 
+{
 
 }
 
@@ -16,24 +21,25 @@ void Controls::resetToMode(MatchMode mode) { }
 void Controls::process() {
     //driveController.process();
     auxController.process();
+    doAux();
 
 
-    //doSwitchPanel();
-    if (callaDisable) {
-        //drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
-    }
-    else {
-        //doDrive();
-    }
+    // //doSwitchPanel();
+    // if (callaDisable) {
+    //     //drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
+    // }
+    // else {
+    //     //doDrive();
+    // }
 
-    if (!sashaDisable) {
-        if (manualAux) {
-            doAuxManual();
-        }
-        else {
-            doAux();
-        }
-    }
+    // if (!sashaDisable) {
+    //     if (manualAux) {
+    //         doAuxManual();
+    //     }
+    //     else {
+    //         doAux();
+    //     }
+    // }
 }
 
 void Controls::processInDisabled() {
@@ -196,6 +202,10 @@ void Controls::doDrive() {
 void Controls::doAux() {
     using AuxButton = AuxControllerType::Button;
     using AuxAxis = AuxControllerType::Axis;
+
+    if (auxController.getButton(AuxButton::TOUCH_PAD)){
+        armMode = !armMode;
+    }
     
     if (hangModeControls == true){
         /* hang and trap controls 
@@ -252,29 +262,82 @@ void Controls::doAux() {
     //     printf("RESET\n");
     // }
 
-    // //CHECK WITH THE MECHIES TO SEE IF THE FOLLOWING FUNT IS ACTUALLY NEEDED
-    // if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
-    //     //set arm low enough to get under the stage
-    // } else if (auxController.getDPad() == ThunderGameController::DPad::UP){
+     
+     if (auxController.getDPad() == ThunderGameController::DPad::UP){
+       //set arm low enough to get under the stage
+        if(armMode) {
+       arm->ARM_SLOW_SPEED += .1;
+       if (arm->ARM_SLOW_SPEED >= .5) {
+        arm->ARM_SLOW_SPEED = .5;
+       }
+        }
+     } else if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
     //     //set arm back to normal position
-    // }
-
-    double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
-
-    if (std::fabs(armPivot) < AXIS_DEADZONE) {
-        armPivot = 0;
+    if (armMode) {
+    arm->ARM_SLOW_SPEED -= .1;
+       if (arm->ARM_SLOW_SPEED <= -.5) {
+        arm->ARM_SLOW_SPEED = -.5;
+       }
     }
+     }
 
-    if (armPivot > 0.2) {
-        armPivot = 0.2;
-    }
-    
-    if (armPivot < -0.2) {
-        armPivot = -0.2;
-    }
-    if (arm != nullptr)
-        arm->setPower(armPivot);
+    if (armMode){
+        // Arm stuff- ALSO  A FUNCTIONNNN OUTTA DIS STUFF 2
+        double armPivot = -auxController.getAxis(AuxAxis::LEFT_Y);
 
+        if (std::fabs(armPivot) < AXIS_DEADZONE) {
+            armPivot = 0;
+        }
+
+        if (armPivot > arm->ARM_SLOW_SPEED) {
+            armPivot = arm->ARM_SLOW_SPEED;
+        }
+        
+        if (armPivot < -arm->ARM_SLOW_SPEED) {
+            armPivot = -arm->ARM_SLOW_SPEED;
+        }
+        currentSpeed = armPivot;
+        frc::SmartDashboard::PutNumber("Arm_Speed", currentSpeed);
+        if (arm != nullptr)
+        {
+            arm->setPower(armPivot);
+        }
+
+    }
+    else{
+        // Hang stuff - MAKE A FUNCTION OUTTA THIS STUFF
+        double hangLeft = -auxController.getAxis(AuxAxis::LEFT_Y);
+        double hangRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
+
+        if (std::fabs(hangLeft) < AXIS_DEADZONE) {
+            hangLeft = 0;
+        }
+
+        if (hangLeft > MAX_ARM_SPEED) {
+            hangLeft = MAX_ARM_SPEED;
+        }
+        if (hangLeft < -MAX_ARM_SPEED) {
+            hangLeft = -MAX_ARM_SPEED;
+        }
+        if (hang != nullptr)
+        {
+            hang->setSpeed(hangLeft);
+        }
+
+        // Right Side
+
+        if (std::fabs(hangRight) < AXIS_DEADZONE) {
+            hangRight = 0;
+        }
+        if (hangRight > MAX_ARM_SPEED) {
+            hangRight = MAX_ARM_SPEED;
+        }
+        if (hangRight < -MAX_ARM_SPEED) {
+            hangRight = -MAX_ARM_SPEED;
+        }
+        if (hang != nullptr)
+            hang->setSpeed(hangRight);
+    }
 }
 
 void Controls::doAuxManual() {
@@ -307,5 +370,9 @@ void Controls::doSwitchPanel() {
 }
 
 void Controls::sendFeedback() {
+    frc::SmartDashboard::PutString("Arm_currentmode", armMode?"arm test mode" : "hang mode");
+    frc::SmartDashboard::PutNumber("Hang_Speed", MAX_ARM_SPEED);
+    frc::SmartDashboard::PutNumber("Arm_Speed", currentSpeed);
+
 
 }
