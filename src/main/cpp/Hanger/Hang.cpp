@@ -46,7 +46,6 @@ Hang::~Hang()
 
 }
 
-void Hang::process () {}
 
 // void Hang::process() {
 //     switch(currentState) { // if the current state any of these, then call do whichever process is in the body
@@ -135,57 +134,10 @@ void Hang::process () {}
 //     moveDirection = position;
 // } // look into
 
-// void Hang::debug(Feedback* feedback) {
-
-//     feedback->sendDouble("thunderdashboard", "hang_pos", 100 * (winch->GetEncoder() / kMaxHeight));
-
-//     feedback->sendDouble("hang", "speed", winch->Get());
-//     feedback->sendDouble("hang", "encoder", winch->GetEncoder());
-//     feedback->sendDouble("hang", "ratchet", ratchetPawlMarried);
-//     feedback->sendString("hang", "zero sensor", leafSensor.Get() ? "true" : "false");
-
-//     const char* stateName = "";
-//     switch(currentState) {
-//         case STOPPED:
-//             stateName = "STOPPED";
-//         break;
-//         case DIVORCED:
-//             stateName = "WINCH_DISENGAGE";
-//         break;
-//         case MOVING_UP:
-//             stateName = "MOVING_UP";
-//         break;
-//         case MOVING_DOWN:
-//             stateName = "MOVING_DOWN";
-//         break;
-//     }
-//     feedback->sendString("hang", "state", stateName);
-
-//     const char* directionName = "";
-//     switch(moveDirection) {
-//         case UP:
-//             directionName = "UP";
-//         break;
-//         case STOP:
-//             directionName = "STOP";
-//         break;
-//         case DOWN:
-//             directionName = "DOWN";
-//         break;
-//     }
-//     feedback->sendString("hang", "direction", directionName);
-//     feedback->sendBoolean("hang", "sensor broken", zeroSensorBroke);
-//     feedback->sendBoolean("hang", "reflective sensor tripped", hangSensorTripped);
-// }
-// /*
-// */
-// void Hang::zeroSensorBroken(bool broke){
-//     zeroSensorBroke = broke;
-// }
-
 // void Hang::reflectiveHangSensorTripped(bool reflectiveHangSensorisTripped){
 //     hangSensorTripped = reflectiveHangSensorisTripped;
 // }
+
 // void Hang::enableSlowRetract(bool enable) {
 //     slowRetract = enable;
 // }
@@ -200,20 +152,44 @@ void Hang::enableBrakeMode(bool enabled) {
         hangMotorRight.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
     }
 }
+void Hang::process() {
+    if (isLeftRelayOn()) {
+        if (!isLeftPawlOpen()) {
+            hangMotorLeft.Set(0.1); // If Left Pawl/Relay is not working reverse motor
+        }
+    }
+    if (isRightRelayOn()) {
+        if (!isRightPawlOpen()) {
+            hangMotorRight.Set(-0.1); // If Right Pawl/Relay is not working reverse motor
+        }
+    }
+}
 void Hang::setMotorLeftSpeed(double speed) { // Motor is reversed
-    if (reflectiveHangSensorLeft.Get()) {
-        hangMotorLeft.Set(speed);
-    } else if (speed < 0) {
-        hangMotorLeft.Set(speed);
+    if (isLeftRelayOn() && isLeftPawlOpen()) {
+        if (reflectiveHangSensorLeft.Get()) {
+            hangMotorLeft.Set(speed);
+        }
+        else if (speed < 0) {
+            hangMotorLeft.Set(speed);
+        } 
+        else {
+            hangMotorLeft.Set(0);
+        }
     } else {
         hangMotorLeft.Set(0);
     }
 }
 void Hang::setMotorRightSpeed(double speed) {
-    if (reflectiveHangSensorRight.Get()) {
-        hangMotorRight.Set(speed);
-    } else if (speed > 0) { // Could be a || but this is easier to read
-        hangMotorRight.Set(speed);
+    if (isRightRelayOn() && isRightPawlOpen()) {
+        if (reflectiveHangSensorRight.Get()) {
+            hangMotorRight.Set(speed);
+        }
+        else if (speed > 0) {
+            hangMotorRight.Set(speed);
+        } 
+        else {
+            hangMotorRight.Set(0);
+        }
     } else {
         hangMotorRight.Set(0);
     }
@@ -246,7 +222,6 @@ std::string Hang::getMotorRightModeString() {
     }
     return motorMode;
 }
-
 void Hang::sendFeedback() {
     frc::SmartDashboard::PutNumber("Hang_Left_Position", getLeftMotorPosition());
     frc::SmartDashboard::PutNumber("Hang_Right_Position", getRightMotorPosition());
@@ -258,11 +233,9 @@ void Hang::sendFeedback() {
     frc::SmartDashboard::PutBoolean("Hang_RightRRSensor", reflectiveHangSensorRight.Get());
     frc::SmartDashboard::PutString("Hang_SolenoidStates", getSolenoidState());
 }
-
 void Hang::setSolenoids(Hang::SolenoidStates state) {
     solenoidRelay.Set((frc::Relay::Value)state);
 }
-
 std::string Hang::getSolenoidState() {
     std::string solenoidState = "Off";
     switch (solenoidRelay.Get())
@@ -281,8 +254,19 @@ std::string Hang::getSolenoidState() {
     }
     return solenoidState;
 }
-
-std::string Hang::ConvertTemperatureToString(double temp){
+bool Hang::isLeftRelayOn() {
+    return (solenoidRelay.Get() == SolenoidStates::LEFT || solenoidRelay.Get() == SolenoidStates::BOTH);
+}
+bool Hang::isRightRelayOn() {
+    return (solenoidRelay.Get() == SolenoidStates::RIGHT || solenoidRelay.Get() == SolenoidStates::BOTH);
+}
+bool Hang::isLeftPawlOpen() {
+    return leafSensorLeft.Get();
+}
+bool Hang::isRightPawlOpen() {
+    return leafSensorRight.Get();
+}
+std::string Hang::ConvertTemperatureToString(double temp) {
     char temperature[16];
     sprintf(temperature, "%lf C/%lf F", temp, temp * 1.8 + 32);
     return temperature;

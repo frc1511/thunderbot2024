@@ -57,6 +57,11 @@ class Hang : public Mechanism {
     void setSolenoids(Hang::SolenoidStates state);
     void sendFeedback() override;
 
+    bool isLeftRelayOn();
+    bool isRightRelayOn();
+
+    bool isLeftPawlOpen();
+    bool isRightPawlOpen();
 
 //     /**
 //      * When retracting, move slower for precision
