@@ -200,14 +200,26 @@ void Hang::enableBrakeMode(bool enabled) {
         hangMotorRight.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
     }
 }
-void Hang::setMotorLeftSpeed(double speed){
-    hangMotorLeft.Set(speed);
+void Hang::setMotorLeftSpeed(double speed) { // Motor is reversed
+    if (reflectiveHangSensorLeft.Get()) {
+        hangMotorLeft.Set(speed);
+    } else if (speed < 0) {
+        hangMotorLeft.Set(speed);
+    } else {
+        hangMotorLeft.Set(0);
+    }
 }
-void Hang::setMotorRightSpeed(double speed){
-    hangMotorRight.Set(speed);
+void Hang::setMotorRightSpeed(double speed) {
+    if (reflectiveHangSensorRight.Get()) {
+        hangMotorRight.Set(speed);
+    } else if (speed > 0) { // Could be a || but this is easier to read
+        hangMotorRight.Set(speed);
+    } else {
+        hangMotorRight.Set(0);
+    }
 }
 void Hang::setSpeed(double speed){
-    setMotorLeftSpeed(speed);
+    setMotorLeftSpeed(-speed);
     setMotorRightSpeed(speed);
 }
 double Hang::getLeftMotorPosition()
@@ -242,6 +254,8 @@ void Hang::sendFeedback() {
     // frc::SmartDashboard::PutString("Hang_RightMotorTemp", ConvertTemperatureToString(hangMotorRight.GetMotorTemperature()));
     frc::SmartDashboard::PutString("Hang_LeftmotorMode", getMotorLeftModeString());
     frc::SmartDashboard::PutString("Hang_RightmotorMode", getMotorRightModeString());
+    frc::SmartDashboard::PutBoolean("Hang_LeftRRSensor", reflectiveHangSensorLeft.Get());
+    frc::SmartDashboard::PutBoolean("Hang_RightRRSensor", reflectiveHangSensorRight.Get());
     frc::SmartDashboard::PutString("Hang_SolenoidStates", getSolenoidState());
 }
 

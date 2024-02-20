@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Basic/IOMap.h>
 #include <rev/CANSparkMax.h>
 #include <rev/SparkPIDController.h>
 #include <rev/ControlType.h>
@@ -57,7 +58,7 @@ class Shamptake : public Mechanism{
       OUTTAKE
     };
     Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::NORMAL;
-    frc::DigitalInput noteSensor{5};
+    frc::DigitalInput noteSensor{DIO_GAMEPIECE_RR_SENSOR};
     bool sensorDetected = false;
     bool trippedBefore = false;
 

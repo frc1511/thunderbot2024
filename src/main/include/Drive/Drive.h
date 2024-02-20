@@ -169,6 +169,14 @@ public:
     void setMode(DriveMode mode) {
         driveMode = mode;
     };
+
+    // The locations of the swerve modules on the robot.
+    wpi::array<frc::Translation2d, 4> locations {
+        frc::Translation2d(-ROBOT_WIDTH/2, +ROBOT_LENGTH/2), // Front left.
+        frc::Translation2d(-ROBOT_WIDTH/2, -ROBOT_LENGTH/2), // Back left.
+        frc::Translation2d(+ROBOT_WIDTH/2, -ROBOT_LENGTH/2), // Back right.
+        frc::Translation2d(+ROBOT_WIDTH/2, +ROBOT_LENGTH/2), // Front right.
+    };
     /**
      * The helper class that it used to convert chassis speeds into swerve
      * module states.
@@ -180,18 +188,28 @@ public:
      */
     frc::SwerveDriveKinematics<4> moduleStates { kinematics };
 
+    // The swerve modules on the robot.
+    wpi::array<SwerveModule*, 4> swerveModules {
+        new SwerveModule(CAN_SWERVE_DRIVE_FL, CAN_SWERVE_ROTATION_FL, CAN_SWERVE_CANCODER_FL, -123.134766_deg+180_deg - 90_deg),
+        new SwerveModule(CAN_SWERVE_DRIVE_BL, CAN_SWERVE_ROTATION_BL, CAN_SWERVE_CANCODER_BL, -17.666016_deg+180_deg - 90_deg),
+        new SwerveModule(CAN_SWERVE_DRIVE_BR, CAN_SWERVE_ROTATION_BR, CAN_SWERVE_CANCODER_BR, -62.753906_deg - 90_deg),
+        new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, -126.298828_deg - 90_deg)
+    };
+    
+    ctre::phoenix6::hardware::Pigeon2 pigeon { CAN_PIGEON };
+    
     /**
      * The class that handles tracking the position of the robot on the field
      * during the match.
      */
-    // frc::SwerveDrivePoseEstimator<4> poseEstimator {
-    //     kinematics,
-    //     getRotation(),
-    //     getModulePositions(),
-    //     frc::Pose2d(),
-    //     { 0.0, 0.0, 0.0 }, // Standard deviations of model states.
-    //     { 1.0, 1.0, 1.0 } // Standard deviations of the vision measurements.
-    // };
+    frc::SwerveDrivePoseEstimator<4> poseEstimator {
+        kinematics,
+        getRotation(),
+        getModulePositions(),
+        frc::Pose2d(),
+        { 0.0, 0.0, 0.0 }, // Standard deviations of model states.
+        { 1.0, 1.0, 1.0 } // Standard deviations of the vision measurements.
+    };
     // PID Controller for angular drivetrain movement.
     frc::ProfiledPIDController<units::radians> manualThetaPIDController {
         DRIVE_THETA_P, DRIVE_THETA_I, DRIVE_THETA_D,
@@ -244,33 +262,18 @@ private:
     /**
      * Returns the states of the swerve modules. (velocity and rotatation)
      */
-    //wpi::array<frc::SwerveModuleState, 4> getModuleStates();
+    wpi::array<frc::SwerveModuleState, 4> getModuleStates();
 
     /**
      * Returns the positions of the swerve modules.
      */
-    // wpi::array<frc::SwerveModulePosition, 4> getModulePositions();
+    wpi::array<frc::SwerveModulePosition, 4> getModulePositions();
 
 
     bool imuCalibrated = false;
 
-    // The locations of the swerve modules on the robot.
-    wpi::array<frc::Translation2d, 4> locations {
-        frc::Translation2d(-ROBOT_WIDTH/2, +ROBOT_LENGTH/2), // Front left.
-        frc::Translation2d(-ROBOT_WIDTH/2, -ROBOT_LENGTH/2), // Back left.
-        frc::Translation2d(+ROBOT_WIDTH/2, -ROBOT_LENGTH/2), // Back right.
-        frc::Translation2d(+ROBOT_WIDTH/2, +ROBOT_LENGTH/2), // Front right.
-    };
 
-    // The swerve modules on the robot.
-    // wpi::array<SwerveModule*, 4> swerveModules {
-    //     new SwerveModule(CAN_SWERVE_DRIVE_FL, CAN_SWERVE_ROTATION_FL, CAN_SWERVE_CANCODER_FL, -123.134766_deg+180_deg - 90_deg),
-    //     new SwerveModule(CAN_SWERVE_DRIVE_BL, CAN_SWERVE_ROTATION_BL, CAN_SWERVE_CANCODER_BL, -17.666016_deg+180_deg - 90_deg),
-    //     new SwerveModule(CAN_SWERVE_DRIVE_BR, CAN_SWERVE_ROTATION_BR, CAN_SWERVE_CANCODER_BR, -62.753906_deg - 90_deg),
-    //     new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, -126.298828_deg - 90_deg)
-    // };
 
-    ctre::phoenix6::hardware::Pigeon2 pigeon { CAN_PIGEON };
 
 
     // The current drive mode.
