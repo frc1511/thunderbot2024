@@ -28,6 +28,8 @@ public:
         SHARE = 9,
         OPTIONS = 10,
 
+        TOUCH_PAD = 14,
+
         BACK = SHARE,
         START = OPTIONS,
 

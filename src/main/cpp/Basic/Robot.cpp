@@ -6,11 +6,11 @@
 #include <Autonomous/Auto.h>
 
 void Robot::RobotInit() {
-    // AddPeriodic([&]() {
-    //     for (Mechanism* mech : allMechanisms) {
-    //         //mech->sendFeedback();
-    //     }
-    // }, 40_ms);
+    AddPeriodic([&]() {
+        for (Mechanism* mech : allMechanisms) {
+            mech->sendFeedback();
+        }
+    }, 80_ms);
 }
 void Robot::RobotPeriodic() {}
 
@@ -25,14 +25,20 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {
 //    reset(Mechanism::MatchMode::TELEOP);
-    shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
-    shampTake.doPersistentConfiguration();
+    //shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
+    //shampTake.doPersistentConfiguration();
+    //arm.doPersistentConfiguration();
+    drive.doPersistentConfiguration();
+    //hang.doPersistentConfiguration();
 }
 void Robot::TeleopPeriodic() {
-    shampTake.process();
+    //shampTake.process();
     controls.process();
-    shampTake.runIntakeMotors();
-    //drive.process();
+    //arm.process();
+    //hang.process();
+    //shampTake.runIntakeMotors();
+
+    drive.process();
 }
 
 void Robot::DisabledInit() {

@@ -8,13 +8,15 @@
 #include <GamEpiece/Arm.h>
 #include <GamEpiece/Shamptake.h>
 
-
-using DriveControllerType = ThunderXboxController;
-using AuxControllerType = ThunderXboxController;
+using DriveControllerType = ThunderPS4Controller;
+using AuxControllerType = ThunderPS4Controller;
 
 class Controls : public Mechanism {
 public:
-    Controls(Drive* drive, Shamptake* _shampjtake);
+    double MAX_ARM_SPEED = 0.5;
+    double MAX_HANG_SPEED = 0.2;
+    //Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
+ Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
 
     void resetToMode(MatchMode mode) override;
     void process() override;
@@ -27,8 +29,12 @@ private:
     Drive* drive;
     DriveControllerType driveController{ThunderGameController::Controller::DRIVER};
     Shamptake* shamptake;
+    Arm* arm;
+    Hang* hang;
     AuxControllerType auxController{ThunderGameController::Controller::AUX};
     frc::GenericHID switchPanel{2};
+    bool armMode;
+    double currentSpeed;
     
     void doDrive();
     void doAux();
@@ -39,7 +45,7 @@ private:
     bool doUltraBrickMode = false;
     bool shouldStrobe = false;
     bool hangModeControls = false;
-    bool driveRobotCentric = false;
+    bool driveRobotCentric = true;
     bool balanceControlOff = false;
     unsigned driveCtrlFlags = 0;
 
