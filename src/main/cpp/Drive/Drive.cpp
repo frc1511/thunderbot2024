@@ -216,7 +216,7 @@ void Drive::resetOdometry(frc::Pose2d pose) {
      * while ofsetting for the IMU's recorded rotation.
      */
 
-    //poseEstimator.ResetPosition(getRotation(), getModulePositions(), pose);
+    poseEstimator.ResetPosition(getRotation(), getModulePositions(), pose);
 
     pigeon.SetYaw(0_deg);
 
@@ -226,8 +226,7 @@ void Drive::resetOdometry(frc::Pose2d pose) {
 }
 
 frc::Pose2d Drive::getEstimatedPose() {
-    return frc::Pose2d(0_m, 0_m, 0_deg);
-    //return poseEstimator.GetEstimatedPosition();
+    return poseEstimator.GetEstimatedPosition();
 }
 
 frc::Rotation2d Drive::getRotation() {
@@ -254,7 +253,7 @@ void Drive::updateOdometry() {
      * Update the pose estimator with encoder measurements from
      * the swerve modules.
      */
-    //poseEstimator.Update(getRotation(), getModulePositions());
+    poseEstimator.Update(getRotation(), getModulePositions());
 }
 
 void Drive::execStopped() {

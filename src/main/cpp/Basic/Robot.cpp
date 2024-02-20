@@ -10,7 +10,7 @@ void Robot::RobotInit() {
         for (Mechanism* mech : allMechanisms) {
             mech->sendFeedback();
         }
-    }, 40_ms);
+    }, 80_ms);
 }
 void Robot::RobotPeriodic() {}
 
@@ -27,17 +27,18 @@ void Robot::TeleopInit() {
 //    reset(Mechanism::MatchMode::TELEOP);
     //shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
     //shampTake.doPersistentConfiguration();
-    arm.doPersistentConfiguration();
+    //arm.doPersistentConfiguration();
+    drive.doPersistentConfiguration();
     //hang.doPersistentConfiguration();
 }
 void Robot::TeleopPeriodic() {
     //shampTake.process();
     controls.process();
-    arm.process();
+    //arm.process();
     //hang.process();
     //shampTake.runIntakeMotors();
 
-    //drive.process();
+    drive.process();
 }
 
 void Robot::DisabledInit() {

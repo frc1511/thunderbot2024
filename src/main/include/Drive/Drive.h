@@ -196,6 +196,8 @@ public:
         new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, -126.298828_deg - 90_deg)
     };
     
+    ctre::phoenix6::hardware::Pigeon2 pigeon { CAN_PIGEON };
+    
     /**
      * The class that handles tracking the position of the robot on the field
      * during the match.
@@ -272,7 +274,6 @@ private:
 
 
 
-    ctre::phoenix6::hardware::Pigeon2 pigeon { CAN_PIGEON };
 
 
     // The current drive mode.

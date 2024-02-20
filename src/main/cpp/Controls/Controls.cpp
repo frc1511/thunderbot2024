@@ -6,9 +6,9 @@
 #define AXIS_DEADZONE 0.1
 
 
-Controls::Controls(Drive* _drive, Arm* _arm, Hang* _hang) :
+Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang) :
     drive(_drive),
-    //shamptake(nullptr),
+    shamptake(_shamptake),
     arm(_arm),
     hang(_hang),
     armMode(false) 
@@ -19,18 +19,18 @@ Controls::Controls(Drive* _drive, Arm* _arm, Hang* _hang) :
 void Controls::resetToMode(MatchMode mode) { }
 
 void Controls::process() {
-    //driveController.process();
+    driveController.process();
     auxController.process();
     doAux();
 
 
     // //doSwitchPanel();
-    // if (callaDisable) {
-    //     //drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
-    // }
-    // else {
-    //     //doDrive();
-    // }
+    if (callaDisable) {
+        drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
+    }
+    else {
+        doDrive();
+    }
 
     // if (!sashaDisable) {
     //     if (manualAux) {
@@ -51,11 +51,11 @@ void Controls::processInDisabled() {
     bool calIMU = driveController.getButton(DriveButton::SHARE, ThunderGameController::ButtonState::PRESSED);
 
     if (resetOdometry) {
-        //drive->resetOdometry();
+        drive->resetOdometry();
     }
 
     if (calIMU) {
-        //drive->calibrateIMU();
+        drive->calibrateIMU();
     }
 }
 
@@ -173,7 +173,7 @@ void Controls::doDrive() {
     }
 
 
-    // Hi Peter!!!
+    // Hi Peter!!
     if (xySlowMode || settings.newDriver){
         finalXVel *= 0.375;//.428571439;
         finalYVel *= 0.375;//.427928372; // LOL
@@ -203,7 +203,7 @@ void Controls::doAux() {
     using AuxButton = AuxControllerType::Button;
     using AuxAxis = AuxControllerType::Axis;
 
-    if (auxController.getButton(AuxButton::TOUCH_PAD)){
+    if (auxController.getDPad() == ThunderGameController::DPad::RIGHT){
         armMode = !armMode;
     }
     
@@ -234,52 +234,52 @@ void Controls::doAux() {
     bool fire = auxController.getButton(AuxButton::X);
     bool intake = auxController.getButton(AuxButton::Y);
     bool outtake = auxController.getButton(AuxButton::A);
-    // if (toggleCurve) {
-    //     shamptake->shooterSwitch();
-    //     printf("Shooter curved: %d\n", shamptake->shooterMode == shamptake->CURVED);
-    // }
+    if (toggleCurve) {
+        shamptake->shooterSwitch();
+        printf("Shooter curved: %d\n", shamptake->shooterMode == shamptake->CURVED);
+    }
 
-    // if (!intake) {
-    //     shamptake->intakeSpeed = shamptake->STOP;
-    // }
+    if (!intake) {
+        shamptake->intakeSpeed = shamptake->STOP;
+    }
 
-    // if (shooter) {
-    //     if (fire){
-    //         shamptake->intakeSpeed = shamptake->FIRE;
-    //         shamptake->shooter(1);
-    //         shamptake->trippedBefore = false;
-    //         printf("RESET\n");
-    //     } else {
-    //         shamptake->shooter(0.6);
-    //     }
-    // } else {
-    //     shamptake->shooter(0);
-    // }
+    if (shooter) {
+        if (fire){
+            shamptake->intakeSpeed = shamptake->FIRE;
+            shamptake->shooter(1);
+            shamptake->trippedBefore = false;
+            printf("RESET\n");
+        } else {
+            shamptake->shooter(0.6);
+        }
+    } else {
+        shamptake->shooter(0);
+    }
     
-    // if (outtake) {
-    //     shamptake->intakeSpeed = shamptake->OUTTAKE;
-    //     shamptake->trippedBefore = false;
-    //     printf("RESET\n");
-    // }
+    if (outtake) {
+        shamptake->intakeSpeed = shamptake->OUTTAKE;
+        shamptake->trippedBefore = false;
+        printf("RESET\n");
+    }
 
      
-     if (auxController.getDPad() == ThunderGameController::DPad::UP){
-       //set arm low enough to get under the stage
+    if (auxController.getDPad() == ThunderGameController::DPad::UP){
+        //set arm low enough to get under the stage
         if(armMode) {
-       arm->ARM_SLOW_SPEED += .1;
-       if (arm->ARM_SLOW_SPEED >= .5) {
-        arm->ARM_SLOW_SPEED = .5;
-       }
+            arm->ARM_SLOW_SPEED += .1;
+            if (arm->ARM_SLOW_SPEED >= .5) {
+                arm->ARM_SLOW_SPEED = .5;
+            }
         }
-     } else if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
-    //     //set arm back to normal position
-    if (armMode) {
-    arm->ARM_SLOW_SPEED -= .1;
-       if (arm->ARM_SLOW_SPEED <= -.5) {
-        arm->ARM_SLOW_SPEED = -.5;
-       }
+    } else if (auxController.getDPad() == ThunderGameController::DPad::DOWN){
+        //     //set arm back to normal position
+        if (armMode) {
+            arm->ARM_SLOW_SPEED -= .1;
+            if (arm->ARM_SLOW_SPEED <= -.5) {
+                arm->ARM_SLOW_SPEED = -.5;
+            }
+        }
     }
-     }
 
     if (armMode){
         // Arm stuff- ALSO  A FUNCTIONNNN OUTTA DIS STUFF 2
@@ -313,11 +313,22 @@ void Controls::doAux() {
             hangLeft = 0;
         }
 
-        if (hangLeft > MAX_ARM_SPEED) {
-            hangLeft = MAX_ARM_SPEED;
+        if (hangLeft > MAX_HANG_SPEED) {
+            hangLeft = MAX_HANG_SPEED;
         }
-        if (hangLeft < -MAX_ARM_SPEED) {
-            hangLeft = -MAX_ARM_SPEED;
+        if (hangLeft < -MAX_HANG_SPEED) {
+            hangLeft = -MAX_HANG_SPEED;
+        }
+
+        if (std::fabs(hangRight) < AXIS_DEADZONE) {
+            hangRight = 0;
+        }
+
+        if (hangRight > MAX_HANG_SPEED) {
+            hangRight = MAX_HANG_SPEED;
+        }
+        if (hangRight < -MAX_HANG_SPEED) {
+            hangRight = -MAX_HANG_SPEED;
         }
         if (hang != nullptr)
         {
@@ -330,22 +341,8 @@ void Controls::doAux() {
             } else {
                 hang->setSolenoids(Hang::SolenoidStates::OFF);
             }
-            //hang->setSpeed(hangLeft);
-        }
-
-        // Right Side
-
-        if (std::fabs(hangRight) < AXIS_DEADZONE) {
-            hangRight = 0;
-        }
-        if (hangRight > MAX_ARM_SPEED) {
-            hangRight = MAX_ARM_SPEED;
-        }
-        if (hangRight < -MAX_ARM_SPEED) {
-            hangRight = -MAX_ARM_SPEED;
-        }
-        if (hang != nullptr) {
-            //hang->setSpeed(hangRight);
+            hang->setMotorLeftSpeed(-hangLeft);
+            hang->setMotorRightSpeed(hangRight);
         }
     }
 }

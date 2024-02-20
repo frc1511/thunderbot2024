@@ -34,14 +34,14 @@ private:
 
     Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
     Drive drive;
-    //Shamptake shampTake;
+    Shamptake shampTake;
     Arm arm;
     Hang hang;
     //Controls controls {nullptr, &shampTake, &arm, &hang};
-    Controls controls {nullptr, &arm, &hang};
+    Controls controls {&drive, &shampTake, &arm, &hang};
     //Auto autoCode {&drive};
     std::vector<Mechanism*> allMechanisms {
         //&drive, &controls
-        &arm, &hang
+        &arm, &hang, &drive
     };
 };

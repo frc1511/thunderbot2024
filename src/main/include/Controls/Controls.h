@@ -14,9 +14,9 @@ using AuxControllerType = ThunderPS4Controller;
 class Controls : public Mechanism {
 public:
     double MAX_ARM_SPEED = 0.5;
-
+    double MAX_HANG_SPEED = 0.2;
     //Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
- Controls(Drive* drive, Arm* _arm, Hang* _hang);
+ Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
 
     void resetToMode(MatchMode mode) override;
     void process() override;
@@ -28,7 +28,7 @@ public:
 private:
     Drive* drive;
     DriveControllerType driveController{ThunderGameController::Controller::DRIVER};
-    //Shamptake* shamptake;
+    Shamptake* shamptake;
     Arm* arm;
     Hang* hang;
     AuxControllerType auxController{ThunderGameController::Controller::AUX};
@@ -45,7 +45,7 @@ private:
     bool doUltraBrickMode = false;
     bool shouldStrobe = false;
     bool hangModeControls = false;
-    bool driveRobotCentric = false;
+    bool driveRobotCentric = true;
     bool balanceControlOff = false;
     unsigned driveCtrlFlags = 0;
 
