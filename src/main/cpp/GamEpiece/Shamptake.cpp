@@ -65,14 +65,6 @@ void Shamptake::stop() {
     intake(0);
     shooter(0);
 }
-void Shamptake::shooterSwitch() {
-   
-    if (shooterMode == Shamptake::ShooterMode::DEFAULT) {
-        shooterMode = Shamptake::ShooterMode::CURVED;
-    } else if (shooterMode == Shamptake::ShooterMode::CURVED) {
-        shooterMode = Shamptake::ShooterMode::DEFAULT;
-    }
-}
 void Shamptake::process() {
     //if no snesor detected
         //run intake (Before Sensor) (IntakeSpeed = Normal)
