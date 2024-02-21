@@ -41,17 +41,11 @@ class Shamptake : public Mechanism{
     void stopIntake();
     void shooter(double Power);
     void stop();
-    void shooterSwitch();//change mode between basic shooting and curved shooting
     void runIntakeMotors();
     void autoIntake();
     void autoShoot();
     bool runIntake;
     bool runOuttake;
-
-    enum ShooterMode {
-      DEFAULT,
-      CURVED
-    };
 
     enum IntakeSpeed {
       NORMAL,
@@ -69,7 +63,6 @@ class Shamptake : public Mechanism{
 
     frc::Timer shooterTimer;
 
-    Shamptake::ShooterMode shooterMode = Shamptake::ShooterMode::DEFAULT;
   private:
     rev::SparkPIDController shooterMotorRightPIDController;
     rev::SparkPIDController shooterMotorLeftPIDController;
