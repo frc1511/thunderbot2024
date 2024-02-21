@@ -224,6 +224,7 @@ public:
      * Begins a command to drive and rotate to a specified pose.
      */
     void cmdDriveToPose(units::meter_t x, units::meter_t y, frc::Rotation2d angle, YaqoubsTrajectoryConfig config = YaqoubsTrajectoryConfig());
+    bool isTrajectoryFinished();
 
 private:
 

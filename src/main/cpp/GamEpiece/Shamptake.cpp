@@ -46,6 +46,17 @@ void Shamptake::stopIntake() {
     intake(0);
     runIntake = false;
 }
+void Shamptake::autoIntake() {
+    autoIntaking = true;
+    intakeSpeed = IntakeSpeed::NORMAL;
+    runIntakeMotors();
+}
+void Shamptake::autoShoot() {
+    autoShooting = true;
+    shooterTimer.Reset();
+    shooterTimer.Start();
+    shooter(FIRE);
+}
 void Shamptake::shooter(double Power) {
     // double motorRightpower = 0;
     // double motorLeftpower = 0;
@@ -90,6 +101,10 @@ void Shamptake::process() {
         if (trippedBefore) { // Past Sensor
             //sleep(0.7);
             intakeSpeed = IntakeSpeed::STOP;
+            if (autoIntaking) {
+                autoIntaking = false;
+                stopIntake();
+            }
         } else { // Before Sensor
             intakeSpeed = IntakeSpeed::NORMAL;
         }
@@ -97,6 +112,14 @@ void Shamptake::process() {
         intakeSpeed = IntakeSpeed::SLOW;
         trippedBefore = true;
         printf("SET\n");
+    }
+
+    if (autoShooting) {
+        if (shooterTimer.Get() >= 1_s) {
+            autoShooting = false;
+            shooterTimer.Stop();
+            shooter(0);
+        }
     }
 }
 void Shamptake::runIntakeMotors() {

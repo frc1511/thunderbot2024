@@ -7,6 +7,7 @@
 #include <frc/DigitalInput.h>
 #include <Basic/Mechanism.h>
 #include <Basic/IOMap.h>
+#include <frc/Timer.h>
 
 #define SHAMPTANK_RIGHT_MOTOR_P 0.0002
 #define SHAMPTANK_RIGHT_MOTOR_I 0.0
@@ -42,6 +43,8 @@ class Shamptake : public Mechanism{
     void stop();
     void shooterSwitch();//change mode between basic shooting and curved shooting
     void runIntakeMotors();
+    void autoIntake();
+    void autoShoot();
     bool runIntake;
     bool runOuttake;
 
@@ -61,6 +64,10 @@ class Shamptake : public Mechanism{
     frc::DigitalInput noteSensor{DIO_GAMEPIECE_RR_SENSOR};
     bool sensorDetected = false;
     bool trippedBefore = false;
+    bool autoIntaking = false;
+    bool autoShooting = false;
+
+    frc::Timer shooterTimer;
 
     Shamptake::ShooterMode shooterMode = Shamptake::ShooterMode::DEFAULT;
   private:

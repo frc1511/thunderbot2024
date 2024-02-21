@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Drive/Drive.h>
+#include <GamEpiece/Shamptake.h>
 #include <frc/Timer.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc2/command/TrapezoidProfileCommand.h>
@@ -13,7 +14,7 @@
 class Auto {
 
     public:
-        Auto(Drive* drive);
+        Auto(Drive* drive, Shamptake* shamptake);
 
         enum AutoMode {
             NONE,
@@ -30,6 +31,7 @@ class Auto {
 
     private:
         Drive* drive;
+        Shamptake* shamptake;
 
         Auto::AutoMode mode = AutoMode::TEST;
 

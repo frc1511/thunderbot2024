@@ -248,6 +248,10 @@ void Drive::cmdDriveToPose(units::meter_t x, units::meter_t y, frc::Rotation2d a
     trajectoryController.setTrajectory(getEstimatedPose(), { x, y, units::math::fmod(angle.Degrees(), 360_deg) }, config);
 }
 
+bool Drive::isTrajectoryFinished() {
+    return driveMode == DriveMode::TRAJECTORY_FINISHED;
+}
+
 void Drive::updateOdometry() {
     /**
      * Update the pose estimator with encoder measurements from

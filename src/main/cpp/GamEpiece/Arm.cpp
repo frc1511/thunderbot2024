@@ -8,8 +8,14 @@ double degrees;
 Arm::Arm() 
 //: boreEncoder(armMotor.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192))
 //,armEncoder(armMotor.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42))
+//: armPIDController(armMotor.GetPIDController())
 {
-   
+    /*armPIDController.SetP(ARM_MOTOR_P);
+    armPIDController.SetI(ARM_MOTOR_I);
+    armPIDController.SetD(ARM_MOTOR_D);
+    armPIDController.SetIZone(ARM_MOTOR_I_ZONE);
+    armPIDController.SetFF(ARM_MOTOR_FEED_FOWARD);
+    armPIDController.SetOutputRange(0, 1);*/
 }
 
 Arm::~Arm() {
@@ -20,9 +26,9 @@ void Arm::process()
 {
     double degrees = getBoreDegrees();
     if (degrees <= 180 || degrees >= 216) {
-        bool armCanMove = false;
+        armCanMove = false;
     } else {
-        bool armCanMove = true;
+        armCanMove = true;
     }
 }
 
@@ -34,8 +40,6 @@ void Arm::sendFeedback() {
     frc::SmartDashboard::PutNumber("Arm_boreDegrees", degrees);
     frc::SmartDashboard::PutBoolean("Arm_canMove", armCanMove);
     frc::SmartDashboard::PutString("Arm_getBoreDegreesResponse", degreesResponse);
-    frc::SmartDashboard::PutNumber("Arm_angleMotorPosition", getRawMotorRotationPosition());
-    frc::SmartDashboard::PutNumber("Arm_rawMotorPosition", getRawMotorPosition());
     frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
     frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());
@@ -57,15 +61,6 @@ bool Arm::isOnLowerLimit() {
 bool Arm::init() {
     bool isInit = true;
     return isInit;
-}
-double Arm::getRawMotorPosition() {
-    double position = 0; //-armEncoder.GetPosition(); // Encoders are reversed
-    return position;
-}
-
-double Arm::getRawMotorRotationPosition() {
-    double rotation = 0; // -armEncoder.GetPosition();
-    return rotation;
 }
 
 double Arm::getRawBorePosition() {
@@ -98,6 +93,10 @@ void Arm::setPower(double power) {
         power = 0;
         printf("position under %lf limit\n", 0.5);
     }
+    power = -power;
+    printf("3Power:%lf\n", power);
+
+    armMotor.Set(power);
     // if (!backingOffMinimum && getRawMotorRotationPosition() < ARM_MINIMUM_ENCODER) {
     //     power = 0;
     //     backingOffMinimum = true;
@@ -129,10 +128,6 @@ void Arm::setPower(double power) {
     // if (armCanMove == false) {
     // power = 0;
     // }
-    power = -power;
-    printf("3Power:%lf\n", power);
-
-    armMotor.Set(power);
 }
 void Arm::stop() {
     setPower(0);
