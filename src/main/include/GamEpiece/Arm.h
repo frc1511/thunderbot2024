@@ -31,11 +31,8 @@ public:
     void resetToMode(MatchMode mode) override;
 
     bool isOnLowerLimit();
-    bool isAutoMovingArmDone();
 
     void setPower(double power);
-    void autoMoveArm(units::angle::degree_t angle);
-    void stopAutoMoveArm();
 
     void stop();
 private:
@@ -69,10 +66,6 @@ private:
 
     bool backingOffMinimum = false;
     bool backingOffMaximum = false;
-
-    units::angle::degree_t autoArmAngle;
-    bool autoMovingArm = false;
-    bool autoMovingArmDone = false;
 
     frc::ProfiledPIDController<units::degrees> armPIDController{ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, frc::TrapezoidProfile<units::degrees>::Constraints()};
 

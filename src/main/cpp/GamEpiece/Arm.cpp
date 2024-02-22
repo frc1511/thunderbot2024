@@ -1,5 +1,4 @@
 #include <GamEpiece/Arm.h>
-#include <cmath>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 bool armCanMove = true;
@@ -30,11 +29,6 @@ void Arm::process()
         armCanMove = false;
     } else {
         armCanMove = true;
-    }
-
-    if (autoMovingArm) {
-        double power = armPIDController.Calculate(units::degree_t(degrees), autoArmAngle);
-        setPower(power);
     }
 }
 
@@ -87,26 +81,6 @@ std::string Arm::getMotorModeString() {
         motorMode = "Brake";
     }
     return motorMode;
-}
-
-void Arm::autoMoveArm(units::angle::degree_t angle) {
-    autoArmAngle = angle;
-    autoMovingArm = true;
-    autoMovingArmDone = false;
-}
-
-void Arm::stopAutoMoveArm() {
-    autoMovingArm = false;
-    autoMovingArmDone = false;
-}
-
-bool Arm::isAutoMovingArmDone() {
-    //if the arm is at or past the point it needs to be at, then it is done going to the position
-    if (!autoMovingArm) return false;
-    if (fabs(getBoreDegrees()) >= fabs(double(autoArmAngle))) {
-        autoMovingArmDone = true;
-        //don't stop moving the arm since it will just fall back down
-    }
 }
 
 void Arm::setPower(double power) {

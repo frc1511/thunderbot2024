@@ -7,10 +7,9 @@
 #include <frc2/command/SwerveControllerCommand.h>
 #include <Drive/Drive.h>
 #include <GamEpiece/Shamptake.h>
-#include <GamEpiece/Arm.h>
 
-Auto::Auto(Drive* drive, Shamptake* shamptake, Arm* arm)
-    : drive(drive), shamptake(shamptake), arm(arm){
+Auto::Auto(Drive* drive, Shamptake* shamptake)
+    : drive(drive), shamptake(shamptake){
 
     }
 void Auto::getAutonomousCommand() {
@@ -60,25 +59,29 @@ void Auto::doAuto() { //called during auto
     }
 }
 
-void Auto::testAuto() { //test auto, leave, grab a note, and shoot
+void Auto::testAuto() { //test auto, leave
     printf("Auto Running\n");
-    if (step == 0) { //Move to a position on the field and start intaking
+    if (step == 0) {
         drive->cmdDriveToPose(1_m, 0_m, 0_deg);
+        step += 1;
+    }
+    if (step == 1 && drive->isTrajectoryFinished()) {
         shamptake->autoIntake();
-        step++;
+        step += 1;
     }
-    if (step == 1 && drive->isTrajectoryFinished() && !shamptake->autoIntaking) { //When its done intaking and at the position, move the arm
-        //What do I move the arm to?
-        //arm->autoMoveArm(10_deg); go to some amount of degrees (for shooting)
-        step++;
+    if (step == 2) {
+        if (!shamptake->autoIntaking) {
+            shamptake->autoShoot();
+            step += 1;
+        }
     }
-    if (step == 2 && arm->isAutoMovingArmDone()) { //When the arm is done moving, shoot
-        shamptake->autoShoot();
-        step++;
+    //Make the arm move!!!
+    if (step == 3) {
+        if (!shamptake->autoShooting) {
+            step += 1;
+        }
     }
-    if (step == 3 && !shamptake->autoShooting) { //When shooting is done, auto is done
-        //Stop arm movement?
-        arm->stopAutoMoveArm();
+    if (step == 4) {
         autoDone = true;
     }
        // drive->setMode(Drive::DriveMode::VELOCITY);
