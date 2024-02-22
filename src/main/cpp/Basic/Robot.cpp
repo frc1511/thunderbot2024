@@ -16,11 +16,12 @@ void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {
     //reset(Mechanism::MatchMode::AUTO);
-    //autoCode.doAuto();
+    drive.doPersistentConfiguration();
 }
 void Robot::AutonomousPeriodic() {
     //controls.process();
-    //drive.process();
+    autoCode.doAuto();
+    drive.process();
 }
 
 void Robot::TeleopInit() {

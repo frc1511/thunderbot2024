@@ -45,6 +45,9 @@ void Shamptake::intake(double Power) {
 void Shamptake::stopIntake() {
     intake(0);
     runIntake = false;
+    if (autoIntaking) {
+        autoIntaking = false;
+    }
 }
 void Shamptake::autoIntake() {
     autoIntaking = true;

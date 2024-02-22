@@ -39,7 +39,7 @@ private:
     Hang hang;
     //Controls controls {nullptr, &shampTake, &arm, &hang};
     Controls controls {&drive, &shampTake, &arm, &hang};
-    //Auto autoCode {&drive};
+    Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
         //&drive, &controls
         &arm, &hang, &drive
