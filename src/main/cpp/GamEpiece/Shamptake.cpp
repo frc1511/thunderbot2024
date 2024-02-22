@@ -27,6 +27,11 @@ void Shamptake::sendFeedback() {
 
 }
 
+bool Shamptake::isNoteSensorTripped()
+{
+    return !noteSensor.Get();
+}
+
 void Shamptake::doPersistentConfiguration() {
     shooterMotorRight.SetInverted(false);
     shooterMotorLeft.SetInverted(true);

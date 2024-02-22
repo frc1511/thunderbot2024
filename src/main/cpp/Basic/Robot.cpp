@@ -17,6 +17,7 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
     //reset(Mechanism::MatchMode::AUTO);
     //autoCode.doAuto();
+    blinky.setLEDMode(BlinkyBlinky::LEDMode::OFF);
 }
 void Robot::AutonomousPeriodic() {
     //controls.process();
@@ -30,6 +31,7 @@ void Robot::TeleopInit() {
     //arm.doPersistentConfiguration();
     drive.doPersistentConfiguration();
     //hang.doPersistentConfiguration();
+    blinky.setLEDMode(BlinkyBlinky::LEDMode::OFF);
 }
 void Robot::TeleopPeriodic() {
     //shampTake.process();
@@ -39,13 +41,16 @@ void Robot::TeleopPeriodic() {
     //shampTake.runIntakeMotors();
 
     drive.process();
+    blinky.process();
 }
 
 void Robot::DisabledInit() {
 //    reset(Mechanism::MatchMode::DISABLED);
+    blinky.setLEDMode(BlinkyBlinky::LEDMode::PIT_MODE);
 }
 void Robot::DisabledPeriodic() {
 //    controls.processInDisabled();
+    blinky.process();    
 }
 
 void Robot::TestInit() {

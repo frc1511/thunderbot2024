@@ -35,6 +35,7 @@ public:
     void setPower(double power);
 
     void stop();
+    double getBoreNormalizedPosition();
 private:
     bool init();
 
@@ -51,7 +52,7 @@ private:
 
     bool armCanMove = true;
 
-    //rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
+    rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkLimitSwitch reversearmLimitSwitch = armMotor.GetReverseLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkRelativeEncoder armEncoder; // Encoder Inside of Motor
 

@@ -5,6 +5,9 @@ bool armCanMove = true;
 std::string degreesResponse = "not set";
 double degrees;
 
+#define ARM_MIN_RAW 0.5
+#define ARM_MAX_RAW 0.66
+
 Arm::Arm() 
 //: boreEncoder(armMotor.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192))
 //,armEncoder(armMotor.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42))
@@ -16,6 +19,7 @@ Arm::Arm()
     armPIDController.SetIZone(ARM_MOTOR_I_ZONE);
     armPIDController.SetFF(ARM_MOTOR_FEED_FOWARD);
     armPIDController.SetOutputRange(0, 1);*/
+    forwardarmLimitSwitch.EnableLimitSwitch(true);
 }
 
 Arm::~Arm() {
@@ -56,7 +60,7 @@ void Arm::resetToMode(MatchMode mode) {
 }
 
 bool Arm::isOnLowerLimit() {
-    return !limitSwitch.Get(); // Get the limit switch reading (it's inverted)
+    return forwardarmLimitSwitch.Get(); // Get the limit switch reading (it's inverted)
 }
 bool Arm::init() {
     bool isInit = true;
@@ -67,6 +71,14 @@ double Arm::getRawBorePosition() {
     double length = encoder.GetOutput();
 
     return length;
+}
+
+double Arm::getBoreNormalizedPosition() {
+    double d = getRawBorePosition();
+    d -= ARM_MIN_RAW;
+    d /= (ARM_MAX_RAW - ARM_MIN_RAW);
+
+    return d;
 }
 
 double Arm::getBoreDegrees() {
