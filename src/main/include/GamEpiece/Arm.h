@@ -6,6 +6,11 @@
 #include <rev/CANSparkMax.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/DutyCycle.h>
+#include <units/angular_velocity.h>
+#include <units/angular_acceleration.h>
+#include <units/velocity.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
 #define ARM_MINIMUM_ENCODER -42.309
 #define ARM_MINIMUM_ENCODER_SLOW -35.000
 #define ARM_MAXIMUM_ENCODER -3.000 // Approx.
@@ -17,7 +22,8 @@
 #define ARM_MOTOR_D 0.0
 #define ARM_MOTOR_FEED_FOWARD 0.000170
 #define ARM_MOTOR_I_ZONE 0.0
-
+#define ARM_MAX_VEL 20_deg_per_s
+#define ARM_MAX_ACCEL 20_deg_per_s_sq
 
 class Arm : public Mechanism {
 public:
@@ -74,6 +80,9 @@ private:
     bool autoMovingArm = false;
     bool autoMovingArmDone = false;
 
-    frc::ProfiledPIDController<units::degrees> armPIDController{ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, frc::TrapezoidProfile<units::degrees>::Constraints()};
+    frc::ProfiledPIDController<units::degrees> armPIDController{
+        ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, 
+        frc::TrapezoidProfile<units::degrees>::Constraints(ARM_MAX_VEL, ARM_MAX_ACCEL)
+    };
 
 };
