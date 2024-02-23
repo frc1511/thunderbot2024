@@ -22,8 +22,8 @@
 #define ARM_MOTOR_D 0.0
 #define ARM_MOTOR_FEED_FOWARD 0.000170
 #define ARM_MOTOR_I_ZONE 0.0
-#define ARM_MAX_VEL 20_deg_per_s
-#define ARM_MAX_ACCEL 20_deg_per_s_sq
+#define ARM_MAX_VEL 5_deg_per_s
+#define ARM_MAX_ACCEL 2_deg_per_s_sq
 
 class Arm : public Mechanism {
 public:
@@ -36,14 +36,14 @@ public:
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
 
-    bool isOnLowerLimit();
-    bool isAutoMovingArmDone();
+    bool isMoveDone();
 
     void setPower(double power);
-    void autoMoveArm(units::angle::degree_t angle);
-    void stopAutoMoveArm();
+    void moveToAngle(units::angle::degree_t angle);
 
     void stop();
+
+    void setMotorBrake(bool armBrakeOn);
 private:
     bool init();
 
@@ -53,7 +53,6 @@ private:
 
     std::string getMotorModeString();
 
-    frc::DigitalInput limitSwitch {DIO_ARM_LIMIT_SWITCH};
     frc::DigitalInput boreEncoder {DIO_GAMEPIECE_BORE_ENCODER};
     frc::DutyCycle encoder{boreEncoder};
     rev::CANSparkMax armMotor {CAN_PIVOT_ARM, rev::CANSparkMax::MotorType::kBrushless};
@@ -76,9 +75,7 @@ private:
     bool backingOffMinimum = false;
     bool backingOffMaximum = false;
 
-    units::angle::degree_t autoArmAngle;
-    bool autoMovingArm = false;
-    bool autoMovingArmDone = false;
+    units::angle::degree_t targetAngle;
 
     frc::ProfiledPIDController<units::degrees> armPIDController{
         ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, 

@@ -17,27 +17,31 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
     //reset(Mechanism::MatchMode::AUTO);
     drive.doPersistentConfiguration();
+    arm.doPersistentConfiguration();
+    arm.setMotorBrake(true);
 }
 void Robot::AutonomousPeriodic() {
     //controls.process();
     autoCode.doAuto();
     drive.process();
+    arm.process();
 }
 
 void Robot::TeleopInit() {
 //    reset(Mechanism::MatchMode::TELEOP);
-    //shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
-    //shampTake.doPersistentConfiguration();
-    //arm.doPersistentConfiguration();
+    shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
+    shampTake.doPersistentConfiguration();
+    arm.doPersistentConfiguration();
     drive.doPersistentConfiguration();
+    arm.setMotorBrake(true);
     //hang.doPersistentConfiguration();
 }
 void Robot::TeleopPeriodic() {
-    //shampTake.process();
+    shampTake.process();
     controls.process();
-    //arm.process();
+    arm.process();
     //hang.process();
-    //shampTake.runIntakeMotors();
+    shampTake.runIntakeMotors();
 
     drive.process();
 }
@@ -46,7 +50,7 @@ void Robot::DisabledInit() {
 //    reset(Mechanism::MatchMode::DISABLED);
 }
 void Robot::DisabledPeriodic() {
-//    controls.processInDisabled();
+    controls.processInDisabled();
 }
 
 void Robot::TestInit() {

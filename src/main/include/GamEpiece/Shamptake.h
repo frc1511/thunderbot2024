@@ -8,6 +8,7 @@
 #include <Basic/Mechanism.h>
 #include <Basic/IOMap.h>
 #include <frc/Timer.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #define SHAMPTANK_RIGHT_MOTOR_P 0.0002
 #define SHAMPTANK_RIGHT_MOTOR_I 0.0
@@ -63,7 +64,9 @@ class Shamptake : public Mechanism{
 
     frc::Timer shooterTimer;
 
+
   private:
+    std::string intakeModeString();
     rev::SparkPIDController shooterMotorRightPIDController;
     rev::SparkPIDController shooterMotorLeftPIDController;
 };

@@ -42,13 +42,15 @@ private:
     bool dpadRight;
     bool dpadDown;
     bool dpadLeft;
-    bool leftSolenoidManualButton;
-    bool rightSolenoidManualButton;
+    bool otherPreset;
+    bool linePreset;
+    bool subwooferPreset;
+    bool ampPreset;
 
     void doDrive();
     void doAux();
     void doAuxManual();
-    void doSwitchPanel();
+    void doSwitchPanel(bool isDissabled);
     bool driveLockX = false;
     bool manualAux = false;
     bool doUltraBrickMode = false;

@@ -24,7 +24,7 @@ Shamptake::~Shamptake() {
 }
 
 void Shamptake::sendFeedback() {
-
+    frc::SmartDashboard::PutString("Shamptake_intakeMode", intakeModeString());
 }
 
 void Shamptake::doPersistentConfiguration() {
@@ -117,28 +117,49 @@ void Shamptake::process() {
         }
     }
 }
+
+std::string Shamptake::intakeModeString() {
+    std::string modeString = "ERROR";
+    switch (intakeSpeed)
+    {
+    case IntakeSpeed::NORMAL:
+        modeString = "NORMAL";
+        break;
+    case IntakeSpeed::STOP:
+        modeString = "STOP";
+        break;
+    case IntakeSpeed::SLOW:
+        modeString = "SLOW";
+        break;
+    case IntakeSpeed::FIRE:
+        modeString = "FIRE";
+        break;
+    case IntakeSpeed::OUTTAKE:
+        modeString = "OUTTAKE";
+        break;
+    default:
+        break;
+    }
+    return modeString;
+}
+
 void Shamptake::runIntakeMotors() {
     double speed = 0;
     switch (intakeSpeed)
     {
     case IntakeSpeed::NORMAL:
-        speed = 0.5;
-        printf("NORMAL\n");
+        speed = 0.7;
         break;
     case IntakeSpeed::STOP:
-        printf("STOP\n");
         speed = 0;
         break;
     case IntakeSpeed::SLOW:
-        printf("SLOW\n");
-        speed = 0.2;
+        speed = 0.4;
         break;
     case IntakeSpeed::FIRE:
-        speed = 0.5;
-        printf("FIRE\n");
+        speed = 0.8;
         break;
     case IntakeSpeed::OUTTAKE:
-        printf("OUTTAKE\n");
         speed = -0.4;
         break;
     default:

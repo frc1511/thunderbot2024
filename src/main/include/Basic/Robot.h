@@ -7,7 +7,7 @@
 #include <frc/TimedRobot.h>
 #include <Controls/Controls.h>
 #include <Drive/Drive.h>
-//#include <GamEpiece/Shamptake.h>
+#include <GamEpiece/Shamptake.h>
 #include <Autonomous/Auto.h>
 #include <GamEpiece/Arm.h>
 #include <Hanger/Hang.h>
@@ -41,7 +41,6 @@ private:
     Controls controls {&drive, &shampTake, &arm, &hang};
     Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
-        //&drive, &controls
-        &arm, &hang, &drive
+        &arm, &hang, &drive, &shampTake, &controls
     };
 };
