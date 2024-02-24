@@ -2,34 +2,30 @@
 #include <cmath>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+#define ARM_ENCODER_OFFSET 116.28_deg
 
 Arm::Arm() {
-
+    armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+    armMotor.SetInverted(false);
+    encoder.SetDistancePerRotation(360);
+    armPIDController.Reset(getBoreDegrees());
 }
 
 Arm::~Arm() {
-
+    
 }
 
 void Arm::process()
 {
-    double degrees = getBoreDegrees();
-    if (degrees <= 180 || degrees >= 235) {
-        armCanMove = false;
-    } else {
-        armCanMove = true;
-    }
+    units::degree_t degrees = getBoreDegrees();
 
-    double power = armPIDController.Calculate(units::degree_t(degrees), targetAngle);
-    setPower(power);
+    double power = armPIDController.Calculate(degrees, targetAngle);
+    setPower(-power);
 }
 
 void Arm::sendFeedback() {
-  //frc::SmartDashboard::PutBoolean("Arm_forwardsparkLimitSwitch", forwardarmLimitSwitch.Get());
-  //frc::SmartDashboard::PutBoolean("Arm_reversesparkLimitSwitch", reversearmLimitSwitch.Get());
-    frc::SmartDashboard::PutNumber("Arm_borePosition", getRawBorePosition());
-    frc::SmartDashboard::PutNumber("Arm_boreDegrees", getBoreDegrees());
-    frc::SmartDashboard::PutBoolean("Arm_canMove", armCanMove);
+    frc::SmartDashboard::PutNumber("Arm_rawBorePosition", getRawBorePosition().value());
+    frc::SmartDashboard::PutNumber("Arm_boreDegrees", double(getBoreDegrees()));
     frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
     frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
@@ -37,12 +33,13 @@ void Arm::sendFeedback() {
 }
 
 void Arm::doPersistentConfiguration() {
-    armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
-    armMotor.SetInverted(false);
+    
 }
 
 void Arm::resetToMode(MatchMode mode) {
-
+    setMotorBrake(true);
+    setPower(0);
+    armPIDController.Reset(getBoreDegrees());
 }
 
 bool Arm::init() {
@@ -58,16 +55,13 @@ void Arm::setMotorBrake(bool armBrakeOn) {
     }
 }
 
-double Arm::getRawBorePosition() {
-    double length = encoder.GetOutput();
-
-    return length;
+units::degree_t Arm::getRawBorePosition() {
+    return 360_deg - units::degree_t(encoder.GetDistance());
 }
 
-double Arm::getBoreDegrees() {
-    double degrees = getRawBorePosition();
-    degrees *= 360.0;
-    return degrees;
+units::degree_t Arm::getBoreDegrees() {
+    units::degree_t degrees = getRawBorePosition();
+    return units::math::fmod(degrees - ARM_ENCODER_OFFSET, 360_deg);
 }
 
 std::string Arm::getMotorModeString() {
@@ -79,32 +73,23 @@ std::string Arm::getMotorModeString() {
 }
 
 void Arm::moveToAngle(units::angle::degree_t angle) {
-    targetAngle = angle;
-    printf("Angle target set to: %f\n", targetAngle.value());
+    targetAngle = std::clamp(angle, 0_deg, 85_deg);
 }
 
 bool Arm::isMoveDone() {
     //if the arm is at or past the point it needs to be at, then it is done going to the position
-    if (fabs(getBoreDegrees()) >= fabs(double(targetAngle))) {
+    if (fabs(double(getBoreDegrees())) >= fabs(double(targetAngle))) {
         return true;
         //don't stop moving the arm since it will just fall back down
     }
     return false;
 }
 
-void Arm::setPower(double power) {
-    power = -power;
-    printf("Incoming Power:%lf\n", power);
-    double position = getRawBorePosition();
-    if (position > 0.66 && power < 0) {
-        power = 0;
-        printf("position over %lf limit\n", 0.6);
-    } else if (position < 0.5 && power > 0) {
-        power = 0;
-        printf("position under %lf limit\n", 0.5);
-    }
-    printf("Setting Power:%lf\n", power);
+bool Arm::isAtAmp() {
+    return targetAngle >= 70_deg;
+}
 
+void Arm::setPower(double power) {
     armMotor.Set(power);
 }
 void Arm::stop() {

@@ -3,6 +3,9 @@
 Shamptake::Shamptake()
 : shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
   shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()) {
+    shooterMotorRight.SetInverted(false);
+    shooterMotorLeft.SetInverted(true);
+
     shooterMotorRightPIDController.SetP(SHAMPTANK_RIGHT_MOTOR_P);
     shooterMotorRightPIDController.SetI(SHAMPTANK_RIGHT_MOTOR_I);
     shooterMotorRightPIDController.SetD(SHAMPTANK_RIGHT_MOTOR_D);
@@ -28,8 +31,7 @@ void Shamptake::sendFeedback() {
 }
 
 void Shamptake::doPersistentConfiguration() {
-    shooterMotorRight.SetInverted(false);
-    shooterMotorLeft.SetInverted(true);
+
 }
 
 void Shamptake::resetToMode(MatchMode mode) {
@@ -106,7 +108,6 @@ void Shamptake::process() {
     } else { // Sensor Tripped
         intakeSpeed = IntakeSpeed::SLOW;
         trippedBefore = true;
-        printf("SET\n");
     }
 
     if (autoShooting) {
@@ -163,7 +164,6 @@ void Shamptake::runIntakeMotors() {
         speed = -0.4;
         break;
     default:
-        printf("[SHAMPTAKE] IntakeSpeed was not set properly!");
         speed = 0;
         break;
     }

@@ -15,26 +15,19 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {
-    //reset(Mechanism::MatchMode::AUTO);
-    drive.doPersistentConfiguration();
-    arm.doPersistentConfiguration();
-    arm.setMotorBrake(true);
+    reset(Mechanism::MatchMode::AUTO);
 }
 void Robot::AutonomousPeriodic() {
     //controls.process();
-    autoCode.doAuto();
+    //autoCode.doAuto();
     drive.process();
     arm.process();
 }
 
 void Robot::TeleopInit() {
-//    reset(Mechanism::MatchMode::TELEOP);
+    reset(Mechanism::MatchMode::TELEOP);
     shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
-    shampTake.doPersistentConfiguration();
-    arm.doPersistentConfiguration();
-    drive.doPersistentConfiguration();
     arm.setMotorBrake(true);
-    //hang.doPersistentConfiguration();
 }
 void Robot::TeleopPeriodic() {
     shampTake.process();
@@ -47,23 +40,23 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::DisabledInit() {
-//    reset(Mechanism::MatchMode::DISABLED);
+   reset(Mechanism::MatchMode::DISABLED);
 }
 void Robot::DisabledPeriodic() {
     controls.processInDisabled();
 }
 
 void Robot::TestInit() {
-    //reset(Mechanism::MatchMode::TEST);
+    reset(Mechanism::MatchMode::TEST);
 }
 void Robot::TestPeriodic() {}
 
 void Robot::reset(Mechanism::MatchMode mode) {
-    //for (Mechanism* mech : allMechanisms) {
-    //    mech->callResetToMode(lastMode);
-   // }
+    for (Mechanism* mech : allMechanisms) {
+       mech->callResetToMode(lastMode);
+    }
 
-    //lastMode = mode;
+    lastMode = mode;
 }
 
 #ifndef RUNNING_FRC_TESTS

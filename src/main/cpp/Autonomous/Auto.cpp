@@ -61,28 +61,11 @@ void Auto::doAuto() { //called during auto
 }
 
 void Auto::testAuto() { //test auto, leave, grab a note, and shoot
-    printf("Auto Running\n");
-    if (step == 0) { //Move to a position on the field and start intaking
-        arm->moveToAngle(200_deg);
-        //drive->cmdDriveToPose(0_m, 2_m, 0_deg);
-        //shamptake->autoIntake();
+    if (step == 0) {
+        drive->cmdDriveToPose(0_m, 3_m, 0_deg);
         step++;
     }
-    if (step == 1 && arm->isMoveDone()) { //When its done intaking and at the position, move the arm
-      /*if (shamptake->autoIntaking) {
-            shamptake->stopIntake();
-       }*/
-        //What do I move the arm to?
-        //arm->autoMoveArm(10_deg); go to some amount of degrees (for shooting)
-        autoDone = true;
-        printf("Auto Done");
-      //  step++;
-    }
-    if (step == 2 && arm->isMoveDone()) { //When the arm is done moving, shoot
-        shamptake->autoShoot();
-        step++;
-    }
-    if (step == 3 && !shamptake->autoShooting) { //When shooting is done, auto is done
+    if (step == 1 && drive->isTrajectoryFinished()) {
         autoDone = true;
     }
        // drive->setMode(Drive::DriveMode::VELOCITY);

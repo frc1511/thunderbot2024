@@ -5,33 +5,26 @@
 #include <frc/DigitalInput.h>
 #include <rev/CANSparkMax.h>
 #include <frc/controller/ProfiledPIDController.h>
-#include <frc/DutyCycle.h>
+#include <frc/DutyCycleEncoder.h>
 #include <units/angular_velocity.h>
 #include <units/angular_acceleration.h>
 #include <units/velocity.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
-#define ARM_MINIMUM_ENCODER -42.309
-#define ARM_MINIMUM_ENCODER_SLOW -35.000
-#define ARM_MAXIMUM_ENCODER -3.000 // Approx.
-#define ARM_MAXIMUM_ENCODER_SLOW -10.000
 
 //might be differnet values
-#define ARM_MOTOR_P 0.0002
+#define ARM_MOTOR_P 0.02
 #define ARM_MOTOR_I 0.0
 #define ARM_MOTOR_D 0.0
-#define ARM_MOTOR_FEED_FOWARD 0.000170
-#define ARM_MOTOR_I_ZONE 0.0
-#define ARM_MAX_VEL 5_deg_per_s
-#define ARM_MAX_ACCEL 2_deg_per_s_sq
+#define ARM_MAX_VEL 75_deg_per_s
+#define ARM_MAX_ACCEL 75_deg_per_s_sq
 
 class Arm : public Mechanism {
 public:
-    double ARM_SLOW_SPEED = 0.1;
     Arm();
     ~Arm();
 
-    void process() override;
+    void  process() override;
     void sendFeedback() override;
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
@@ -41,23 +34,22 @@ public:
     void setPower(double power);
     void moveToAngle(units::angle::degree_t angle);
 
+    bool isAtAmp();
+
     void stop();
 
     void setMotorBrake(bool armBrakeOn);
 private:
     bool init();
 
-    double getRawBorePosition();
+    units::degree_t getRawBorePosition();
 
-    double getBoreDegrees();
+    units::degree_t getBoreDegrees();
 
     std::string getMotorModeString();
 
-    frc::DigitalInput boreEncoder {DIO_GAMEPIECE_BORE_ENCODER};
-    frc::DutyCycle encoder{boreEncoder};
+    frc::DutyCycleEncoder encoder{DIO_GAMEPIECE_BORE_ENCODER};
     rev::CANSparkMax armMotor {CAN_PIVOT_ARM, rev::CANSparkMax::MotorType::kBrushless};
-
-    bool armCanMove = true;
 
     //rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkLimitSwitch reversearmLimitSwitch = armMotor.GetReverseLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
@@ -75,7 +67,7 @@ private:
     bool backingOffMinimum = false;
     bool backingOffMaximum = false;
 
-    units::angle::degree_t targetAngle;
+    units::angle::degree_t targetAngle = 10_deg;
 
     frc::ProfiledPIDController<units::degrees> armPIDController{
         ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, 

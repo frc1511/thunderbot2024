@@ -13,9 +13,9 @@
 #include <units/angular_acceleration.h>
 #include <units/math.h>
 
-#define TRAJECTORY_MAX_VELOCITY 1_mps
-#define TRAJECTORY_MAX_ACCLERATION 0.25_mps_sq
-#define TRAJECTORY_MAX_ANGULAR_VELOCITY 0.5_rad_per_s
+#define TRAJECTORY_MAX_VELOCITY 3.8_mps
+#define TRAJECTORY_MAX_ACCLERATION 2_mps_sq
+#define TRAJECTORY_MAX_ANGULAR_VELOCITY 6.28_rad_per_s
 #define TRAJECTORY_MIN_ANGULAR_VELOCITY 0_rad_per_s
 #define TRAJECTORY_ANGULAR_VELOCITY_FACTOR 2
 
