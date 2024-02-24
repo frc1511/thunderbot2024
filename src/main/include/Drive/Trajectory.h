@@ -13,12 +13,18 @@
 #include <units/angular_acceleration.h>
 #include <units/math.h>
 
+#define TRAJECTORY_MAX_VELOCITY 3.8_mps
+#define TRAJECTORY_MAX_ACCLERATION 2_mps_sq
+#define TRAJECTORY_MAX_ANGULAR_VELOCITY 6.28_rad_per_s
+#define TRAJECTORY_MIN_ANGULAR_VELOCITY 0_rad_per_s
+#define TRAJECTORY_ANGULAR_VELOCITY_FACTOR 2
+
 struct YaqoubsTrajectoryConfig {
-    units::meters_per_second_t maxVelocity = maxVelocity;
-    units::meters_per_second_squared_t maxAcceleration = maxAcceleration;
-    units::radians_per_second_t maxAngularVelocity = maxAngularVelocity;
-    units::radians_per_second_t minAngularVelocity = minAngularVelocity;
-    double angularVelocityFactor = angularVelocityFactor;
+    units::meters_per_second_t maxVelocity = TRAJECTORY_MAX_VELOCITY;
+    units::meters_per_second_squared_t maxAcceleration = TRAJECTORY_MAX_ACCLERATION;
+    units::radians_per_second_t maxAngularVelocity = TRAJECTORY_MAX_ANGULAR_VELOCITY;
+    units::radians_per_second_t minAngularVelocity = TRAJECTORY_MIN_ANGULAR_VELOCITY;
+    double angularVelocityFactor = TRAJECTORY_ANGULAR_VELOCITY_FACTOR;
     units::meters_per_second_t startVelocity = 0_mps;
     units::meters_per_second_t endVelocity = 0_mps;
 };

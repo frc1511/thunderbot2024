@@ -6,9 +6,10 @@
 #include <frc/geometry/Transform2d.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <Drive/Drive.h>
+#include <GamEpiece/Shamptake.h>
 
-Auto::Auto(Drive* drive)
-    : drive(drive) {
+Auto::Auto(Drive* drive, Shamptake* shamptake)
+    : drive(drive), shamptake(shamptake){
 
     }
 void Auto::getAutonomousCommand() {
@@ -58,9 +59,14 @@ void Auto::doAuto() { //called during auto
     }
 }
 
-void Auto::testAuto() { //test auto, leave
-    printf("Auto Running\n");
-    drive->cmdDriveToPose(1_m, 0_m, 0_deg);
+void Auto::testAuto() { //test auto, leave, grab a note, and shoot
+    if (step == 0) {
+        drive->cmdDriveToPose(0_m, 3_m, 0_deg);
+        step++;
+    }
+    if (step == 1 && drive->isTrajectoryFinished()) {
+        autoDone = true;
+    }
        // drive->setMode(Drive::DriveMode::VELOCITY);
    // drive->moveDistance(5, 1_mps);
     //drive->execStopped();

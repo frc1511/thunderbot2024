@@ -3,6 +3,9 @@
 Shamptake::Shamptake()
 : shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
   shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()) {
+    shooterMotorRight.SetInverted(false);
+    shooterMotorLeft.SetInverted(true);
+
     shooterMotorRightPIDController.SetP(SHAMPTANK_RIGHT_MOTOR_P);
     shooterMotorRightPIDController.SetI(SHAMPTANK_RIGHT_MOTOR_I);
     shooterMotorRightPIDController.SetD(SHAMPTANK_RIGHT_MOTOR_D);
@@ -24,12 +27,11 @@ Shamptake::~Shamptake() {
 }
 
 void Shamptake::sendFeedback() {
-
+    frc::SmartDashboard::PutString("Shamptake_intakeMode", intakeModeString());
 }
 
 void Shamptake::doPersistentConfiguration() {
-    shooterMotorRight.SetInverted(false);
-    shooterMotorLeft.SetInverted(true);
+
 }
 
 void Shamptake::resetToMode(MatchMode mode) {
@@ -45,6 +47,20 @@ void Shamptake::intake(double Power) {
 void Shamptake::stopIntake() {
     intake(0);
     runIntake = false;
+    if (autoIntaking) {
+        autoIntaking = false;
+    }
+}
+void Shamptake::autoIntake() {
+    autoIntaking = true;
+    intakeSpeed = IntakeSpeed::NORMAL;
+    runIntakeMotors();
+}
+void Shamptake::autoShoot() {
+    autoShooting = true;
+    shooterTimer.Reset();
+    shooterTimer.Start();
+    shooter(FIRE);
 }
 void Shamptake::shooter(double Power) {
     // double motorRightpower = 0;
@@ -58,20 +74,12 @@ void Shamptake::shooter(double Power) {
     // }
     //shooterMotorRight.Set(motorRightpower); 
     //shooterMotorLeft.Set(motorLeftpower); 
-    shooterMotorLeftPIDController.SetReference(Power * 5000, rev::ControlType::kVelocity);
-    shooterMotorRightPIDController.SetReference(Power * 5000, rev::ControlType::kVelocity);
+    shooterMotorLeftPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
+    shooterMotorRightPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
 }
 void Shamptake::stop() {
     intake(0);
     shooter(0);
-}
-void Shamptake::shooterSwitch() {
-   
-    if (shooterMode == Shamptake::ShooterMode::DEFAULT) {
-        shooterMode = Shamptake::ShooterMode::CURVED;
-    } else if (shooterMode == Shamptake::ShooterMode::CURVED) {
-        shooterMode = Shamptake::ShooterMode::DEFAULT;
-    }
 }
 void Shamptake::process() {
     //if no snesor detected
@@ -90,41 +98,72 @@ void Shamptake::process() {
         if (trippedBefore) { // Past Sensor
             //sleep(0.7);
             intakeSpeed = IntakeSpeed::STOP;
+            if (autoIntaking) {
+                autoIntaking = false;
+                stopIntake();
+            }
         } else { // Before Sensor
             intakeSpeed = IntakeSpeed::NORMAL;
         }
     } else { // Sensor Tripped
         intakeSpeed = IntakeSpeed::SLOW;
         trippedBefore = true;
-        printf("SET\n");
+    }
+
+    if (autoShooting) {
+        if (shooterTimer.Get() >= 1_s) {
+            autoShooting = false;
+            shooterTimer.Stop();
+            shooter(0);
+        }
     }
 }
+
+std::string Shamptake::intakeModeString() {
+    std::string modeString = "ERROR";
+    switch (intakeSpeed)
+    {
+    case IntakeSpeed::NORMAL:
+        modeString = "NORMAL";
+        break;
+    case IntakeSpeed::STOP:
+        modeString = "STOP";
+        break;
+    case IntakeSpeed::SLOW:
+        modeString = "SLOW";
+        break;
+    case IntakeSpeed::FIRE:
+        modeString = "FIRE";
+        break;
+    case IntakeSpeed::OUTTAKE:
+        modeString = "OUTTAKE";
+        break;
+    default:
+        break;
+    }
+    return modeString;
+}
+
 void Shamptake::runIntakeMotors() {
     double speed = 0;
     switch (intakeSpeed)
     {
     case IntakeSpeed::NORMAL:
-        speed = 0.5;
-        printf("NORMAL\n");
+        speed = 0.7;
         break;
     case IntakeSpeed::STOP:
-        printf("STOP\n");
         speed = 0;
         break;
     case IntakeSpeed::SLOW:
-        printf("SLOW\n");
-        speed = 0.2;
+        speed = 0.4;
         break;
     case IntakeSpeed::FIRE:
-        speed = 0.5;
-        printf("FIRE\n");
+        speed = 0.8;
         break;
     case IntakeSpeed::OUTTAKE:
-        printf("OUTTAKE\n");
         speed = -0.4;
         break;
     default:
-        printf("[SHAMPTAKE] IntakeSpeed was not set properly!");
         speed = 0;
         break;
     }

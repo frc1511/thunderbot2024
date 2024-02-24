@@ -1,11 +1,14 @@
 #pragma once
 
+#include <Basic/IOMap.h>
 #include <rev/CANSparkMax.h>
 #include <rev/SparkPIDController.h>
 #include <rev/ControlType.h>
 #include <frc/DigitalInput.h>
 #include <Basic/Mechanism.h>
 #include <Basic/IOMap.h>
+#include <frc/Timer.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #define SHAMPTANK_RIGHT_MOTOR_P 0.0002
 #define SHAMPTANK_RIGHT_MOTOR_I 0.0
@@ -39,15 +42,11 @@ class Shamptake : public Mechanism{
     void stopIntake();
     void shooter(double Power);
     void stop();
-    void shooterSwitch();//change mode between basic shooting and curved shooting
     void runIntakeMotors();
+    void autoIntake();
+    void autoShoot();
     bool runIntake;
     bool runOuttake;
-
-    enum ShooterMode {
-      DEFAULT,
-      CURVED
-    };
 
     enum IntakeSpeed {
       NORMAL,
@@ -57,12 +56,17 @@ class Shamptake : public Mechanism{
       OUTTAKE
     };
     Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::NORMAL;
-    frc::DigitalInput noteSensor{5};
+    frc::DigitalInput noteSensor{DIO_GAMEPIECE_RR_SENSOR};
     bool sensorDetected = false;
     bool trippedBefore = false;
+    bool autoIntaking = false;
+    bool autoShooting = false;
 
-    Shamptake::ShooterMode shooterMode = Shamptake::ShooterMode::DEFAULT;
+    frc::Timer shooterTimer;
+
+
   private:
+    std::string intakeModeString();
     rev::SparkPIDController shooterMotorRightPIDController;
     rev::SparkPIDController shooterMotorLeftPIDController;
 };
