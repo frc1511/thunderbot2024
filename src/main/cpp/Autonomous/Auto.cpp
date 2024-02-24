@@ -59,29 +59,12 @@ void Auto::doAuto() { //called during auto
     }
 }
 
-void Auto::testAuto() { //test auto, leave
-    printf("Auto Running\n");
+void Auto::testAuto() { //test auto, leave, grab a note, and shoot
     if (step == 0) {
-        drive->cmdDriveToPose(1_m, 0_m, 0_deg);
-        step += 1;
+        drive->cmdDriveToPose(0_m, 3_m, 0_deg);
+        step++;
     }
     if (step == 1 && drive->isTrajectoryFinished()) {
-        shamptake->autoIntake();
-        step += 1;
-    }
-    if (step == 2) {
-        if (!shamptake->autoIntaking) {
-            shamptake->autoShoot();
-            step += 1;
-        }
-    }
-    //Make the arm move!!!
-    if (step == 3) {
-        if (!shamptake->autoShooting) {
-            step += 1;
-        }
-    }
-    if (step == 4) {
         autoDone = true;
     }
        // drive->setMode(Drive::DriveMode::VELOCITY);

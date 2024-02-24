@@ -2,6 +2,7 @@
 
 #include <Drive/Drive.h>
 #include <GamEpiece/Shamptake.h>
+#include <GamEpiece/Arm.h>
 #include <frc/Timer.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc2/command/TrapezoidProfileCommand.h>

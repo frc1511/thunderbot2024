@@ -11,7 +11,7 @@ Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang)
     shamptake(_shamptake),
     arm(_arm),
     hang(_hang),
-    armMode(false) 
+    armMode(true) 
 {
 
 }
@@ -24,7 +24,7 @@ void Controls::process() {
     doAux();
 
 
-    // //doSwitchPanel();
+    doSwitchPanel(false);
     if (callaDisable) {
         drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
     }
@@ -43,7 +43,7 @@ void Controls::process() {
 }
 
 void Controls::processInDisabled() {
-    //doSwitchPanel();
+    doSwitchPanel(true);
 
     using DriveButton = DriveControllerType::Button;
 
@@ -60,7 +60,7 @@ void Controls::processInDisabled() {
 }
 
 bool Controls::getShouldPersistConfig() {
-    //doSwitchPanel();
+    doSwitchPanel(false);
 
     using DriveButton = DriveControllerType::Button;
     using AuxButton = AuxControllerType::Button;
@@ -109,8 +109,10 @@ void Controls::doDrive() {
     }
 
     if (driveLockX) {
-        // driveCtrlFlags |= Drive::ControlFlag::LOCK_X;
+        driveCtrlFlags |= Drive::ControlFlag::LOCK_Y;
     }
+
+    
 
     if (toggleRotation) {
         drive->resetPIDControllers();
@@ -204,46 +206,51 @@ void Controls::doAux() {
     using AuxAxis = AuxControllerType::Axis;
     
     //CONTROLMAP
-    dpadUp = false;
-    dpadRight = false;
-    dpadDown = false;
-    dpadLeft = false;
-    if (auxController.getDPad() == ThunderGameController::DPad::UP) {
-        dpadUp = true;
-    } else if (auxController.getDPad() == ThunderGameController::DPad::RIGHT) {
-        dpadRight = true;
-    } else if (auxController.getDPad() == ThunderGameController::DPad::DOWN) {
-        dpadDown = true;
-    } else if (auxController.getDPad() == ThunderGameController::DPad::LEFT) {
-        dpadLeft = true;
-    }
+    const bool dpadUp = auxController.getDPad() == ThunderGameController::DPad::UP;
+    const bool dpadRight = auxController.getDPad() == ThunderGameController::DPad::RIGHT;
+    const bool dpadDown = auxController.getDPad() == ThunderGameController::DPad::DOWN;
+    const bool dpadLeft = auxController.getDPad() == ThunderGameController::DPad::LEFT;
 
 
     bool overrideGamePieceNo = auxController.getButton(AuxButton::SHARE, ThunderGameController::ButtonState::PRESSED);
     bool overrideGamePieceYes = auxController.getButton(AuxButton::OPTIONS, ThunderGameController::ButtonState::PRESSED);
 
-    bool armModeToggle = dpadRight;
-    bool armLowButton = dpadUp;
-    bool armNormalButton = dpadDown;
-
     bool intake = auxController.getAxis(AuxAxis::RIGHT_TRIGGER) > 0.5;//Intake, for running intake motors
     bool shooter = auxController.getButton(AuxButton::LEFT_BUMPER);//Preheat, for running shooter motors
     bool fire = auxController.getAxis(AuxAxis::LEFT_TRIGGER) > 0.5;//Shoot, for running shooter and intake motors
-    bool outtake = auxController.getButton(AuxButton::A);//Outtake, for running intake motors in reverse
+    bool outtake = auxController.getButton(AuxButton::RIGHT_BUMPER);//Outtake, for running intake motors in reverse
+
 
     if (armMode) {
-    double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
-    } else if (!armMode) {
-    double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);//Hang movement
-    double hangMotorRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
-    
-    //TEMP
-    bool leftSolenoidManualButton = auxController.getButton(AuxButton::A);//TEMP these are eventually going to be arm settings, change after hang gets automatic solenoids when doing motors
-    bool rightSolenoidManualButton = auxController.getButton(AuxButton::B);//TEMP
+        double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
+        bool intakePreset = auxController.getButton(AuxButton::CROSS);
+        bool linePreset = auxController.getButton(AuxButton::CIRCLE);
+        bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
+        bool ampPreset = auxController.getButton(AuxButton::SQUARE);
 
-    //stuff for when hang gets automatic solenoids when doing motors
-    //bool armSubwooferMode = auxController.getButton(AuxButton::Y);
-    //bool armLineMode
+        if (intakePreset) {
+            arm->moveToAngle(16.4_deg);
+        } else if (linePreset) {
+            arm->moveToAngle(34.6_deg);
+        } else if (subwooferPreset) {
+            arm->moveToAngle(0_deg);
+        } else if (ampPreset) {
+            arm->moveToAngle(85_deg); // Don't forget to update Arm::isAtAmp()
+        }
+    } else { //Hang mode
+        double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);//Hang movement
+        double hangMotorRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
+        
+        //TEMP
+        bool otherPreset = auxController.getButton(AuxButton::CROSS);//TEMP these are eventually going to be arm settings, change after hang gets automatic solenoids when doing motors
+        bool linePreset = auxController.getButton(AuxButton::CIRCLE);
+        bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
+        bool ampPreset = auxController.getButton(AuxButton::SQUARE);
+
+
+        //stuff for when hang gets automatic solenoids when doing motors
+        //bool armSubwooferMode = auxController.getButton(AuxButton::Y);
+        //bool armLineMode
     }
 
     //SHAMPTAKE
@@ -254,11 +261,19 @@ void Controls::doAux() {
     if (shooter) {
         if (fire){
             shamptake->intakeSpeed = shamptake->FIRE;
-            shamptake->shooter(1);
+            if (arm->isAtAmp()) {
+                shamptake->shooter(0.2);
+            } else {
+                shamptake->shooter(1);
+            }
             shamptake->trippedBefore = false;
             printf("RESET\n");
         } else {
-            shamptake->shooter(0.6);
+            if (arm->isAtAmp()) {
+                shamptake->shooter(0.2);
+            } else {
+                shamptake->shooter(0.6);
+            }
         }
     } else {
         shamptake->shooter(0);
@@ -271,28 +286,7 @@ void Controls::doAux() {
     }
 
 
-    //ARM/HANG
-    if (armMode){
-        // Arm stuff- ALSO  A FUNCTIONNNN OUTTA DIS STUFF 2
-
-        if (std::fabs(armSpeed) < AXIS_DEADZONE) {
-            armSpeed = 0;
-        }
-
-        if (armSpeed > arm->ARM_SLOW_SPEED) {
-            armSpeed = arm->ARM_SLOW_SPEED;
-        }
-        
-        if (armSpeed < -arm->ARM_SLOW_SPEED) {
-            armSpeed = -arm->ARM_SLOW_SPEED;
-        }
-        if (arm != nullptr)
-        {
-            arm->setPower(armSpeed);
-        }
-
-    }
-    else{
+   /* if (!armmode){
         //HANG
         // Hang stuff - MAKE A FUNCTION OUTTA THIS STUFF
         
@@ -320,11 +314,11 @@ void Controls::doAux() {
         }
         if (hang != nullptr)
         {
-            if (leftSolenoidManualButton && rightSolenoidManualButton) {//TEMP, to be removed after hang gets automatic solenoids when doing motors (manual mode right now)
+            if (otherPreset && linePreset) {//TEMP, to be removed after hang gets automatic solenoids when doing motors (manual mode right now)
                 hang->setSolenoids(Hang::SolenoidStates::BOTH);
-            } else if (leftSolenoidManualButton) {
+            } else if (otherPreset) {
                 hang->setSolenoids(Hang::SolenoidStates::LEFT);
-            } else if (rightSolenoidManualButton) {
+            } else if (linePreset) {
                 hang->setSolenoids(Hang::SolenoidStates::RIGHT);
             } else {
                 hang->setSolenoids(Hang::SolenoidStates::OFF);
@@ -333,48 +327,18 @@ void Controls::doAux() {
             hang->setMotorRightSpeed(hangMotorRight);
         }
     }
-    if (armModeToggle){
-        armMode = !armMode;
-        armModeToggle = false;
-    }
-    //ARM
-    if (armLowButton){
-        //set arm low enough to get under the stage
-        if(armMode) {
-            arm->ARM_SLOW_SPEED += .1;
-            if (arm->ARM_SLOW_SPEED >= .5) {
-                arm->ARM_SLOW_SPEED = .5;
-            }
-        }
-        if (auxController.getButton(AuxButton::TRIANGLE)){//These aren't going to be set until after hang solenoids stuff is ready (solenoids open when they need to without input)
-            //  SUBWOOFER preset
-        } 
-        else if (auxController.getButton(AuxButton::CIRCLE)){
-            //  LINE preset
-        }
-        else if (auxController.getButton(AuxButton::CROSS)){
-            //other reserved preset
-        }
-        else if (auxController.getButton(AuxButton::SQUARE)){
-            //amp preset
-        } 
-    } else if (armNormalButton){
-        //set arm back to normal position
-        if (armMode) {
-            arm->ARM_SLOW_SPEED -= .1;
-            if (arm->ARM_SLOW_SPEED <= -.5) {
-                arm->ARM_SLOW_SPEED = -.5;
-            }
-        }
-    }
+    // if (armModeToggle){
+    //     armMode = !armMode;
+    //     armModeToggle = false;
+    // }
     //HANG
     if (hangModeControls == true){
-        /* hang and trap controls 
+         hang and trap controls 
 
 
-        */
+        
        
-    }
+    }*/
 }
 
 void Controls::doAuxManual() {
@@ -391,8 +355,9 @@ void Controls::doAuxManual() {
 #define SWITCH_SASHA_DISABLE 6
 #define SWITCH_MANUAL_AUX 7
 #define SWITCH_CRATER_MODE 8
+#define SWITCH_ARM_BRAKE 9
 
-void Controls::doSwitchPanel() {
+void Controls::doSwitchPanel(bool isDissabled) {
     bool ledDisable = switchPanel.GetRawButton(SWITCH_LED_DISABLE);
     driveRobotCentric = switchPanel.GetRawButton(SWITCH_ROBOT_CENTRIC);
     callaDisable = switchPanel.GetRawButton(SWITCH_CALLA_DISABLE);
@@ -401,7 +366,17 @@ void Controls::doSwitchPanel() {
     settings.isCraterMode = switchPanel.GetRawButton(SWITCH_CRATER_MODE);
     hangModeControls = switchPanel.GetRawButton(SWITCH_HANG_MODE);
     balanceControlOff = switchPanel.GetRawButton(SWITCH_BALANCE_CONTROL);
+    armBrakeDissable = switchPanel.GetRawButton(SWITCH_ARM_BRAKE);
 
+    if (armBrakeDissable) {
+        if (isDissabled) {
+            arm->setMotorBrake(false);
+        } else {
+            arm->setMotorBrake(true);
+        }
+    } else {
+        arm->setMotorBrake(true);
+    }
 
     int ledMode = frc::SmartDashboard::GetNumber("thunderdashboard_led_mode", 0.0);
 }
@@ -409,7 +384,6 @@ void Controls::doSwitchPanel() {
 void Controls::sendFeedback() {
     frc::SmartDashboard::PutString("Arm_currentmode", armMode ? "arm mode" : "hang mode");
     frc::SmartDashboard::PutNumber("Hang_Speed", MAX_ARM_SPEED);
-    frc::SmartDashboard::PutNumber("Arm_Speed", armSpeed);
-
+    //frc::SmartDashboard::PutNumber("Arm_Speed", armSpeed);
 
 }
