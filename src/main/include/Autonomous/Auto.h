@@ -15,7 +15,7 @@
 class Auto {
 
     public:
-        Auto(Drive* drive, Shamptake* shamptake, Arm* arm);
+        Auto(Drive* drive, Shamptake* shamptake);
 
         enum AutoMode {
             NONE,
@@ -33,7 +33,6 @@ class Auto {
     private:
         Drive* drive;
         Shamptake* shamptake;
-        Arm* arm;
 
         Auto::AutoMode mode = AutoMode::TEST;
 

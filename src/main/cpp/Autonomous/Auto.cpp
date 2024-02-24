@@ -7,10 +7,9 @@
 #include <frc2/command/SwerveControllerCommand.h>
 #include <Drive/Drive.h>
 #include <GamEpiece/Shamptake.h>
-#include <GamEpiece/Arm.h>
 
-Auto::Auto(Drive* drive, Shamptake* shamptake, Arm* arm)
-    : drive(drive), shamptake(shamptake), arm(arm){
+Auto::Auto(Drive* drive, Shamptake* shamptake)
+    : drive(drive), shamptake(shamptake){
 
     }
 void Auto::getAutonomousCommand() {

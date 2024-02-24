@@ -1,5 +1,4 @@
 #include <GamEpiece/Arm.h>
-#include <cmath>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #define ARM_ENCODER_OFFSET 116.28_deg

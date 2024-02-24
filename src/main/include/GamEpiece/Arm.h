@@ -73,5 +73,4 @@ private:
         ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, 
         frc::TrapezoidProfile<units::degrees>::Constraints(ARM_MAX_VEL, ARM_MAX_ACCEL)
     };
-
 };
