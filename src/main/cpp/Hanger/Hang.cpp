@@ -31,8 +31,8 @@
 // const double kSolenoidDisengaged = .72; // .2
 
  Hang::Hang() : 
- hangLeftEncoder(hangMotorLeft.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42)) ,
- hangRightEncoder(hangMotorRight.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42))
+ hangLeftEncoder(hangMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42)) ,
+ hangRightEncoder(hangMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42))
  {
 //     setRatchetPawlMarried(true);
 //     // winch->SetEncoder(0);
@@ -302,8 +302,8 @@ std::string Hang::getSolenoidState() {
     return solenoidState;
 }
 
-std::string Hang::ConvertTemperatureToString(double temp){
-    char temperature[16];
-    sprintf(temperature, "%lf C/%lf F", temp, temp * 1.8 + 32);
+std::string Hang::ConvertTemperatureToString(double temp_c){
+    double temp_f = temp_c * 1.8 + 32;
+    std::string temperature = std::to_string(temp_c) + "C " + std::to_string(temp_f) + "F";
     return temperature;
 }

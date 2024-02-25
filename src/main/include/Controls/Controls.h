@@ -34,28 +34,19 @@ private:
     AuxControllerType auxController{ThunderGameController::Controller::AUX};
     frc::GenericHID switchPanel{2};
     bool armMode;
-    double currentSpeed;
-    double armSpeed;
-    double hangMotorLeft;
-    double hangMotorRight;
-    bool dpadUp;
-    bool dpadRight;
-    bool dpadDown;
-    bool dpadLeft;
-    bool leftSolenoidManualButton;
-    bool rightSolenoidManualButton;
 
     void doDrive();
     void doAux();
     void doAuxManual();
-    void doSwitchPanel();
+    void doSwitchPanel(bool isDissabled);
     bool driveLockX = false;
     bool manualAux = false;
     bool doUltraBrickMode = false;
     bool shouldStrobe = false;
     bool hangModeControls = false;
-    bool driveRobotCentric = true;
+    bool driveRobotCentric = false;
     bool balanceControlOff = false;
+    bool armBrakeDissable = false;
     unsigned driveCtrlFlags = 0;
 
     bool driveAbsRotation = false;
