@@ -43,6 +43,7 @@ class Shamptake : public Mechanism{
     void intake(double Power);
     void stopIntake();
     void shooter(double Power);
+    void stopShooter();
     void stop();
 
     void runIntakeMotors();
@@ -51,16 +52,10 @@ class Shamptake : public Mechanism{
     bool notShooting();
     bool notIntaking();
     bool hasGamepiece();
-
-    void intake(double power);
-    void shooter(double power);
-
+    
     void autoIntake();
     void autoShoot();
 
-    void stopShooter();
-    void stopIntake();
-    void stop();
     bool runIntake;
     bool runOuttake;
 

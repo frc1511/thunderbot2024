@@ -222,7 +222,7 @@ void Controls::doAux() {
 
 
     if (armMode) {
-        double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
+        //double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
         bool intakePreset = auxController.getButton(AuxButton::CROSS);
         bool linePreset = auxController.getButton(AuxButton::CIRCLE);
         bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
@@ -240,13 +240,6 @@ void Controls::doAux() {
     } else { //Hang mode
         double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);//Hang movement
         double hangMotorRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
-        
-        //TEMP
-        bool otherPreset = auxController.getButton(AuxButton::CROSS);//TEMP these are eventually going to be arm settings, change after hang gets automatic solenoids when doing motors
-        bool linePreset = auxController.getButton(AuxButton::CIRCLE);
-        bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
-        bool ampPreset = auxController.getButton(AuxButton::SQUARE);
-
 
         //stuff for when hang gets automatic solenoids when doing motors
         //bool armSubwooferMode = auxController.getButton(AuxButton::Y);

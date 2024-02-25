@@ -55,7 +55,15 @@ void Auto::process() { //called during auto
 }
 
 void Auto::test() { //test auto, leave, grab a note, and shoot
-    
+    if (step == 0) {
+        frc::Pose2d initPose(paths->at(Path::SPEAKER_1).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        drive->runTrajectory(&paths->at(Path::SPEAKER_1), actions);
+        step++;
+    } else if (step == 1 && drive->isFinished()) {
+        drive->runTrajectory(&paths->at(Path::SPEAKER_2_STAGE_2), actions);
+        step++;
+    }
 }
 
 void Auto::speaker1() {

@@ -49,11 +49,7 @@ void Robot::DisabledInit() {
 }
 void Robot::DisabledPeriodic() {
     controls.processInDisabled();
-    blinky.process();    
-    reset(Mechanism::MatchMode::DISABLED);
-}
-void Robot::DisabledPeriodic() {
-    controls.processInDisabled();
+    blinky.process(); 
 }
 
 void Robot::TestInit() {

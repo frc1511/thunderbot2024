@@ -52,7 +52,7 @@ void BlinkyBlinky::process() {
                     setPixel(i, hang->isLeftPawlUp() ? frc::Color::kGreen : frc::Color::kRed);
 
                 for (size_t i = 13; i < 17; i++)
-                    setPixel(i, arm->isOnLowerLimit() ? frc::Color::kGreen : frc::Color::kRed);
+                    setPixel(i, frc::Color::kRed);
                 double armPct = arm->getBoreNormalizedPosition();
                 size_t end = std::max((size_t)4, (size_t)(4 * armPct));
                 for (size_t i = 0; i < 5; i++)
@@ -248,6 +248,7 @@ void BlinkyBlinky::sendFeedback() {
             break;
         case LEDMode::PIT_MODE:
             modeString = "pit";
+            break;
         case LEDMode::RAINBOW:
             modeString = "rainbow";
             break;

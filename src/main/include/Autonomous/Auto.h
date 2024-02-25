@@ -50,17 +50,14 @@ private:
     int step = 0;
 
     enum class Path {
-        TEST_1,
         SPEAKER_1,
         SPEAKER_2_STAGE_2,
     };
     const std::map<Path, CSVTrajectory> bluePaths {
-        { Path::TEST_1,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/test_1.csv",             false } },
         { Path::SPEAKER_1,          CSVTrajectory{ DEPLOY_DIR "ThunderAuto/speaker_1.csv",          false } },
         { Path::SPEAKER_2_STAGE_2,  CSVTrajectory{ DEPLOY_DIR "ThunderAuto/speaker_2_stage_2.csv",  false } }
     };
     const std::map<Path, CSVTrajectory> redPaths {
-        { Path::TEST_1,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/test_1.csv",             true  } },
         { Path::SPEAKER_1,          CSVTrajectory{ DEPLOY_DIR "ThunderAuto/speaker_1.csv",          true  } },
         { Path::SPEAKER_2_STAGE_2,  CSVTrajectory{ DEPLOY_DIR "ThunderAuto/speaker_2_stage_2.csv",  true  } },
     };
