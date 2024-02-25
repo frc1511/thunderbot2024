@@ -26,6 +26,7 @@ void Robot::AutonomousPeriodic() {
     drive.process();
     arm.process();
     shampTake.process();
+    shampTake.runIntakeMotors();
 }
 
 void Robot::TeleopInit() {
