@@ -38,14 +38,22 @@ class Shamptake : public Mechanism{
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
     
-    void intake(double power);
-    void stopIntake();
-    void shooter(double power);
-    void stop();
     void runIntakeMotors();
+
+    bool atTargetRPM();
+    bool notShooting();
+    bool notIntaking();
+    bool hasGamepiece();
+
+    void intake(double power);
+    void shooter(double power);
+
     void autoIntake();
     void autoShoot();
-    bool atTargetRPM();
+
+    void stopShooter();
+    void stopIntake();
+    void stop();
     bool runIntake;
     bool runOuttake;
 
