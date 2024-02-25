@@ -229,13 +229,13 @@ void Controls::doAux() {
         bool ampPreset = auxController.getButton(AuxButton::SQUARE);
 
         if (intakePreset) {
-            arm->moveToAngle(20.3_deg);
+            arm->moveToPreset(Arm::MEDIUM);
         } else if (linePreset) {
-            arm->moveToAngle(34.6_deg);
+            arm->moveToPreset(Arm::LINE);
         } else if (subwooferPreset) {
-            arm->moveToAngle(0_deg);
+            arm->moveToPreset(Arm::SUBWOOFER);
         } else if (ampPreset) {
-            arm->moveToAngle(85_deg); // Don't forget to update Arm::isAtAmp()
+            arm->moveToPreset(Arm::AMP); // Don't forget to update Arm::isAtAmp()
         }
     } else { //Hang mode
         double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);//Hang movement

@@ -32,13 +32,26 @@ public:
     bool isMoveDone();
 
     void setPower(double power);
-    void moveToAngle(units::angle::degree_t angle);
 
     bool isAtAmp();
 
     void stop();
 
     void setMotorBrake(bool armBrakeOn);
+
+
+    enum Presets {
+        BASE,
+        LINE,
+        AMP,
+        SUBWOOFER,
+        MEDIUM
+    };
+
+    void moveToAngle(units::angle::degree_t angle);
+
+    void moveToPreset(Presets preset);
+
 private:
     bool init();
 
