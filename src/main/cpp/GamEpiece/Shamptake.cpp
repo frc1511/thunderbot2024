@@ -47,6 +47,11 @@ void Shamptake::doPersistentConfiguration() {
 void Shamptake::resetToMode(MatchMode mode) {
     sensorDetected = false;
     trippedBefore = false;
+    if (mode == MatchMode::AUTO) {
+        isAuto = true;
+    } else {
+        isAuto = false;
+    }
 }
 
 bool Shamptake::atTargetRPM() {
@@ -103,13 +108,16 @@ void Shamptake::process() {
             autoIntaking = true;
         }
         if (shooterTimer.Get() >= 1_s) {
-            
             autoShooting = false;
+            autoIntaking = false;
             shooterTimer.Stop();
-            shooter(5000);
+            shooter(0);
             intakeSpeed = IntakeSpeed::STOP;
             stop();
         }
+    }
+    if (!autoIntaking && isAuto) {
+        intakeSpeed = IntakeSpeed::STOP;
     }
 }
 
@@ -172,8 +180,10 @@ void Shamptake::intake(double Power) {
 
 void Shamptake::shooter(double power) {
     targetShooterRPM = power;
-    shooterMotorLeftPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
-    shooterMotorRightPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+    //shooterMotorLeftPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+    //shooterMotorRightPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+    shooterMotorLeft.Set(power / 5000);
+    shooterMotorRight.Set(power / 5000);
 }
 
 void Shamptake::autoIntake() {
@@ -185,6 +195,7 @@ void Shamptake::autoIntake() {
 void Shamptake::autoShoot() {
     autoShooting = true;
     shooterTimer.Reset();
+    shooter(4000);
 }
 
 void Shamptake::stopIntake() {

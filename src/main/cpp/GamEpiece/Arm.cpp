@@ -106,7 +106,7 @@ void Arm::moveToPreset(Presets preset) {
 
 bool Arm::isMoveDone() {
     //if the arm is at or past the point it needs to be at, then it is done going to the position
-    if (fabs(double(getBoreDegrees())) >= fabs(double(targetAngle)) - 5) {
+    if (fabs(double(getBoreDegrees()) - targetAngle.value()) <= 5) {
         return true;
         //don't stop moving the arm since it will just fall back down
     }

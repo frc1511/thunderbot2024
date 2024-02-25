@@ -69,7 +69,7 @@ void Auto::test() { //test auto, leave, grab a note, and shoot
 void Auto::speaker1() {
     if (step == 0) {
         //Make shamptake function to make shooter go fast
-        arm->moveToPreset(Arm::Presets::LINE);
+        arm->moveToPreset(Arm::Presets::MEDIUM);
         frc::Pose2d initPose(paths->at(Path::SPEAKER_1).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         drive->runTrajectory(&paths->at(Path::SPEAKER_1), actions);
@@ -87,12 +87,12 @@ void Auto::speaker2() {
     if (step == 3) {
         arm->moveToPreset(Arm::Presets::BASE);
         step++;
-    } else if (step == 4) {
+    } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoIntake();
         drive->runTrajectory(&paths->at(Path::SPEAKER_2_STAGE_2), actions);
         step++;
     } else if (step == 5 && drive->isFinished() && shamptake->hasGamepiece()) {
-        arm->moveToPreset(Arm::Presets::LINE);
+        arm->moveToPreset(Arm::Presets::MEDIUM);
         step++;
     } else if (step == 6 && arm->isMoveDone()) {
         shamptake->autoShoot();

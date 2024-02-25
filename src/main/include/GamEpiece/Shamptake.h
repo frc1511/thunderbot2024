@@ -66,7 +66,7 @@ class Shamptake : public Mechanism{
       FIRE,
       OUTTAKE
     };
-    Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::NORMAL;
+    Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::STOP;
     frc::DigitalInput noteSensor{DIO_GAMEPIECE_RR_SENSOR};
     bool sensorDetected = false;
     bool trippedBefore = false;
@@ -83,6 +83,7 @@ class Shamptake : public Mechanism{
     rev::SparkPIDController shooterMotorLeftPIDController;
     rev::SparkRelativeEncoder shooterMotorLeftEncoder;
     double targetShooterRPM = 0;
+    bool isAuto = false;
 };
 
 
