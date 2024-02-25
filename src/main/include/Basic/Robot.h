@@ -11,6 +11,7 @@
 #include <Autonomous/Auto.h>
 #include <GamEpiece/Arm.h>
 #include <Hanger/Hang.h>
+#include <BlinkyBlinky/BlinkyBlinky.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -37,10 +38,14 @@ private:
     Shamptake shampTake;
     Arm arm;
     Hang hang;
+    BlinkyBlinky blinky{&hang, &arm, &shampTake};
+    
     //Controls controls {nullptr, &shampTake, &arm, &hang};
     Controls controls {&drive, &shampTake, &arm, &hang};
     Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
-        &arm, &hang, &drive, &shampTake, &controls
+
+        &arm, &hang, &drive, &shampTake, &controls, &autoCode, &blinky
+
     };
 };

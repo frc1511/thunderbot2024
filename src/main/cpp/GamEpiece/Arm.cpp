@@ -58,9 +58,14 @@ units::degree_t Arm::getRawBorePosition() {
     return 360_deg - units::degree_t(encoder.GetDistance());
 }
 
+double Arm::getBoreNormalizedPosition() {
+    return getBoreDegrees().value() / 87.0;
+}
+
 units::degree_t Arm::getBoreDegrees() {
     units::degree_t degrees = getRawBorePosition();
     return units::math::fmod(degrees - ARM_ENCODER_OFFSET, 360_deg);
+
 }
 
 std::string Arm::getMotorModeString() {
@@ -75,9 +80,33 @@ void Arm::moveToAngle(units::angle::degree_t angle) {
     targetAngle = std::clamp(angle, 0_deg, 85_deg);
 }
 
+void Arm::moveToPreset(Presets preset) {
+    units::angle::degree_t movingTo = 0_deg;
+    switch (preset)
+    {
+    case LINE:
+        movingTo = 34.6_deg;
+        break;
+    case AMP:
+        movingTo = 85_deg; // Warning: changing this value may require changes to Arm::isAtAmp()
+        break;
+    case MEDIUM:
+        movingTo = 20.3_deg;
+        break;
+    case SUBWOOFER:
+        [[fallthrough]];
+    case BASE:
+        movingTo = 0_deg;
+        break;
+    default:
+        break;
+    }
+    moveToAngle(movingTo);
+}
+
 bool Arm::isMoveDone() {
     //if the arm is at or past the point it needs to be at, then it is done going to the position
-    if (fabs(double(getBoreDegrees())) >= fabs(double(targetAngle))) {
+    if (fabs(double(getBoreDegrees())) >= fabs(double(targetAngle)) - 5) {
         return true;
         //don't stop moving the arm since it will just fall back down
     }

@@ -109,7 +109,7 @@ void Controls::doDrive() {
     }
 
     if (driveLockX) {
-        driveCtrlFlags |= Drive::ControlFlag::LOCK_Y;
+        //driveCtrlFlags |= Drive::ControlFlag::LOCK_Y;
     }
 
     
@@ -181,10 +181,10 @@ void Controls::doDrive() {
         finalYVel *= 0.375;//.427928372; // LOL
     }
     if (rotSlowMode || settings.newDriver){
-        finalAngVel *= .5;
+        finalAngVel *= .36;
     }
     else if (rotSlowerIThinkIDKReallyCallaJustWantedThisForSomeReasonSoHereItIsIGuess || settings.newDriver)  {
-        finalAngVel *= .4;
+        finalAngVel *= .26;
     }
 
     // Control the drivetrain.    
@@ -222,31 +222,24 @@ void Controls::doAux() {
 
 
     if (armMode) {
-        double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
+        //double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
         bool intakePreset = auxController.getButton(AuxButton::CROSS);
         bool linePreset = auxController.getButton(AuxButton::CIRCLE);
         bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
         bool ampPreset = auxController.getButton(AuxButton::SQUARE);
 
         if (intakePreset) {
-            arm->moveToAngle(16.4_deg);
+            arm->moveToPreset(Arm::MEDIUM);
         } else if (linePreset) {
-            arm->moveToAngle(34.6_deg);
+            arm->moveToPreset(Arm::LINE);
         } else if (subwooferPreset) {
-            arm->moveToAngle(0_deg);
+            arm->moveToPreset(Arm::SUBWOOFER);
         } else if (ampPreset) {
-            arm->moveToAngle(85_deg); // Don't forget to update Arm::isAtAmp()
+            arm->moveToPreset(Arm::AMP); // Don't forget to update Arm::isAtAmp()
         }
     } else { //Hang mode
         double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);//Hang movement
         double hangMotorRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
-        
-        //TEMP
-        bool otherPreset = auxController.getButton(AuxButton::CROSS);//TEMP these are eventually going to be arm settings, change after hang gets automatic solenoids when doing motors
-        bool linePreset = auxController.getButton(AuxButton::CIRCLE);
-        bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
-        bool ampPreset = auxController.getButton(AuxButton::SQUARE);
-
 
         //stuff for when hang gets automatic solenoids when doing motors
         //bool armSubwooferMode = auxController.getButton(AuxButton::Y);
@@ -262,17 +255,16 @@ void Controls::doAux() {
         if (fire){
             shamptake->intakeSpeed = shamptake->FIRE;
             if (arm->isAtAmp()) {
-                shamptake->shooter(0.2);
+                shamptake->shooter(1000);
             } else {
-                shamptake->shooter(1);
+                shamptake->shooter(5000);
             }
             shamptake->trippedBefore = false;
-            printf("RESET\n");
         } else {
             if (arm->isAtAmp()) {
-                shamptake->shooter(0.2);
+                shamptake->shooter(1000);
             } else {
-                shamptake->shooter(0.6);
+                shamptake->shooter(5000);
             }
         }
     } else {
@@ -282,7 +274,6 @@ void Controls::doAux() {
     if (outtake) {
         shamptake->intakeSpeed = shamptake->OUTTAKE;
         shamptake->trippedBefore = false;
-        printf("RESET\n");
     }
 
 

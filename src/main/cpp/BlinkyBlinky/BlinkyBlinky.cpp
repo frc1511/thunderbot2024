@@ -1,10 +1,11 @@
 #include <BlinkyBlinky/BlinkyBlinky.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <WhooshWhoosh/WhooshWhoosh.h>
 #include <random>
+#include <algorithm>
 
-BlinkyBlinky::BlinkyBlinky(WhooshWhoosh* _whooshWhoosh)
-: whooshWhoosh(_whooshWhoosh) {
+BlinkyBlinky::BlinkyBlinky(Hang *hang, Arm *arm, Shamptake *shamptake)
+: hang(hang), arm(arm), shamptake(shamptake)
+{
     strip.SetLength(LED_TOTAL);
     strip.SetData(stripBuffer);
     strip.Start();
@@ -15,7 +16,7 @@ BlinkyBlinky::BlinkyBlinky(WhooshWhoosh* _whooshWhoosh)
 BlinkyBlinky::~BlinkyBlinky() = default;
 
 void BlinkyBlinky::resetToMode(MatchMode mode) {
-
+    
 }
 
 void BlinkyBlinky::process() {
@@ -27,8 +28,8 @@ void BlinkyBlinky::process() {
         }
         else {
             setColor(frc::Color::kRed);
-            int end = static_cast<int>(percent * LED_STRIP);
-            int start = std::clamp(end - 10.0, 0.0, (double)LED_STRIP);
+            int end = static_cast<int>(percent * LED_TOTAL);
+            int start = std::clamp(end - 10.0, 0.0, (double)LED_TOTAL);
 
             for (int i = start; i < end; i++) {
                 setMirroredPixel(i, frc::Color::kYellow);
@@ -42,6 +43,29 @@ void BlinkyBlinky::process() {
                 // Turn the LEDs off D:
                 setColor(frc::Color::kBlack);
                 break;
+            case LEDMode::PIT_MODE:
+            {
+                setColor(frc::Color::kWhite);
+                for (size_t i = 0; i < 6; i++)
+                    setPixel(i, hang->isLeftReflectiveSensorTripped() ? frc::Color::kGreen : frc::Color::kRed);
+                for (size_t i = 7; i < 12; i++)
+                    setPixel(i, hang->isLeftPawlUp() ? frc::Color::kGreen : frc::Color::kRed);
+
+                for (size_t i = 13; i < 17; i++)
+                    setPixel(i, frc::Color::kRed);
+                double armPct = arm->getBoreNormalizedPosition();
+                size_t end = std::max((size_t)4, (size_t)(4 * armPct));
+                for (size_t i = 0; i < 5; i++)
+                    setPixel(18 + i, (i <= end) ? frc::Color::kGreen : frc::Color::kRed);
+                for (size_t i = 23; i < 27; i++)
+                    setPixel(i, shamptake->isNoteSensorTripped() ? frc::Color::kGreen : frc::Color::kRed);
+
+                for (size_t i = 28; i < 33; i++)
+                    setPixel(i, hang->isRightPawlUp() ? frc::Color::kGreen : frc::Color::kRed);
+                for (size_t i = 34; i < 39; i++)
+                    setPixel(i, hang->isRightReflectiveSensorTripped() ? frc::Color::kGreen : frc::Color::kRed);
+                break;
+            }
             case LEDMode::RAINBOW:
                 rainbow();
                 break;
@@ -118,12 +142,6 @@ void BlinkyBlinky::setColor(frc::Color color) {
     }
 }
 
-void BlinkyBlinky::setStrip(Strip strip, frc::Color color) {
-    for (std::size_t i = 0; i < 40; i++) {
-        setPixel(static_cast<std::size_t>(strip) + i, color);
-    }
-}
-
 void BlinkyBlinky::interpolateHue(int lowHue, int highHue, int offset) {
     std::size_t j = 0;
     for (std::size_t i = 0; i < LED_TOTAL; i -=- 1) {
@@ -147,9 +165,9 @@ void BlinkyBlinky::kitt() {
 
     double percent = kittIter / KITT_LOOPS;
 
-    int pixel = static_cast<int>(percent * (LED_STRIP - 1));
+    int pixel = static_cast<int>(percent * (LED_TOTAL - 1));
 
-    double fadeRange = LED_STRIP * 0.3;
+    double fadeRange = LED_TOTAL * 0.3;
 
     setColor(frc::Color::kBlack);
 
@@ -163,7 +181,7 @@ void BlinkyBlinky::kitt() {
     }
 
     // Fade up.
-    for (int i = pixel; i <= (pixel + fadeRange > LED_STRIP - 1 ? LED_STRIP - 1 : pixel + fadeRange); i++) {
+    for (int i = pixel; i <= (pixel + fadeRange > LED_TOTAL - 1 ? LED_TOTAL - 1 : pixel + fadeRange); i++) {
         double percent = static_cast<double>(i - pixel) / fadeRange;
 
         double value = (1 / percent) * 128;
@@ -189,7 +207,7 @@ void BlinkyBlinky::fire() {
     if (fireIter >= fireLoops || fireIter <= 0) {
         fireDir = -fireDir;
         fireLoops = FIRE_MAX_LOOPS * ((60 + (static_cast<double>(rand() % 40))) / 100.0);
-        fireRange = (LED_STRIP - 1) * ((50 + (static_cast<double>(rand() % 51))) / 100.0);
+        fireRange = (LED_TOTAL - 1) * ((50 + (static_cast<double>(rand() % 51))) / 100.0);
         if (fireDir == 1) {
             fireIter = fireLoops;
         }
@@ -205,9 +223,9 @@ void BlinkyBlinky::fire() {
     int pixel = fireRange;
 
     for (int i = 0; i < pixel; i++) {
-        setMirroredPixel(i, frc::Color::FromHSV((static_cast<double>(i) / (LED_STRIP - 1)) * 5.0, 255 /*(1.0 / (static_cast<double>(i) / pixel)) * 255*/, 128));
+        setMirroredPixel(i, frc::Color::FromHSV((static_cast<double>(i) / (LED_TOTAL - 1)) * 5.0, 255 /*(1.0 / (static_cast<double>(i) / pixel)) * 255*/, 128));
     }
-    for (int i = pixel; i < LED_STRIP; i++) {
+    for (int i = pixel; i < LED_TOTAL; i++) {
         setMirroredPixel(i, frc::Color::kBlack);
     }
 }
@@ -227,6 +245,9 @@ void BlinkyBlinky::sendFeedback() {
     switch (ledMode) {
         case LEDMode::OFF:
             modeString = "off";
+            break;
+        case LEDMode::PIT_MODE:
+            modeString = "pit";
             break;
         case LEDMode::RAINBOW:
             modeString = "rainbow";

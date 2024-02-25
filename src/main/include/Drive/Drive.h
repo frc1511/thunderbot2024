@@ -4,6 +4,7 @@
 #include <Basic/IOMap.h>
 #include <Drive/Trajectory.h>
 #include <Drive/SwerveModule.h>
+#include <Autonomous/Action.h>
 #include <ctre/phoenix6/Pigeon2.hpp>
 
 #include <frc/geometry/Translation2d.h>
@@ -39,7 +40,10 @@
 #define ROBOT_WIDTH 20.1875_in // Distences from center of each swerve module
 #define ROBOT_LENGTH 20.1875_in 
 
-#define DRIVE_MANUAL_MAX_VEL       3.8_mps
+#define DRIVE_AUTO_MAX_ANG_VEL     6.28_rad_per_s
+#define DRIVE_AUTO_MAX_ANG_ACCEL   3.14_rad_per_s_sq
+
+#define DRIVE_MANUAL_MAX_VEL       4.2_mps
 #define DRIVE_MANUAL_MAX_ANG_VEL   360_deg_per_s
 #define DRIVE_MANUAL_MAX_ANG_ACCEL 6.28_rad_per_s_sq
 // Drivetrain X and Y PID values.
@@ -98,6 +102,9 @@ public:
      * Positive yPct   -> Move forward,           Negative yPct   -> Move backward.
     */
     void manualControlAbsRotation(double xPct, double yPct, units::radian_t angle, unsigned flags);
+    
+    units::second_t getTrajectoryTime() { return trajectoryTimer.Get(); }
+    
     /**
      * Controls the speeds of the drivetrain using the velocities specified.
      * (The direction of the velocities is dependant on the control type).
@@ -112,6 +119,15 @@ public:
      */
     void velocityControlAbsRotation(units::meters_per_second_t xVel, units::meters_per_second_t yVel, units::radian_t angle, unsigned flags);
 
+    /**
+     * Runs a trajectory.
+     */
+    void runTrajectory(const Trajectory* trajectory, const std::map<u_int32_t, Action*>& actionMap);
+
+    /**
+     * Returns whether the current process is finished or not.
+     */
+    bool isFinished() const;
 
     /**
      * Calibrates the IMU (Pauses the robot for 4 seconds while it calibrates).
@@ -144,22 +160,12 @@ public:
      */
     void resetPIDControllers();
 
-    /**
-     * Executes instructions for when the robot is stopped.
-     */
-    void execStopped();
 
-    /**
-     * Move the robot a distance (in feet) at a speed 
-     */
-    void moveDistance(double distance, units::meters_per_second_t speed);
-
-
+private:
     enum class DriveMode {
         STOPPED,
         VELOCITY,
         TRAJECTORY,
-        TRAJECTORY_FINISHED
     };
     
     /**
@@ -225,23 +231,6 @@ public:
     void setModuleStates(frc::ChassisSpeeds speeds);
 
     /**
-     * Begins a command to drive and rotate to a specified pose.
-     */
-    void cmdDriveToPose(units::meter_t x, units::meter_t y, frc::Rotation2d angle, YaqoubsTrajectoryConfig config = YaqoubsTrajectoryConfig());
-    bool isTrajectoryFinished();
-
-private:
-
-    /**
-     * Executes the current follow trajectory command.
-    */
-    void exeFollowTrajectory();
-
-    /**
-     * Returns whether the trajectory has finished and sets the drive mode to TRAJECTORY_FINISHED if finished.
-     */
-    bool trajectoryFinished();
-    /**
      * Updates the position and rotation of the drivetrain on the field.
      */
     void updateOdometry();
@@ -251,6 +240,16 @@ private:
      * Executes the instructions for when the robot is in velocity control.
      */
     void execVelocityControl();
+
+    /**
+     * Executes the instructions for when the robot is running a trajectory.
+     */
+    void execTrajectory();
+
+    /**
+     * Executes instructions for when the robot is stopped.
+     */
+    void execStopped();
 
     /**
      * Puts the drivetrain into brick mode (all modules turned towards the
@@ -277,10 +276,6 @@ private:
 
     bool imuCalibrated = false;
 
-
-
-
-
     // The current drive mode.
     DriveMode driveMode = DriveMode::STOPPED;
 
@@ -293,12 +288,35 @@ private:
 
     // The data concerning velocity control.
     VelocityControlData controlData {};
-    
-    // The trajectory controller.
-    YaqoubsTrajectoryController trajectoryController {};
-    
 
     // Feedback variables.
     frc::ChassisSpeeds chassisSpeeds { 0_mps, 0_mps, 0_rad_per_s };
     frc::Pose2d targetPose;
+
+    // The trajectory that is currently being run.
+    const Trajectory* trajectory = nullptr;
+
+    // The available actions.
+    const std::map<u_int32_t, Action*>* trajectoryActions = nullptr;
+
+    // Actions that are completed.
+    std::vector<u_int32_t> doneTrajectoryActions;
+
+    // The current action.
+    std::map<units::second_t, u_int32_t>::const_iterator trajectoryActionIter;
+
+    frc::Timer trajectoryTimer;
+
+    // PID Controller for X and Y axis drivetrain movement.
+    frc::PIDController xPIDController { DRIVE_XY_P, DRIVE_XY_I, DRIVE_XY_D },
+                       yPIDController { DRIVE_XY_P, DRIVE_XY_I, DRIVE_XY_D };
+
+    // PID Controller for angular drivetrain movement.
+    frc::ProfiledPIDController<units::radians> trajectoryThetaPIDController {
+        DRIVE_THETA_P, DRIVE_THETA_I, DRIVE_THETA_D,
+        frc::TrapezoidProfile<units::radians>::Constraints(DRIVE_AUTO_MAX_ANG_VEL, DRIVE_AUTO_MAX_ANG_ACCEL)
+    };
+
+        // The drive controller that will handle the drivetrain movement.
+    frc::HolonomicDriveController driveController;
 };
