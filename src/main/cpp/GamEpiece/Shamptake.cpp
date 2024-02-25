@@ -2,7 +2,9 @@
 
 Shamptake::Shamptake()
 : shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
-  shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()) {
+  shooterMotorRightEncoder(shooterMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()),
+  shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)) {
     shooterMotorRight.SetInverted(false);
     shooterMotorLeft.SetInverted(true);
 
@@ -28,6 +30,10 @@ Shamptake::~Shamptake() {
 
 void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutString("Shamptake_intakeMode", intakeModeString());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterLeftRPM", shooterMotorLeftEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterRightRPM", shooterMotorRightEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterTargetRPM", targetShooterRPM);
+    frc::SmartDashboard::PutBoolean("Shamptake_shooterAtRPM", atTargetRPM());
 }
 
 void Shamptake::doPersistentConfiguration() {
@@ -59,10 +65,10 @@ void Shamptake::autoIntake() {
 void Shamptake::autoShoot() {
     autoShooting = true;
     shooterTimer.Reset();
-    shooterTimer.Start();
-    shooter(FIRE);
+    shooterTimer.Stop();
+    shooter(5000);
 }
-void Shamptake::shooter(double Power) {
+void Shamptake::shooter(double power) {
     // double motorRightpower = 0;
     // double motorLeftpower = 0;
     // if (shooterMode == Shamptake::ShooterMode::CURVED) { 
@@ -74,8 +80,13 @@ void Shamptake::shooter(double Power) {
     // }
     //shooterMotorRight.Set(motorRightpower); 
     //shooterMotorLeft.Set(motorLeftpower); 
-    shooterMotorLeftPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
-    shooterMotorRightPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
+    targetShooterRPM = power;
+    shooterMotorLeftPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+    shooterMotorRightPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+}
+bool Shamptake::atTargetRPM() {
+    bool isAtTarget = (shooterMotorRightEncoder.GetVelocity() >= targetShooterRPM && shooterMotorLeftEncoder.GetVelocity() >= targetShooterRPM);
+    return isAtTarget;
 }
 void Shamptake::stop() {
     intake(0);
@@ -111,9 +122,15 @@ void Shamptake::process() {
     }
 
     if (autoShooting) {
+        if (atTargetRPM() && !autoIntaking) {
+            intakeSpeed = IntakeSpeed::FIRE;
+            shooterTimer.Start();
+            autoIntaking = true;
+        }
         if (shooterTimer.Get() >= 1_s) {
             autoShooting = false;
             shooterTimer.Stop();
+            intakeSpeed = IntakeSpeed::STOP;
             shooter(0);
         }
     }

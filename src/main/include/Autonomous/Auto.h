@@ -15,32 +15,35 @@
 class Auto {
 
     public:
-        Auto(Drive* drive, Shamptake* shamptake);
+        Auto(Drive* drive, Shamptake* shamptake, Arm* arm);
 
         enum AutoMode {
             NONE,
-            TEST
+            TEST,
+            SPEAKER1
         };
 
         bool isAutoDone() {  
-             return autoDone; 
+            return autoDone; 
         };
 
         void doAuto();
 
-        void getAutonomousCommand();
+        void reset();
 
     private:
         Drive* drive;
         Shamptake* shamptake;
+        Arm* arm;
 
-        Auto::AutoMode mode = AutoMode::TEST;
+        Auto::AutoMode mode = AutoMode::SPEAKER1;
 
         frc::Timer delayTimer {};
         frc::Timer autoTimer {};
 
         void doNothing();
         void testAuto();
+        void speaker1Auto();
 
         int step = 0;
         bool autoDone;

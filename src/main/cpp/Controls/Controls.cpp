@@ -109,7 +109,7 @@ void Controls::doDrive() {
     }
 
     if (driveLockX) {
-        driveCtrlFlags |= Drive::ControlFlag::LOCK_Y;
+        //driveCtrlFlags |= Drive::ControlFlag::LOCK_Y;
     }
 
     
@@ -181,10 +181,10 @@ void Controls::doDrive() {
         finalYVel *= 0.375;//.427928372; // LOL
     }
     if (rotSlowMode || settings.newDriver){
-        finalAngVel *= .5;
+        finalAngVel *= .36;
     }
     else if (rotSlowerIThinkIDKReallyCallaJustWantedThisForSomeReasonSoHereItIsIGuess || settings.newDriver)  {
-        finalAngVel *= .4;
+        finalAngVel *= .26;
     }
 
     // Control the drivetrain.    
@@ -229,7 +229,7 @@ void Controls::doAux() {
         bool ampPreset = auxController.getButton(AuxButton::SQUARE);
 
         if (intakePreset) {
-            arm->moveToAngle(16.4_deg);
+            arm->moveToAngle(20.3_deg);
         } else if (linePreset) {
             arm->moveToAngle(34.6_deg);
         } else if (subwooferPreset) {
@@ -262,17 +262,16 @@ void Controls::doAux() {
         if (fire){
             shamptake->intakeSpeed = shamptake->FIRE;
             if (arm->isAtAmp()) {
-                shamptake->shooter(0.2);
+                shamptake->shooter(1000);
             } else {
-                shamptake->shooter(1);
+                shamptake->shooter(5000);
             }
             shamptake->trippedBefore = false;
-            printf("RESET\n");
         } else {
             if (arm->isAtAmp()) {
-                shamptake->shooter(0.2);
+                shamptake->shooter(1000);
             } else {
-                shamptake->shooter(0.6);
+                shamptake->shooter(5000);
             }
         }
     } else {
@@ -282,7 +281,6 @@ void Controls::doAux() {
     if (outtake) {
         shamptake->intakeSpeed = shamptake->OUTTAKE;
         shamptake->trippedBefore = false;
-        printf("RESET\n");
     }
 
 

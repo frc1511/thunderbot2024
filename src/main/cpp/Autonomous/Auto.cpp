@@ -8,41 +8,14 @@
 #include <Drive/Drive.h>
 #include <GamEpiece/Shamptake.h>
 
-Auto::Auto(Drive* drive, Shamptake* shamptake)
-    : drive(drive), shamptake(shamptake){
+Auto::Auto(Drive* drive, Shamptake* shamptake, Arm* arm)
+    : drive(drive), shamptake(shamptake), arm(arm) {
 
-    }
-void Auto::getAutonomousCommand() {
-    /*frc::TrajectoryConfig trajectoryConfig{(units::meters_per_second_t)AUTO_MAX_SPEED,
-                                           (units::meters_per_second_squared_t)AUTO_MAX_ANGLE_SPEED};
-    trajectoryConfig.SetKinematics(drive->kinematics);
-
-    frc::PIDController xController = frc::PIDController(1.5, 0, 0);
-    frc::PIDController yController = frc::PIDController(1.5, 0, 0);
-    
-
-    auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-        // Start at the origin facing the +X direction
-        frc::Pose2d{0_m, 0_m, 0_deg},
-        // Pass through these two interior waypoints, making an 's' curve path
-        {frc::Translation2d{1_m, 1_m}, frc::Translation2d{2_m, -1_m}},
-        // End 3 meters straight ahead of where we started, facing forward
-        frc::Pose2d{3_m, 0_m, 0_deg},
-        // Pass the config
-        trajectoryConfig);
-    
-    frc2::CommandPtr swerveControllerCommand = frc2::SwerveControllerCommand<4>(
-        exampleTrajectory,
-        [this]() {return drive->getEstimatedPose();},
-        drive->kinematics,
-        xController,
-        yController,
-        drive->manualThetaPIDController,
-        [this](auto kinematics moduleStates) {drive->setModuleStates(kinematics moduleStates);},
-        {}).ToPtr();   */
-    
 }
-
+void Auto::reset() {
+    step = 0;
+    drive->resetOdometry({0_m, 0_m, 0_deg});
+}
 void Auto::doAuto() { //called during auto
     if (autoDone) { //don't do auto if you are done with auto
         doNothing();
@@ -55,6 +28,9 @@ void Auto::doAuto() { //called during auto
             break;
         case TEST:
             testAuto();
+            break;
+        case SPEAKER1:
+            speaker1Auto();
             break;
     }
 }
@@ -81,6 +57,21 @@ void Auto::testAuto() { //test auto, leave, grab a note, and shoot
     } else if (step >= 1) {
         autoDone = true; //auto is done after all steps
     }*/
+}
+
+void Auto::speaker1Auto() {
+    if (step == 0) {
+        drive->cmdDriveToPose(0_m, 0.94_m, -45_deg);
+        arm->moveToAngle(20.3_deg);
+        step++;
+    }
+    if (step == 1 && drive->isTrajectoryFinished() && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    }
+    if (step == 2 && !shamptake->autoShooting) {
+        autoDone = true;
+    }
 }
 
 void Auto::doNothing() {

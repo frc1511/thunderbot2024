@@ -39,7 +39,7 @@
 #define ROBOT_WIDTH 20.1875_in // Distences from center of each swerve module
 #define ROBOT_LENGTH 20.1875_in 
 
-#define DRIVE_MANUAL_MAX_VEL       3.8_mps
+#define DRIVE_MANUAL_MAX_VEL       4.2_mps
 #define DRIVE_MANUAL_MAX_ANG_VEL   360_deg_per_s
 #define DRIVE_MANUAL_MAX_ANG_ACCEL 6.28_rad_per_s_sq
 // Drivetrain X and Y PID values.

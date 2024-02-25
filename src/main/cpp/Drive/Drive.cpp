@@ -330,6 +330,8 @@ void Drive::setModuleStates(frc::ChassisSpeeds speeds) {
     // Generate individual module states using the chassis velocities.
     wpi::array<frc::SwerveModuleState, 4> moduleStates(kinematics.ToSwerveModuleStates(speeds));
     
+    kinematics.DesaturateWheelSpeeds(&moduleStates, DRIVE_MANUAL_MAX_VEL);
+
     // Set the states of the individual modules.
     for(std::size_t i = 0; i < swerveModules.size(); i++) {
         swerveModules.at(i)->setState(moduleStates.at(i));

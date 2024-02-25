@@ -38,13 +38,14 @@ class Shamptake : public Mechanism{
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
     
-    void intake(double Power);
+    void intake(double power);
     void stopIntake();
-    void shooter(double Power);
+    void shooter(double power);
     void stop();
     void runIntakeMotors();
     void autoIntake();
     void autoShoot();
+    bool atTargetRPM();
     bool runIntake;
     bool runOuttake;
 
@@ -68,7 +69,10 @@ class Shamptake : public Mechanism{
   private:
     std::string intakeModeString();
     rev::SparkPIDController shooterMotorRightPIDController;
+    rev::SparkRelativeEncoder shooterMotorRightEncoder;
     rev::SparkPIDController shooterMotorLeftPIDController;
+    rev::SparkRelativeEncoder shooterMotorLeftEncoder;
+    double targetShooterRPM = 0;
 };
 
 
