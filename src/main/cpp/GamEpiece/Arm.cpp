@@ -41,6 +41,10 @@ void Arm::resetToMode(MatchMode mode) {
     armPIDController.Reset(getBoreDegrees());
 }
 
+bool Arm::isOnLowerLimit() {
+    return forwardarmLimitSwitch.Get(); // Get the limit switch reading (it's inverted)
+}
+
 bool Arm::init() {
     bool isInit = true;
     return isInit;
@@ -58,9 +62,23 @@ units::degree_t Arm::getRawBorePosition() {
     return 360_deg - units::degree_t(encoder.GetDistance());
 }
 
+double Arm::getBoreNormalizedPosition() {
+    double d = getRawBorePosition().Value();
+    d -= ARM_MIN_RAW;
+    d /= (ARM_MAX_RAW - ARM_MIN_RAW);
+
+    return d;
+}
+
+double Arm::getBoreDegrees() {
+    double degrees = getRawBorePosition();
+    degrees *= 360.0;
+    return degrees;
+
 units::degree_t Arm::getBoreDegrees() {
     units::degree_t degrees = getRawBorePosition();
     return units::math::fmod(degrees - ARM_ENCODER_OFFSET, 360_deg);
+
 }
 
 std::string Arm::getMotorModeString() {

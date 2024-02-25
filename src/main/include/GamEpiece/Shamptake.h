@@ -38,6 +38,13 @@ class Shamptake : public Mechanism{
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
     
+    bool isNoteSensorTripped();
+
+    void intake(double Power);
+    void stopIntake();
+    void shooter(double Power);
+    void stop();
+
     void runIntakeMotors();
 
     bool atTargetRPM();

@@ -57,6 +57,11 @@ class Hang : public Mechanism {
     void setSolenoids(Hang::SolenoidStates state);
     void sendFeedback() override;
 
+    bool isLeftReflectiveSensorTripped();
+    bool isRightReflectiveSensorTripped();
+    bool isLeftPawlUp();
+    bool isRightPawlUp();
+
 
 //     /**
 //      * When retracting, move slower for precision

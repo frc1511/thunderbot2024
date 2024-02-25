@@ -36,6 +36,11 @@ void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutBoolean("Shamptake_shooterAtRPM", atTargetRPM());
 }
 
+bool Shamptake::isNoteSensorTripped()
+{
+    return !noteSensor.Get();
+}
+
 void Shamptake::doPersistentConfiguration() {
 }
 

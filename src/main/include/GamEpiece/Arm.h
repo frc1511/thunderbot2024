@@ -37,8 +37,9 @@ public:
 
     void stop();
 
-    void setMotorBrake(bool armBrakeOn);
+    double getBoreNormalizedPosition();
 
+    void setMotorBrake(bool armBrakeOn);
 
     enum Presets {
         BASE,

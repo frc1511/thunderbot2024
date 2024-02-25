@@ -247,6 +247,26 @@ std::string Hang::getMotorRightModeString() {
     return motorMode;
 }
 
+bool Hang::isLeftReflectiveSensorTripped()
+{
+    return !reflectiveHangSensorLeft.Get();
+}
+
+bool Hang::isRightReflectiveSensorTripped()
+{
+    return !reflectiveHangSensorRight.Get();
+}
+
+bool Hang::isLeftPawlUp()
+{
+    return !leafSensorLeft.Get();
+}
+
+bool Hang::isRightPawlUp()
+{
+    return !leafSensorRight.Get();
+}
+
 void Hang::sendFeedback() {
     frc::SmartDashboard::PutNumber("Hang_Left_Position", getLeftMotorPosition());
     frc::SmartDashboard::PutNumber("Hang_Right_Position", getRightMotorPosition());
