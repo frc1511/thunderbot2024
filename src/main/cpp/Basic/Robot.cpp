@@ -16,11 +16,10 @@ void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {
     reset(Mechanism::MatchMode::AUTO);
-    autoCode.reset();
 }
 void Robot::AutonomousPeriodic() {
     //controls.process();
-    autoCode.doAuto();
+    autoCode.process();
     drive.process();
     arm.process();
     shampTake.process();

@@ -41,6 +41,6 @@ private:
     Controls controls {&drive, &shampTake, &arm, &hang};
     Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
-        &arm, &hang, &drive, &shampTake, &controls
+        &arm, &hang, &drive, &shampTake, &controls, &autoCode
     };
 };

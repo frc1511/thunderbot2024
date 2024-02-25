@@ -89,8 +89,9 @@ void Arm::moveToPreset(Presets preset) {
         movingTo = 20.3_deg;
         break;
     case SUBWOOFER:
+        [[fallthrough]];
     case BASE:
-        movingTo = 34.6_deg;
+        movingTo = 0_deg;
         break;
     default:
         break;

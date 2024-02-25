@@ -7,70 +7,90 @@
 #include <frc2/command/SwerveControllerCommand.h>
 #include <Drive/Drive.h>
 #include <GamEpiece/Shamptake.h>
+#include <frc/DriverStation.h>
 
 Auto::Auto(Drive* drive, Shamptake* shamptake, Arm* arm)
     : drive(drive), shamptake(shamptake), arm(arm) {
 
 }
-void Auto::reset() {
+void Auto::resetToMode(MatchMode mode) {
+    delayTimer.Reset();
+    delayTimer.Start();
+    autoTimer.Reset();
+    autoTimer.Start();
+
     step = 0;
-    drive->resetOdometry({0_m, 0_m, 0_deg});
+
+    if (mode == MatchMode::AUTO) {
+        drive->calibrateIMU();
+    }
 }
-void Auto::doAuto() { //called during auto
-    if (autoDone) { //don't do auto if you are done with auto
-        doNothing();
-        return;
+void Auto::process() { //called during auto
+    if (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed) {
+        paths = &redPaths;
+    }
+    else {
+        paths = &bluePaths;
     }
 
+    // Autonomous delay.
+    if (delayTimer.Get().value() <= frc::SmartDashboard::GetNumber("thunderdashboard_auto_start_delay", 0.0)) {
+        return;
+    }
     switch (mode) { //find what auto mode you are using and do it
-        case NONE:
+        using enum AutoMode;
+        case DO_NOTHING:
             doNothing();
             break;
         case TEST:
-            testAuto();
+            test();
             break;
-        case SPEAKER1:
-            speaker1Auto();
+        case SPEAKER_1_GP:
+            speaker1();
+            break;
+        case SPEAKER_2_GP:
+            speaker2();
             break;
     }
 }
 
-void Auto::testAuto() { //test auto, leave, grab a note, and shoot
-    if (step == 0) {
-        drive->cmdDriveToPose(0_m, 3_m, 0_deg);
-        step++;
-    }
-    if (step == 1 && drive->isTrajectoryFinished()) {
-        autoDone = true;
-    }
-       // drive->setMode(Drive::DriveMode::VELOCITY);
-   // drive->moveDistance(5, 1_mps);
-    //drive->execStopped();
-    //autoDone = true;
-
-
-  /*  if (step == 0) { //set the drive motors
-        drive->drive();
-        sleep(1000);
-        drive->stop();
-        step++;
-    } else if (step >= 1) {
-        autoDone = true; //auto is done after all steps
-    }*/
+void Auto::test() { //test auto, leave, grab a note, and shoot
+    
 }
 
-void Auto::speaker1Auto() {
+void Auto::speaker1() {
     if (step == 0) {
-        drive->cmdDriveToPose(0_m, 0.94_m, -45_deg);
-        arm->moveToAngle(20.3_deg);
+        //Make shamptake function to make shooter go fast
+        arm->moveToPreset(Arm::Presets::LINE);
+        frc::Pose2d initPose(paths->at(Path::SPEAKER_1).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        drive->runTrajectory(&paths->at(Path::SPEAKER_1), actions);
         step++;
-    }
-    if (step == 1 && drive->isTrajectoryFinished() && arm->isMoveDone()) {
+    } else if (step == 1 && drive->isFinished() && arm->isMoveDone()) {
         shamptake->autoShoot();
         step++;
+    } else if (step == 2 && shamptake->notShooting()) { //Make isShootingDone thing in shamptake
+        step++;
     }
-    if (step == 2 && !shamptake->autoShooting) {
-        autoDone = true;
+}
+
+void Auto::speaker2() {
+    speaker1();
+    if (step == 3) {
+        arm->moveToPreset(Arm::Presets::BASE);
+        step++;
+    } else if (step == 4) {
+        shamptake->autoIntake();
+        drive->runTrajectory(&paths->at(Path::SPEAKER_2_STAGE_2), actions);
+        step++;
+    } else if (step == 5 && drive->isFinished() && shamptake->hasGamepiece()) {
+        arm->moveToPreset(Arm::Presets::LINE);
+        step++;
+    } else if (step == 6 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 7 && shamptake->notShooting()) {
+        step++;
     }
 }
 
@@ -89,23 +109,33 @@ void Auto::doNothing() {
     // Well technically it's doing something - chris(2023)
 }
 
-// DriveDistanceProfiled::DriveDistanceProfiled(units::meter_t distance,
-//                                              Drive* drive)
-//     : CommandHelper{
-//           frc::TrapezoidProfile<units::meters>{
-//               // Limit the max acceleration and velocity
-//               {AUTO_MAX_SPEED, AUTO_MAX_ACCELERATION}},
-//           // Pipe the profile state to the drive
-//           [drive](auto setpointState) {
-//             drive->setModuleStates(setpointState, setpointState);
-//           },
-//           // End at desired position in meters; implicitly starts at 0
-//           [distance] {
-//             return frc::TrapezoidProfile<units::meters>::State{distance, 0_mps};
-//           },
-//           [] { return frc::TrapezoidProfile<units::meters>::State{}; },
-//           // Require the drive
-//           {drive}} {
-//   // Reset drive encoders since we're starting at 0
-//   drive->resetOdometry();
-// }
+void Auto::sendFeedback() {
+    int desiredAutoMode = static_cast<int>(frc::SmartDashboard::GetNumber("Auto_Mode", 0.0));
+    if (desiredAutoMode < (int)autoModeNames.size() && desiredAutoMode >= 0) {
+        mode = static_cast<AutoMode>(desiredAutoMode);
+    }
+    else {
+        mode = AutoMode::DO_NOTHING;
+    }
+
+
+    frc::SmartDashboard::PutNumber("Autonomous_Step", step);
+    frc::SmartDashboard::PutBoolean("Autonomous_DriveFinished", drive->isFinished());
+    frc::SmartDashboard::PutString("Autonomous_ModeName", autoModeNames.at(mode));
+
+    std::string buffer = "";
+
+    auto handleDashboardString = [&](AutoMode mode, const char* description) {
+        int mode_index = static_cast<int>(mode);
+        // Put mode index in buffer.
+        buffer += fmt::format(",{}", mode_index);
+        // Send description.
+        frc::SmartDashboard::PutString(fmt::format("thunderdashboard_auto_{}", mode_index), description);
+    };
+
+    for (auto [mode, name] : autoModeNames) {
+        handleDashboardString(mode, name);
+    }
+
+    frc::SmartDashboard::PutString("thunderdashboard_auto_list", buffer);
+}
