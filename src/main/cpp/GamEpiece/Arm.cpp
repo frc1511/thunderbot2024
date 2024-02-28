@@ -26,8 +26,8 @@ void Arm::process()
 void Arm::sendFeedback() {
     frc::SmartDashboard::PutNumber("Arm_rawBorePosition", getRawBorePosition().value());
     frc::SmartDashboard::PutNumber("Arm_boreDegrees", double(getBoreDegrees()));
-    frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
-    frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
+    //frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
+    //frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
     frc::SmartDashboard::PutNumber("Arm_targetAngle", targetAngle.value());
 }
@@ -38,13 +38,8 @@ void Arm::doPersistentConfiguration() {
 
 void Arm::resetToMode(MatchMode mode) {
     setMotorBrake(true);
-    setPower(0);
+    stop();
     armPIDController.Reset(getBoreDegrees());
-}
-
-bool Arm::init() {
-    bool isInit = true;
-    return isInit;
 }
 
 void Arm::setMotorBrake(bool armBrakeOn) {
@@ -60,20 +55,18 @@ units::degree_t Arm::getRawBorePosition() {
 }
 
 double Arm::getBoreNormalizedPosition() {
-    double d = getBoreDegrees().value() / 87.0;
+    double d = getBoreDegrees().value() / 85.0;
     return d;
 }
 
 units::degree_t Arm::getBoreDegrees() {
     units::degree_t degrees = getRawBorePosition();
     return units::math::fmod(degrees - ARM_ENCODER_OFFSET, 360_deg);
-
 }
 
 bool Arm::isAtLowerLimit() {
     return forwardarmLimitSwitch.Get();
 }
-
 
 std::string Arm::getMotorModeString() {
     std::string motorMode = "Coast";
@@ -88,40 +81,21 @@ void Arm::moveToAngle(units::angle::degree_t angle) {
 }
 
 void Arm::moveToPreset(Presets preset) {
-    units::angle::degree_t movingTo = 0_deg;
-    switch (preset)
-    {
-    case LINE:
-        movingTo = 34.6_deg;
-        break;
-    case AMP:
-        movingTo = 85_deg; // Warning: changing this value may require changes to Arm::isAtAmp()
-        break;
-    case MEDIUM:
-        movingTo = 20.3_deg;
-        break;
-    case SUBWOOFER:
-        [[fallthrough]];
-    case BASE:
-        movingTo = 0_deg;
-        break;
-    default:
-        break;
-    }
+    units::angle::degree_t movingTo = presetAngles[preset];
     moveToAngle(movingTo);
 }
 
 bool Arm::isMoveDone() {
     //if the arm is at or past the point it needs to be at, then it is done going to the position
-    if (fabs(double(getBoreDegrees()) - targetAngle.value()) <= 5) {
+    if (fabs(double(getBoreDegrees()) - targetAngle.value()) <= targetAngleThreshold) {
         return true;
         //don't stop moving the arm since it will just fall back down
     }
     return false;
 }
 
-bool Arm::isAtAmp() {
-    return targetAngle >= 70_deg;
+bool Arm::isNearPreset(Presets preset) {
+    return fabs(double(targetAngle - presetAngles[preset])) <= presetAngleThreshold;
 }
 
 void Arm::setPower(double power) {

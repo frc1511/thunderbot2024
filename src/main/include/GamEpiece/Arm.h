@@ -16,8 +16,8 @@
 #define ARM_MOTOR_P 0.02
 #define ARM_MOTOR_I 0.0
 #define ARM_MOTOR_D 0.0
-#define ARM_MAX_VEL 75_deg_per_s
-#define ARM_MAX_ACCEL 75_deg_per_s_sq
+#define ARM_MAX_VEL 90_deg_per_s //75_deg_per_s
+#define ARM_MAX_ACCEL 90_deg_per_s_sq //75_deg_per_s_sq
 
 class Arm : public Mechanism {
 public:
@@ -33,7 +33,6 @@ public:
 
     void setPower(double power);
 
-    bool isAtAmp();
 
     void stop();
 
@@ -46,8 +45,11 @@ public:
         LINE,
         AMP,
         SUBWOOFER,
-        MEDIUM
+        MEDIUM,
+        MAX_PRESETS
     };
+
+    bool isNearPreset(Presets preset);
 
     void moveToAngle(units::angle::degree_t angle);
 
@@ -56,7 +58,6 @@ public:
     bool isAtLowerLimit();
 
 private:
-    bool init();
 
     units::degree_t getRawBorePosition();
 
@@ -68,6 +69,19 @@ private:
     rev::CANSparkMax armMotor {CAN_PIVOT_ARM, rev::CANSparkMax::MotorType::kBrushless};
 
     rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
+    units::degree_t presetAngles [Presets::MAX_PRESETS] = {
+        0_deg,
+        34.6_deg,
+        85_deg,
+        0_deg,
+        20.3_deg
+    };
+
+    double targetAngleThreshold = 5;
+    double presetAngleThreshold = 15;
+    
+
+    //rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkLimitSwitch reversearmLimitSwitch = armMotor.GetReverseLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkRelativeEncoder armEncoder; // Encoder Inside of Motor
 

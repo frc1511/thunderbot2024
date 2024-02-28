@@ -252,32 +252,26 @@ void Controls::doAux() {
 
     //SHAMPTAKE
     if (!intake) {
-        shamptake->intakeSpeed = shamptake->STOP;
+        shamptake->intakeSpeed = shamptake->STOP_INTAKE;
     }
 
     if (shooter) {
-        if (fire){
-            shamptake->intakeSpeed = shamptake->FIRE;
+        if (fire) {
+            shamptake->intakeSpeed = shamptake->FIRE_INTAKE;
             shamptake->hasNote = false;
-            if (arm->isAtAmp()) {
-                shamptake->shooter(1000);
-            } else {
-                shamptake->shooter(5000);
-            }
             shamptake->trippedBefore = false;
+        }
+        if (arm->isNearPreset(Arm::Presets::AMP)) {
+            shamptake->shooterSpeed = shamptake->AMP_SHOOTER;
         } else {
-            if (arm->isAtAmp()) {
-                shamptake->shooter(1000);
-            } else {
-                shamptake->shooter(5000);
-            }
+            shamptake->shooterSpeed = shamptake->FIRE_SHOOTER;
         }
     } else {
-        shamptake->shooter(0);
+        shamptake->stopShooter();
     }
     
     if (outtake) {
-        shamptake->intakeSpeed = shamptake->OUTTAKE;
+        shamptake->intakeSpeed = shamptake->OUTTAKE_INTAKE;
         shamptake->hasNote = false;
         shamptake->trippedBefore = false;
     }
@@ -391,7 +385,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
     else if (fire){
         blink->setLEDMode(BlinkyBlinky::LEDMode::SCORE);
     }
-    else if (shamptake->intakeSpeed == Shamptake::IntakeSpeed::NORMAL){
+    else if (shamptake->intakeSpeed == Shamptake::IntakeSpeed::NORMAL_INTAKE){
         blink->setLEDMode(BlinkyBlinky::LEDMode::INTAKE);
     }
     else if (shamptake->hasNote){
