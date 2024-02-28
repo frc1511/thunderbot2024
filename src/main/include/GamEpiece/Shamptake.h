@@ -40,13 +40,12 @@ class Shamptake : public Mechanism{
     
     bool isNoteSensorTripped();
 
-    void intake(double Power);
     void stopIntake();
-    void shooter(double Power);
+    void shooter(double RPM);
     void stopShooter();
     void stop();
 
-    void runIntakeMotors();
+    void runMotors();
 
     bool atTargetRPM();
     bool notShooting();
@@ -56,17 +55,27 @@ class Shamptake : public Mechanism{
     void autoIntake();
     void autoShoot();
 
-    bool runIntake;
     bool runOuttake;
 
     enum IntakeSpeed {
-      NORMAL,
-      STOP,
-      SLOW,
-      FIRE,
-      OUTTAKE
+        NORMAL_INTAKE,
+        STOP_INTAKE,
+        SLOW_INTAKE,
+        FIRE_INTAKE,
+        OUTTAKE_INTAKE,
+        MAX_INTAKE_SPEED
     };
-    Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::STOP;
+
+    enum ShooterSpeed {
+        STOP_SHOOTER,
+        FIRE_SHOOTER,
+        AMP_SHOOTER,
+        AUTO_FIRE_SHOOTER,
+        MAX_SHOOTER_SPEED
+    };
+
+    Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::STOP_INTAKE;
+    Shamptake::ShooterSpeed shooterSpeed = Shamptake::ShooterSpeed::STOP_SHOOTER;
     frc::DigitalInput noteSensor{DIO_GAMEPIECE_RR_SENSOR};
     bool sensorDetected = false;
     bool trippedBefore = false;
@@ -78,6 +87,7 @@ class Shamptake : public Mechanism{
 
 
   private:
+    void intake(double power);
     std::string intakeModeString();
     rev::SparkPIDController shooterMotorRightPIDController;
     rev::SparkRelativeEncoder shooterMotorRightEncoder;
@@ -85,6 +95,20 @@ class Shamptake : public Mechanism{
     rev::SparkRelativeEncoder shooterMotorLeftEncoder;
     double targetShooterRPM = 0;
     bool isAuto = false;
+
+    double presetIntakeSpeeds [IntakeSpeed::MAX_INTAKE_SPEED] = {
+        0.7,
+        0,
+        0.2,
+        0.8,
+        -0.4
+    };
+    double presetShooterSpeeds [ShooterSpeed::MAX_SHOOTER_SPEED] = {
+        0,
+        5000,
+        1000,
+        4000
+    };
 };
 
 

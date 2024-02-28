@@ -21,7 +21,7 @@ Shamptake::Shamptake()
     shooterMotorLeftPIDController.SetIZone(SHAMPTANK_LEFT_MOTOR_I_ZONE);
     shooterMotorLeftPIDController.SetFF(SHAMPTANK_LEFT_MOTOR_FEED_FOWARD);
     shooterMotorLeftPIDController.SetOutputRange(0, 1);
-    shooter(0);
+    stop();
 }
 
 Shamptake::~Shamptake() {
@@ -47,15 +47,13 @@ void Shamptake::doPersistentConfiguration() {
 void Shamptake::resetToMode(MatchMode mode) {
     sensorDetected = false;
     trippedBefore = false;
-    if (mode == MatchMode::AUTO) {
-        isAuto = true;
-    } else {
-        isAuto = false;
-    }
+    isAuto = (mode == MatchMode::AUTO);
+    stop();
 }
 
 bool Shamptake::atTargetRPM() {
-    bool isAtTarget = (shooterMotorRightEncoder.GetVelocity() >= targetShooterRPM && shooterMotorLeftEncoder.GetVelocity() >= targetShooterRPM);
+    bool isAtTarget = (shooterMotorRightEncoder.GetVelocity() >= targetShooterRPM &&
+                       shooterMotorLeftEncoder.GetVelocity() >= targetShooterRPM);
     return isAtTarget;
 }
 
@@ -83,42 +81,38 @@ void Shamptake::process() {
     //if outtaking
         //Outtake (Handled in controls)
         //intake previously tripped = false (So we don't stop when inkaing next time)
-    sensorDetected = !noteSensor.Get();
+    sensorDetected = isNoteSensorTripped();
     
     if (!sensorDetected) {
         if (trippedBefore) { // Past Sensor
             //sleep(0.7);
-            intakeSpeed = IntakeSpeed::STOP;
+            intakeSpeed = IntakeSpeed::STOP_INTAKE;
             if (autoIntaking) {
                 autoIntaking = false;
                 stopIntake();
             }
         } else { // Before Sensor
-            intakeSpeed = IntakeSpeed::NORMAL;
+            intakeSpeed = IntakeSpeed::NORMAL_INTAKE;
         }
     } else { // Sensor Tripped
-        intakeSpeed = IntakeSpeed::SLOW;
+        intakeSpeed = IntakeSpeed::SLOW_INTAKE;
         trippedBefore = true;
         hasNote = true;
     }
 
     if (autoShooting) {
         if (atTargetRPM() && notIntaking()) {
-            intakeSpeed = IntakeSpeed::FIRE;
+            intakeSpeed = IntakeSpeed::FIRE_INTAKE;
             shooterTimer.Start();
             autoIntaking = true;
         }
         if (shooterTimer.Get() >= 1_s) {
-            autoShooting = false;
-            autoIntaking = false;
             shooterTimer.Stop();
-            shooter(0);
-            intakeSpeed = IntakeSpeed::STOP;
             stop();
         }
     }
     if (!autoIntaking && isAuto) {
-        intakeSpeed = IntakeSpeed::STOP;
+        intakeSpeed = IntakeSpeed::STOP_INTAKE;
     }
 }
 
@@ -126,19 +120,19 @@ std::string Shamptake::intakeModeString() {
     std::string modeString = "ERROR";
     switch (intakeSpeed)
     {
-    case IntakeSpeed::NORMAL:
+    case IntakeSpeed::NORMAL_INTAKE:
         modeString = "NORMAL";
         break;
-    case IntakeSpeed::STOP:
+    case IntakeSpeed::STOP_INTAKE:
         modeString = "STOP";
         break;
-    case IntakeSpeed::SLOW:
+    case IntakeSpeed::SLOW_INTAKE:
         modeString = "SLOW";
         break;
-    case IntakeSpeed::FIRE:
+    case IntakeSpeed::FIRE_INTAKE:
         modeString = "FIRE";
         break;
-    case IntakeSpeed::OUTTAKE:
+    case IntakeSpeed::OUTTAKE_INTAKE:
         modeString = "OUTTAKE";
         break;
     default:
@@ -147,71 +141,43 @@ std::string Shamptake::intakeModeString() {
     return modeString;
 }
 
-void Shamptake::runIntakeMotors() {
-    double speed = 0;
-    switch (intakeSpeed)
-    {
-    case IntakeSpeed::NORMAL:
-        speed = 0.7;
-        break;
-    case IntakeSpeed::STOP:
-        speed = 0;
-        break;
-    case IntakeSpeed::SLOW:
-        speed = 0.4;
-        break;
-    case IntakeSpeed::FIRE:
-        speed = 0.8;
-        break;
-    case IntakeSpeed::OUTTAKE:
-        speed = -0.4;
-        break;
-    default:
-        speed = 0;
-        break;
-    }
-    intake(speed);
+void Shamptake::runMotors() {
+    double iSpeed = presetIntakeSpeeds[intakeSpeed];
+    intake(iSpeed);
+
+    double sSpeed = presetShooterSpeeds[shooterSpeed];
+    shooter(sSpeed);
 }
 
-void Shamptake::intake(double Power) {
-    intakeMotor1.Set(Power);
-    //intakeMotor2.Set(Power);
-    runIntake = true;
+void Shamptake::intake(double power) {
+    intakeMotor1.Set(power);
 }
 
-void Shamptake::shooter(double power) {
-    targetShooterRPM = power;
-    //shooterMotorLeftPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
-    //shooterMotorRightPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
-    shooterMotorLeft.Set(power / 5000);
-    shooterMotorRight.Set(power / 5000);
+void Shamptake::shooter(double RPM) {
+    targetShooterRPM = RPM;
+    shooterMotorLeftPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+    shooterMotorRightPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
 }
 
 void Shamptake::autoIntake() {
     autoIntaking = true;
-    intakeSpeed = IntakeSpeed::NORMAL;
-    runIntakeMotors();
+    intakeSpeed = IntakeSpeed::NORMAL_INTAKE;
 }
 
 void Shamptake::autoShoot() {
     autoShooting = true;
     shooterTimer.Reset();
-    shooter(4000);
+    shooterSpeed = ShooterSpeed::AUTO_FIRE_SHOOTER;
 }
 
 void Shamptake::stopIntake() {
-    intake(0);
-    runIntake = false;
-    if (autoIntaking) {
-        autoIntaking = false;
-    }
+    intakeSpeed = IntakeSpeed::STOP_INTAKE;
+    autoIntaking = false;
 }
 
 void Shamptake::stopShooter() {
-    shooter(0);
-    if (autoShooting) {
-        autoShooting = false;
-    }
+    shooterSpeed = ShooterSpeed::STOP_SHOOTER;
+    autoShooting = false;
 }
 
 void Shamptake::stop() {
