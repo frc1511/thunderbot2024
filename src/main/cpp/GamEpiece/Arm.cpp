@@ -8,6 +8,7 @@ Arm::Arm() {
     armMotor.SetInverted(false);
     encoder.SetDistancePerRotation(360);
     armPIDController.Reset(getBoreDegrees());
+    forwardarmLimitSwitch.EnableLimitSwitch(true);
 }
 
 Arm::~Arm() {
@@ -59,7 +60,8 @@ units::degree_t Arm::getRawBorePosition() {
 }
 
 double Arm::getBoreNormalizedPosition() {
-    return getBoreDegrees().value() / 87.0;
+    double d = getBoreDegrees().value() / 87.0;
+    return d;
 }
 
 units::degree_t Arm::getBoreDegrees() {
@@ -67,6 +69,11 @@ units::degree_t Arm::getBoreDegrees() {
     return units::math::fmod(degrees - ARM_ENCODER_OFFSET, 360_deg);
 
 }
+
+bool Arm::isAtLowerLimit() {
+    return forwardarmLimitSwitch.Get();
+}
+
 
 std::string Arm::getMotorModeString() {
     std::string motorMode = "Coast";

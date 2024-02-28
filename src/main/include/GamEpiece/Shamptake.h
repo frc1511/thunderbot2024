@@ -72,6 +72,7 @@ class Shamptake : public Mechanism{
     bool trippedBefore = false;
     bool autoIntaking = false;
     bool autoShooting = false;
+    bool hasNote = false;
 
     frc::Timer shooterTimer;
 

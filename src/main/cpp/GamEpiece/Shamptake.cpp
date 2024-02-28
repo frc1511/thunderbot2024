@@ -99,6 +99,7 @@ void Shamptake::process() {
     } else { // Sensor Tripped
         intakeSpeed = IntakeSpeed::SLOW;
         trippedBefore = true;
+        hasNote = true;
     }
 
     if (autoShooting) {
