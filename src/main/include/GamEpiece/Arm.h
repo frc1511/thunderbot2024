@@ -53,6 +53,8 @@ public:
 
     void moveToPreset(Presets preset);
 
+    bool isAtLowerLimit();
+
 private:
     bool init();
 
@@ -65,7 +67,7 @@ private:
     frc::DutyCycleEncoder encoder{DIO_GAMEPIECE_BORE_ENCODER};
     rev::CANSparkMax armMotor {CAN_PIVOT_ARM, rev::CANSparkMax::MotorType::kBrushless};
 
-    //rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
+    rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkLimitSwitch reversearmLimitSwitch = armMotor.GetReverseLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkRelativeEncoder armEncoder; // Encoder Inside of Motor
 

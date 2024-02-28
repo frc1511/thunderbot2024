@@ -2,15 +2,17 @@
 #include <cmath>
 #include <numbers>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <BlinkyBlinky/BlinkyBlinky.h>
 
 #define AXIS_DEADZONE 0.1
 
 
-Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang) :
+Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink):
     drive(_drive),
     shamptake(_shamptake),
     arm(_arm),
     hang(_hang),
+    blink(_blink),
     armMode(true) 
 {
 
@@ -77,6 +79,8 @@ void Controls::doDrive() {
     bool brickDrive = driveController.getButton(DriveButton::CROSS);
     
     bool toggleRotation = driveController.getButton(DriveButton::TRIANGLE, ThunderGameController::ButtonState::PRESSED);
+    ampLight = driveController.getButton(DriveButton::SQUARE);
+    sourceLight = driveController.getButton(DriveButton::TOUCH_PAD);
     double xVel = driveController.getLeftXAxis();
     double yVel = driveController.getLeftYAxis();
     double angVel = driveController.getRightXAxis();
@@ -254,6 +258,7 @@ void Controls::doAux() {
     if (shooter) {
         if (fire){
             shamptake->intakeSpeed = shamptake->FIRE;
+            shamptake->hasNote = false;
             if (arm->isAtAmp()) {
                 shamptake->shooter(1000);
             } else {
@@ -273,6 +278,7 @@ void Controls::doAux() {
     
     if (outtake) {
         shamptake->intakeSpeed = shamptake->OUTTAKE;
+        shamptake->hasNote = false;
         shamptake->trippedBefore = false;
     }
 
@@ -368,9 +374,53 @@ void Controls::doSwitchPanel(bool isDissabled) {
     } else {
         arm->setMotorBrake(true);
     }
-
     int ledMode = frc::SmartDashboard::GetNumber("thunderdashboard_led_mode", 0.0);
+
+    if (ledDisable){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::OFF);
+    }
+    else if (settings.isCraterMode){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::PIT_MODE);
+    }
+    else if (hangModeControls){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::HANG_MODE);
+    }
+    else if (shouldStrobe){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::PARTY);
+    }
+    else if (fire){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::SCORE);
+    }
+    else if (shamptake->intakeSpeed == Shamptake::IntakeSpeed::NORMAL){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::INTAKE);
+    }
+    else if (shamptake->hasNote){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::HAS_GAMEPIECE);
+    }
+    else if (ampLight){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::AMP);
+    }
+    else if (!drive->isIMUCalibrated()){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::CALIBRATING);
+    }
+    else if (sourceLight){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::SOURCE);
+    }
+    else {
+        if (getCurrentMode () == MatchMode::DISABLED){
+            blink->setLEDMode(BlinkyBlinky::LEDMode::ALLIANCE);
+        }
+        else {
+            blink->setLEDMode(BlinkyBlinky::LEDMode::BASE);
+        }
+
+    }
 }
+
+
+
+
+
 
 void Controls::sendFeedback() {
     frc::SmartDashboard::PutString("Arm_currentmode", armMode ? "arm mode" : "hang mode");

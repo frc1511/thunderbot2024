@@ -41,7 +41,7 @@ private:
     BlinkyBlinky blinky{&hang, &arm, &shampTake};
     
     //Controls controls {nullptr, &shampTake, &arm, &hang};
-    Controls controls {&drive, &shampTake, &arm, &hang};
+    Controls controls {&drive, &shampTake, &arm, &hang, &blinky};
     Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
 
