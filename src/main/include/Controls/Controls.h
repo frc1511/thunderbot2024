@@ -18,7 +18,7 @@ public:
     double MAX_ARM_SPEED = 0.5;
     double MAX_HANG_SPEED = 0.2;
     //Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
-    Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink);
+    Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, bool* _debugMode);
 
     void resetToMode(MatchMode mode) override;
     void process() override;
@@ -34,6 +34,7 @@ private:
     Arm* arm;
     Hang* hang;
     BlinkyBlinky* blink;
+    bool* debugMode;
     AuxControllerType auxController{ThunderGameController::Controller::AUX};
     frc::GenericHID switchPanel{2};
     bool armMode;

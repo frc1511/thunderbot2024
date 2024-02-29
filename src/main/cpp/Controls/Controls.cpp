@@ -7,13 +7,14 @@
 #define AXIS_DEADZONE 0.1
 
 
-Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink):
+Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, bool* _debugMode):
     drive(_drive),
     shamptake(_shamptake),
     arm(_arm),
     hang(_hang),
     blink(_blink),
-    armMode(true) 
+    armMode(true),
+    debugMode(_debugMode)
 {
 
 }
@@ -347,6 +348,8 @@ void Controls::doAuxManual() {
 #define SWITCH_MANUAL_AUX 7
 #define SWITCH_CRATER_MODE 8
 #define SWITCH_ARM_BRAKE 9
+#define SWITCH_UNUSED 10
+#define SWITCH_DEBUG_MODE 11
 
 void Controls::doSwitchPanel(bool isDissabled) {
     bool ledDisable = switchPanel.GetRawButton(SWITCH_LED_DISABLE);
@@ -358,6 +361,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
     hangModeControls = switchPanel.GetRawButton(SWITCH_HANG_MODE);
     balanceControlOff = switchPanel.GetRawButton(SWITCH_BALANCE_CONTROL);
     armBrakeDissable = switchPanel.GetRawButton(SWITCH_ARM_BRAKE);
+    *debugMode = switchPanel.GetRawButton(SWITCH_DEBUG_MODE);
 
     if (armBrakeDissable) {
         if (isDissabled) {
