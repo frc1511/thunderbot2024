@@ -31,8 +31,8 @@
 // const double kSolenoidDisengaged = .72; // .2
 
  Hang::Hang() : 
- hangLeftEncoder(hangMotorLeft.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42)) ,
- hangRightEncoder(hangMotorRight.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42))
+ hangLeftEncoder(hangMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42)) ,
+ hangRightEncoder(hangMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42))
  {
 //     setRatchetPawlMarried(true);
 //     // winch->SetEncoder(0);
@@ -222,6 +222,27 @@ std::string Hang::getMotorRightModeString() {
     }
     return motorMode;
 }
+
+bool Hang::isLeftReflectiveSensorTripped()
+{
+    return !reflectiveHangSensorLeft.Get();
+}
+
+bool Hang::isRightReflectiveSensorTripped()
+{
+    return !reflectiveHangSensorRight.Get();
+}
+
+bool Hang::isLeftPawlUp()
+{
+    return !leafSensorLeft.Get();
+}
+
+bool Hang::isRightPawlUp()
+{
+    return !leafSensorRight.Get();
+}
+
 void Hang::sendFeedback() {
     frc::SmartDashboard::PutNumber("Hang_Left_Position", getLeftMotorPosition());
     frc::SmartDashboard::PutNumber("Hang_Right_Position", getRightMotorPosition());
@@ -254,6 +275,7 @@ std::string Hang::getSolenoidState() {
     }
     return solenoidState;
 }
+
 bool Hang::isLeftRelayOn() {
     return (solenoidRelay.Get() == SolenoidStates::LEFT || solenoidRelay.Get() == SolenoidStates::BOTH);
 }
@@ -266,8 +288,8 @@ bool Hang::isLeftPawlOpen() {
 bool Hang::isRightPawlOpen() {
     return leafSensorRight.Get();
 }
-std::string Hang::ConvertTemperatureToString(double temp) {
-    char temperature[16];
-    sprintf(temperature, "%lf C/%lf F", temp, temp * 1.8 + 32);
+std::string Hang::ConvertTemperatureToString(double temp_c) {
+    double temp_f = temp_c * 1.8 + 32;
+    std::string temperature = std::to_string(temp_c) + "C " + std::to_string(temp_f) + "F";
     return temperature;
 }

@@ -1,83 +1,71 @@
 #include <GamEpiece/Arm.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-bool armCanMove = true;
-std::string degreesResponse = "not set";
-double degrees;
+#define ARM_ENCODER_OFFSET 116.28_deg
 
-Arm::Arm() 
-//: boreEncoder(armMotor.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192))
-//,armEncoder(armMotor.GetEncoder(rev::SparkMaxRelativeEncoder::Type::kHallSensor, 42))
-{
-   
+Arm::Arm() {
+    armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+    armMotor.SetInverted(false);
+    encoder.SetDistancePerRotation(360);
+    armPIDController.Reset(getBoreDegrees());
+    forwardarmLimitSwitch.EnableLimitSwitch(true);
 }
 
 Arm::~Arm() {
-
+    
 }
 
 void Arm::process()
 {
-    double degrees = getBoreDegrees();
-    if (degrees <= 180 || degrees >= 216) {
-        bool armCanMove = false;
-    } else {
-        bool armCanMove = true;
-    }
+    units::degree_t degrees = getBoreDegrees();
+
+    double power = armPIDController.Calculate(degrees, targetAngle);
+    setPower(-power);
 }
 
 void Arm::sendFeedback() {
-    frc::SmartDashboard::PutBoolean("Arm_isOnLowerLimit", isOnLowerLimit());
-  //frc::SmartDashboard::PutBoolean("Arm_forwardsparkLimitSwitch", forwardarmLimitSwitch.Get());
-  //frc::SmartDashboard::PutBoolean("Arm_reversesparkLimitSwitch", reversearmLimitSwitch.Get());
-    frc::SmartDashboard::PutNumber("Arm_borePosition", getRawBorePosition());
-    frc::SmartDashboard::PutNumber("Arm_boreDegrees", degrees);
-    frc::SmartDashboard::PutBoolean("Arm_canMove", armCanMove);
-    frc::SmartDashboard::PutString("Arm_getBoreDegreesResponse", degreesResponse);
-    frc::SmartDashboard::PutNumber("Arm_angleMotorPosition", getRawMotorRotationPosition());
-    frc::SmartDashboard::PutNumber("Arm_rawMotorPosition", getRawMotorPosition());
-    frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
-    frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
-    frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());
-    frc::SmartDashboard::PutNumber("Arm_maxspeed", ARM_SLOW_SPEED);    
+    frc::SmartDashboard::PutNumber("Arm_rawBorePosition", getRawBorePosition().value());
+    frc::SmartDashboard::PutNumber("Arm_boreDegrees", double(getBoreDegrees()));
+    //frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
+    //frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
+    frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
+    frc::SmartDashboard::PutNumber("Arm_targetAngle", targetAngle.value());
 }
 
 void Arm::doPersistentConfiguration() {
-    armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
-    armMotor.SetInverted(false);
+    
 }
 
 void Arm::resetToMode(MatchMode mode) {
-
+    setMotorBrake(true);
+    stop();
+    armPIDController.Reset(getBoreDegrees());
 }
 
-bool Arm::isOnLowerLimit() {
-    return !limitSwitch.Get(); // Get the limit switch reading (it's inverted)
-}
-bool Arm::init() {
-    bool isInit = true;
-    return isInit;
-}
-double Arm::getRawMotorPosition() {
-    double position = 0; //-armEncoder.GetPosition(); // Encoders are reversed
-    return position;
+void Arm::setMotorBrake(bool armBrakeOn) {
+    if (armBrakeOn) {
+        armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+    } else {
+        armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+    }
 }
 
-double Arm::getRawMotorRotationPosition() {
-    double rotation = 0; // -armEncoder.GetPosition();
-    return rotation;
+units::degree_t Arm::getRawBorePosition() {
+    return 360_deg - units::degree_t(encoder.GetDistance());
 }
 
-double Arm::getRawBorePosition() {
-    double length = encoder.GetOutput();
-
-    return length;
+double Arm::getBoreNormalizedPosition() {
+    double d = getBoreDegrees().value() / 85.0;
+    return d;
 }
 
-double Arm::getBoreDegrees() {
-    double degrees = getRawBorePosition();
-    degrees *= 360.0;
-    return degrees;
+units::degree_t Arm::getBoreDegrees() {
+    units::degree_t degrees = getRawBorePosition();
+    return units::math::fmod(degrees - ARM_ENCODER_OFFSET, 360_deg);
+}
+
+bool Arm::isAtLowerLimit() {
+    return forwardarmLimitSwitch.Get();
 }
 
 std::string Arm::getMotorModeString() {
@@ -88,50 +76,29 @@ std::string Arm::getMotorModeString() {
     return motorMode;
 }
 
-void Arm::setPower(double power) {
-    printf("Incoming Power:%lf\n", power);
-    double position = getRawBorePosition();
-    if (position > 0.66 && power < 0) {
-        power = 0;
-        printf("position over %lf limit\n", 0.6);
-    } else if (position < 0.5 && power > 0) {
-        power = 0;
-        printf("position under %lf limit\n", 0.5);
+void Arm::moveToAngle(units::angle::degree_t angle) {
+    targetAngle = std::clamp(angle, 0_deg, 85_deg);
+}
+
+void Arm::moveToPreset(Presets preset) {
+    units::angle::degree_t movingTo = presetAngles[preset];
+    moveToAngle(movingTo);
+}
+
+bool Arm::isMoveDone() {
+    //if the arm is at or past the point it needs to be at, then it is done going to the position
+    if (fabs(double(getBoreDegrees()) - targetAngle.value()) <= targetAngleThreshold) {
+        return true;
+        //don't stop moving the arm since it will just fall back down
     }
-    // if (!backingOffMinimum && getRawMotorRotationPosition() < ARM_MINIMUM_ENCODER) {
-    //     power = 0;
-    //     backingOffMinimum = true;
-    // }
-    // printf("1Power:%lf\n", power);
-    // if (backingOffMinimum && getRawMotorRotationPosition() >= ARM_MINIMUM_ENCODER_SLOW) {
-    //     backingOffMinimum = false;
-    // }
-    // if (power < 0 && backingOffMinimum) {
-    //     power = -ARM_SLOW_SPEED;
-    // }
+    return false;
+}
 
+bool Arm::isNearPreset(Presets preset) {
+    return fabs(double(targetAngle - presetAngles[preset])) <= presetAngleThreshold;
+}
 
-    // if (!backingOffMaximum && getRawMotorRotationPosition() > ARM_MAXIMUM_ENCODER) {
-    //     power = 0;
-    //     backingOffMaximum = true;
-    // } else if (!backingOffMaximum && isOnLowerLimit()) {
-    //     power = 0;
-    //     backingOffMaximum = true;
-    // }
-    // printf("2Power:%lf\n", power);
-    // if (backingOffMaximum && getRawMotorRotationPosition() <= ARM_MAXIMUM_ENCODER_SLOW) {
-    //     backingOffMaximum = false;
-    // }
-    // if (power > 0 && backingOffMaximum) {
-    //     power = ARM_SLOW_SPEED;
-    // }
-
-    // if (armCanMove == false) {
-    // power = 0;
-    // }
-    power = -power;
-    printf("3Power:%lf\n", power);
-
+void Arm::setPower(double power) {
     armMotor.Set(power);
 }
 void Arm::stop() {

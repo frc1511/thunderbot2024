@@ -7,6 +7,8 @@
 #include <frc/DigitalInput.h>
 #include <Basic/Mechanism.h>
 #include <Basic/IOMap.h>
+#include <frc/Timer.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #define SHAMPTANK_RIGHT_MOTOR_P 0.0002
 #define SHAMPTANK_RIGHT_MOTOR_I 0.0
@@ -36,36 +38,77 @@ class Shamptake : public Mechanism{
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
     
-    void intake(double Power);
+    bool isNoteSensorTripped();
+
     void stopIntake();
-    void shooter(double Power);
+    void shooter(double RPM);
+    void stopShooter();
     void stop();
-    void shooterSwitch();//change mode between basic shooting and curved shooting
-    void runIntakeMotors();
-    bool runIntake;
+
+    void runMotors();
+
+    bool atTargetRPM();
+    bool notShooting();
+    bool notIntaking();
+    bool hasGamepiece();
+    
+    void autoIntake();
+    void autoShoot();
+
     bool runOuttake;
 
-    enum ShooterMode {
-      DEFAULT,
-      CURVED
+    enum IntakeSpeed {
+        NORMAL_INTAKE,
+        STOP_INTAKE,
+        SLOW_INTAKE,
+        FIRE_INTAKE,
+        OUTTAKE_INTAKE,
+        MAX_INTAKE_SPEED
     };
 
-    enum IntakeSpeed {
-      NORMAL,
-      STOP,
-      SLOW,
-      FIRE,
-      OUTTAKE
+    enum ShooterSpeed {
+        STOP_SHOOTER,
+        FIRE_SHOOTER,
+        AMP_SHOOTER,
+        AUTO_FIRE_SHOOTER,
+        MAX_SHOOTER_SPEED
     };
-    Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::NORMAL;
+
+    Shamptake::IntakeSpeed intakeSpeed = Shamptake::IntakeSpeed::STOP_INTAKE;
+    Shamptake::ShooterSpeed shooterSpeed = Shamptake::ShooterSpeed::STOP_SHOOTER;
     frc::DigitalInput noteSensor{DIO_GAMEPIECE_RR_SENSOR};
     bool sensorDetected = false;
     bool trippedBefore = false;
+    bool autoIntaking = false;
+    bool autoShooting = false;
+    bool hasNote = false;
 
-    Shamptake::ShooterMode shooterMode = Shamptake::ShooterMode::DEFAULT;
+    frc::Timer shooterTimer;
+
+
   private:
+    void intake(double power);
+    std::string intakeModeString();
     rev::SparkPIDController shooterMotorRightPIDController;
+    rev::SparkRelativeEncoder shooterMotorRightEncoder;
     rev::SparkPIDController shooterMotorLeftPIDController;
+    rev::SparkRelativeEncoder shooterMotorLeftEncoder;
+    double targetShooterRPM = 0;
+    bool isAuto = false;
+
+    double presetIntakeSpeeds [IntakeSpeed::MAX_INTAKE_SPEED] = {
+        0.7,
+        0,
+        0.2,
+        0.8,
+        -0.4
+    };
+    double presetShooterSpeeds [ShooterSpeed::MAX_SHOOTER_SPEED] = {
+        0,
+        5000,
+        1000,
+        4000
+    };
 };
 
 

@@ -4,47 +4,83 @@
 #include <Basic/Mechanism.h>
 #include <frc/DigitalInput.h>
 #include <rev/CANSparkMax.h>
-#include <rev/SparkLimitSwitch.h>
-#include <frc/DutyCycle.h>
-#define ARM_MINIMUM_ENCODER -42.309
-#define ARM_MINIMUM_ENCODER_SLOW -35.000
-#define ARM_MAXIMUM_ENCODER -3.000 // Approx.
-#define ARM_MAXIMUM_ENCODER_SLOW -10.000
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/DutyCycleEncoder.h>
+#include <units/angular_velocity.h>
+#include <units/angular_acceleration.h>
+#include <units/velocity.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
 
+//might be differnet values
+#define ARM_MOTOR_P 0.02
+#define ARM_MOTOR_I 0.0
+#define ARM_MOTOR_D 0.0
+#define ARM_MAX_VEL 90_deg_per_s //75_deg_per_s
+#define ARM_MAX_ACCEL 90_deg_per_s_sq //75_deg_per_s_sq
 
 class Arm : public Mechanism {
 public:
-    double ARM_SLOW_SPEED = 0.1;
     Arm();
     ~Arm();
 
-    void process() override;
+    void  process() override;
     void sendFeedback() override;
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
 
-    bool isOnLowerLimit();
+    bool isMoveDone();
 
     void setPower(double power);
 
+
     void stop();
+
+    double getBoreNormalizedPosition();
+
+    void setMotorBrake(bool armBrakeOn);
+
+    enum Presets {
+        BASE,
+        LINE,
+        AMP,
+        SUBWOOFER,
+        MEDIUM,
+        MAX_PRESETS
+    };
+
+    bool isNearPreset(Presets preset);
+
+    void moveToAngle(units::angle::degree_t angle);
+
+    void moveToPreset(Presets preset);
+
+    bool isAtLowerLimit();
+
 private:
-    bool init();
 
-    double getRawMotorPosition();
+    units::degree_t getRawBorePosition();
 
-    double getRawMotorRotationPosition();
-
-    double getRawBorePosition();
-
-    double getBoreDegrees();
+    units::degree_t getBoreDegrees();
 
     std::string getMotorModeString();
 
-    frc::DigitalInput limitSwitch {DIO_ARM_LIMIT_SWITCH};
-    frc::DigitalInput boreEncoder {DIO_GAMEPIECE_BORE_ENCODER};
-    frc::DutyCycle encoder{boreEncoder};
+    frc::DutyCycleEncoder encoder{DIO_GAMEPIECE_BORE_ENCODER};
     rev::CANSparkMax armMotor {CAN_PIVOT_ARM, rev::CANSparkMax::MotorType::kBrushless};
+
+    rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
+    units::degree_t presetAngles [Presets::MAX_PRESETS] = {
+        0_deg,
+        34.6_deg,
+        85_deg,
+        0_deg,
+        20.3_deg
+    };
+
+    double targetAngleThreshold = 5;
+    double presetAngleThreshold = 15;
+    
+
     //rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkLimitSwitch reversearmLimitSwitch = armMotor.GetReverseLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     //rev::SparkRelativeEncoder armEncoder; // Encoder Inside of Motor
@@ -60,4 +96,11 @@ private:
 
     bool backingOffMinimum = false;
     bool backingOffMaximum = false;
+
+    units::angle::degree_t targetAngle = 10_deg;
+
+    frc::ProfiledPIDController<units::degrees> armPIDController{
+        ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, 
+        frc::TrapezoidProfile<units::degrees>::Constraints(ARM_MAX_VEL, ARM_MAX_ACCEL)
+    };
 };

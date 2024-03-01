@@ -2,7 +2,12 @@
 
 Shamptake::Shamptake()
 : shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
-  shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()) {
+  shooterMotorRightEncoder(shooterMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()),
+  shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)) {
+    shooterMotorRight.SetInverted(false);
+    shooterMotorLeft.SetInverted(true);
+
     shooterMotorRightPIDController.SetP(SHAMPTANK_RIGHT_MOTOR_P);
     shooterMotorRightPIDController.SetI(SHAMPTANK_RIGHT_MOTOR_I);
     shooterMotorRightPIDController.SetD(SHAMPTANK_RIGHT_MOTOR_D);
@@ -16,7 +21,7 @@ Shamptake::Shamptake()
     shooterMotorLeftPIDController.SetIZone(SHAMPTANK_LEFT_MOTOR_I_ZONE);
     shooterMotorLeftPIDController.SetFF(SHAMPTANK_LEFT_MOTOR_FEED_FOWARD);
     shooterMotorLeftPIDController.SetOutputRange(0, 1);
-    shooter(0);
+    stop();
 }
 
 Shamptake::~Shamptake() {
@@ -24,55 +29,47 @@ Shamptake::~Shamptake() {
 }
 
 void Shamptake::sendFeedback() {
+    frc::SmartDashboard::PutString("Shamptake_intakeMode", intakeModeString());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterLeftRPM", shooterMotorLeftEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterRightRPM", shooterMotorRightEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterTargetRPM", targetShooterRPM);
+    frc::SmartDashboard::PutBoolean("Shamptake_shooterAtRPM", atTargetRPM());
+}
 
+bool Shamptake::isNoteSensorTripped()
+{
+    return !noteSensor.Get();
 }
 
 void Shamptake::doPersistentConfiguration() {
-    shooterMotorRight.SetInverted(false);
-    shooterMotorLeft.SetInverted(true);
 }
 
 void Shamptake::resetToMode(MatchMode mode) {
     sensorDetected = false;
     trippedBefore = false;
+    isAuto = (mode == MatchMode::AUTO);
+    stop();
 }
 
-void Shamptake::intake(double Power) {
-    intakeMotor1.Set(Power);
-    //intakeMotor2.Set(Power);
-    runIntake = true;
+bool Shamptake::atTargetRPM() {
+    bool isAtTarget = (shooterMotorRightEncoder.GetVelocity() >= targetShooterRPM &&
+                       shooterMotorLeftEncoder.GetVelocity() >= targetShooterRPM);
+    return isAtTarget;
 }
-void Shamptake::stopIntake() {
-    intake(0);
-    runIntake = false;
+
+bool Shamptake::notShooting() {
+    return !autoShooting;
 }
-void Shamptake::shooter(double Power) {
-    // double motorRightpower = 0;
-    // double motorLeftpower = 0;
-    // if (shooterMode == Shamptake::ShooterMode::CURVED) { 
-    //     motorRightpower = Power * .6;// this should eventually be 6000 rpm
-    //     motorLeftpower = Power * .8;// this should eventually be 4000 rpm
-    // } else {
-    //     motorRightpower = Power * .8;// base speeds
-    //     motorLeftpower = Power * .8;
-    // }
-    //shooterMotorRight.Set(motorRightpower); 
-    //shooterMotorLeft.Set(motorLeftpower); 
-    shooterMotorLeftPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
-    shooterMotorRightPIDController.SetReference(Power * 5000, rev::CANSparkBase::ControlType::kVelocity);
+
+bool Shamptake::notIntaking() {
+    return !autoIntaking;
 }
-void Shamptake::stop() {
-    intake(0);
-    shooter(0);
+
+bool Shamptake::hasGamepiece() {
+    return trippedBefore;
 }
-void Shamptake::shooterSwitch() {
-   
-    if (shooterMode == Shamptake::ShooterMode::DEFAULT) {
-        shooterMode = Shamptake::ShooterMode::CURVED;
-    } else if (shooterMode == Shamptake::ShooterMode::CURVED) {
-        shooterMode = Shamptake::ShooterMode::DEFAULT;
-    }
-}
+
+
 void Shamptake::process() {
     //if no snesor detected
         //run intake (Before Sensor) (IntakeSpeed = Normal)
@@ -84,49 +81,106 @@ void Shamptake::process() {
     //if outtaking
         //Outtake (Handled in controls)
         //intake previously tripped = false (So we don't stop when inkaing next time)
-    sensorDetected = !noteSensor.Get();
+    sensorDetected = isNoteSensorTripped();
     
     if (!sensorDetected) {
         if (trippedBefore) { // Past Sensor
             //sleep(0.7);
-            intakeSpeed = IntakeSpeed::STOP;
+            intakeSpeed = IntakeSpeed::STOP_INTAKE;
+            if (autoIntaking) {
+                autoIntaking = false;
+                stopIntake();
+            }
         } else { // Before Sensor
-            intakeSpeed = IntakeSpeed::NORMAL;
+            intakeSpeed = IntakeSpeed::NORMAL_INTAKE;
         }
     } else { // Sensor Tripped
-        intakeSpeed = IntakeSpeed::SLOW;
+        intakeSpeed = IntakeSpeed::SLOW_INTAKE;
         trippedBefore = true;
-        printf("SET\n");
+        hasNote = true;
+    }
+
+    if (autoShooting) {
+        if (atTargetRPM() && notIntaking()) {
+            intakeSpeed = IntakeSpeed::FIRE_INTAKE;
+            shooterTimer.Start();
+            autoIntaking = true;
+        }
+        if (shooterTimer.Get() >= 1_s) {
+            shooterTimer.Stop();
+            stop();
+        }
+    }
+    if (!autoIntaking && isAuto) {
+        intakeSpeed = IntakeSpeed::STOP_INTAKE;
     }
 }
-void Shamptake::runIntakeMotors() {
-    double speed = 0;
+
+std::string Shamptake::intakeModeString() {
+    std::string modeString = "ERROR";
     switch (intakeSpeed)
     {
-    case IntakeSpeed::NORMAL:
-        speed = 0.5;
-        printf("NORMAL\n");
+    case IntakeSpeed::NORMAL_INTAKE:
+        modeString = "NORMAL";
         break;
-    case IntakeSpeed::STOP:
-        printf("STOP\n");
-        speed = 0;
+    case IntakeSpeed::STOP_INTAKE:
+        modeString = "STOP";
         break;
-    case IntakeSpeed::SLOW:
-        printf("SLOW\n");
-        speed = 0.2;
+    case IntakeSpeed::SLOW_INTAKE:
+        modeString = "SLOW";
         break;
-    case IntakeSpeed::FIRE:
-        speed = 0.5;
-        printf("FIRE\n");
+    case IntakeSpeed::FIRE_INTAKE:
+        modeString = "FIRE";
         break;
-    case IntakeSpeed::OUTTAKE:
-        printf("OUTTAKE\n");
-        speed = -0.4;
+    case IntakeSpeed::OUTTAKE_INTAKE:
+        modeString = "OUTTAKE";
         break;
     default:
-        printf("[SHAMPTAKE] IntakeSpeed was not set properly!");
-        speed = 0;
         break;
     }
-    intake(speed);
+    return modeString;
+}
+
+void Shamptake::runMotors() {
+    double iSpeed = presetIntakeSpeeds[intakeSpeed];
+    intake(iSpeed);
+
+    double sSpeed = presetShooterSpeeds[shooterSpeed];
+    shooter(sSpeed);
+}
+
+void Shamptake::intake(double power) {
+    intakeMotor1.Set(power);
+}
+
+void Shamptake::shooter(double RPM) {
+    targetShooterRPM = RPM;
+    shooterMotorLeftPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+    shooterMotorRightPIDController.SetReference(targetShooterRPM, rev::CANSparkBase::ControlType::kVelocity);
+}
+
+void Shamptake::autoIntake() {
+    autoIntaking = true;
+    intakeSpeed = IntakeSpeed::NORMAL_INTAKE;
+}
+
+void Shamptake::autoShoot() {
+    autoShooting = true;
+    shooterTimer.Reset();
+    shooterSpeed = ShooterSpeed::AUTO_FIRE_SHOOTER;
+}
+
+void Shamptake::stopIntake() {
+    intakeSpeed = IntakeSpeed::STOP_INTAKE;
+    autoIntaking = false;
+}
+
+void Shamptake::stopShooter() {
+    shooterSpeed = ShooterSpeed::STOP_SHOOTER;
+    autoShooting = false;
+}
+
+void Shamptake::stop() {
+    stopIntake();
+    stopShooter();
 }

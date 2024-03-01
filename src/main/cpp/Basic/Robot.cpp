@@ -6,9 +6,11 @@
 #include <Autonomous/Auto.h>
 
 void Robot::RobotInit() {
-    AddPeriodic([&]() {
-        for (Mechanism* mech : allMechanisms) {
-            mech->sendFeedback();
+    AddPeriodic([&]() { 
+        if (debugMode) {
+            for (Mechanism* mech : allMechanisms) {
+                mech->sendFeedback();
+            }
         }
     }, 80_ms);
 }
@@ -17,48 +19,53 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
     //reset(Mechanism::MatchMode::AUTO);
     //autoCode.doAuto();
+    blinky.setLEDMode(BlinkyBlinky::LEDMode::OFF);
+    reset(Mechanism::MatchMode::AUTO);
 }
 void Robot::AutonomousPeriodic() {
     //controls.process();
-    //drive.process();
+    autoCode.process();
+    drive.process();
+    arm.process();
+    shampTake.process();
+    shampTake.runMotors();
 }
 
 void Robot::TeleopInit() {
-//    reset(Mechanism::MatchMode::TELEOP);
-    //shampTake.callResetToMode(Mechanism::MatchMode::TELEOP);
-    //shampTake.doPersistentConfiguration();
-    //arm.doPersistentConfiguration();
-    drive.doPersistentConfiguration();
-    //hang.doPersistentConfiguration();
+    blinky.setLEDMode(BlinkyBlinky::LEDMode::OFF);
+    reset(Mechanism::MatchMode::TELEOP);
 }
 void Robot::TeleopPeriodic() {
-    //shampTake.process();
+    shampTake.process();
     controls.process();
-    //arm.process();
+    arm.process();
     //hang.process();
-    //shampTake.runIntakeMotors();
+    shampTake.runMotors();
 
     drive.process();
+    blinky.process();
 }
 
 void Robot::DisabledInit() {
-//    reset(Mechanism::MatchMode::DISABLED);
+    reset(Mechanism::MatchMode::DISABLED);
+    blinky.setLEDMode(BlinkyBlinky::LEDMode::PIT_MODE);
 }
 void Robot::DisabledPeriodic() {
-//    controls.processInDisabled();
+    controls.processInDisabled();
+    blinky.process(); 
 }
 
 void Robot::TestInit() {
-    //reset(Mechanism::MatchMode::TEST);
+    reset(Mechanism::MatchMode::TEST);
 }
 void Robot::TestPeriodic() {}
 
 void Robot::reset(Mechanism::MatchMode mode) {
-    //for (Mechanism* mech : allMechanisms) {
-    //    mech->callResetToMode(lastMode);
-   // }
+    for (Mechanism* mech : allMechanisms) {
+       mech->callResetToMode(lastMode);
+    }
 
-    //lastMode = mode;
+    lastMode = mode;
 }
 
 #ifndef RUNNING_FRC_TESTS

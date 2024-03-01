@@ -7,10 +7,11 @@
 #include <frc/TimedRobot.h>
 #include <Controls/Controls.h>
 #include <Drive/Drive.h>
-//#include <GamEpiece/Shamptake.h>
+#include <GamEpiece/Shamptake.h>
 #include <Autonomous/Auto.h>
 #include <GamEpiece/Arm.h>
 #include <Hanger/Hang.h>
+#include <BlinkyBlinky/BlinkyBlinky.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -31,17 +32,20 @@ public:
 
 private:
     void reset(Mechanism::MatchMode mode);
-
+    bool debugMode = false;
     Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
     Drive drive;
     Shamptake shampTake;
     Arm arm;
     Hang hang;
+    BlinkyBlinky blinky{&hang, &arm, &shampTake};
+    
     //Controls controls {nullptr, &shampTake, &arm, &hang};
-    Controls controls {&drive, &shampTake, &arm, &hang};
-    //Auto autoCode {&drive};
+    Controls controls {&drive, &shampTake, &arm, &hang, &blinky, &debugMode};
+    Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
-        //&drive, &controls
-        &arm, &hang, &drive
+
+        &arm, &hang, &drive, &shampTake, &controls, &autoCode, &blinky
+
     };
 };
