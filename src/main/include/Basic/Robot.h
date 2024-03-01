@@ -32,7 +32,7 @@ public:
 
 private:
     void reset(Mechanism::MatchMode mode);
-
+    bool debugMode = false;
     Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
     Drive drive;
     Shamptake shampTake;
@@ -41,7 +41,7 @@ private:
     BlinkyBlinky blinky{&hang, &arm, &shampTake};
     
     //Controls controls {nullptr, &shampTake, &arm, &hang};
-    Controls controls {&drive, &shampTake, &arm, &hang, &blinky};
+    Controls controls {&drive, &shampTake, &arm, &hang, &blinky, &debugMode};
     Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
 

@@ -6,9 +6,11 @@
 #include <Autonomous/Auto.h>
 
 void Robot::RobotInit() {
-    AddPeriodic([&]() {
-        for (Mechanism* mech : allMechanisms) {
-            mech->sendFeedback();
+    AddPeriodic([&]() { 
+        if (debugMode) {
+            for (Mechanism* mech : allMechanisms) {
+                mech->sendFeedback();
+            }
         }
     }, 80_ms);
 }
