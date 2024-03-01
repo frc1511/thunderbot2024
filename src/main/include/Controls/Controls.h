@@ -26,7 +26,7 @@ public:
 
     void processInDisabled();
     bool getShouldPersistConfig();
-    
+
 private:
     Drive* drive;
     DriveControllerType driveController{ThunderGameController::Controller::DRIVER};

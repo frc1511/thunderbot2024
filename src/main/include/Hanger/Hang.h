@@ -62,6 +62,11 @@ class Hang : public Mechanism {
     bool isLeftPawlUp();
     bool isRightPawlUp();
 
+    bool isLeftRelayOn();
+    bool isRightRelayOn();
+
+    bool isLeftPawlOpen();
+    bool isRightPawlOpen();
 
 //     /**
 //      * When retracting, move slower for precision
