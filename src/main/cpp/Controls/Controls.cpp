@@ -339,7 +339,7 @@ void Controls::doAuxManual() {
 
 }
 
-#define SWITCH_LED_DISABLE 1
+#define SWITCH_LED_ENABLE 1
 #define SWITCH_ROBOT_CENTRIC 2
 #define SWITCH_HANG_MODE 3
 #define SWITCH_BALANCE_CONTROL 4
@@ -352,7 +352,7 @@ void Controls::doAuxManual() {
 #define SWITCH_DEBUG_MODE 11
 
 void Controls::doSwitchPanel(bool isDissabled) {
-    bool ledDisable = switchPanel.GetRawButton(SWITCH_LED_DISABLE);
+    bool ledEnable = switchPanel.GetRawButton(SWITCH_LED_ENABLE);
     driveRobotCentric = switchPanel.GetRawButton(SWITCH_ROBOT_CENTRIC);
     callaDisable = switchPanel.GetRawButton(SWITCH_CALLA_DISABLE);
     sashaDisable = switchPanel.GetRawButton(SWITCH_SASHA_DISABLE);
@@ -374,7 +374,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
     }
     int ledMode = frc::SmartDashboard::GetNumber("thunderdashboard_led_mode", 0.0);
 
-    if (ledDisable){
+    if (ledEnable){
         blink->setLEDMode(BlinkyBlinky::LEDMode::OFF);
     }
     else if (settings.isCraterMode){
