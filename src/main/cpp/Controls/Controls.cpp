@@ -4,8 +4,6 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <BlinkyBlinky/BlinkyBlinky.h>
 
-#define AXIS_DEADZONE 0.1
-
 
 Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, bool* _debugMode):
     drive(_drive),
@@ -87,7 +85,7 @@ void Controls::doDrive() {
     double angVel = driveController.getRightXAxis();
     bool xySlowMode = driveController.getLeftBumper();
     bool rotSlowMode = driveController.getRightBumper();
-    bool rotSlowerIThinkIDKReallyCallaJustWantedThisForSomeReasonSoHereItIsIGuess = driveController.getRightTrigger() > AXIS_DEADZONE;
+    bool rotSlowerIThinkIDKReallyCallaJustWantedThisForSomeReasonSoHereItIsIGuess = driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE;
     shouldStrobe = driveController.getButton(DriveButton::CIRCLE);
 
     double xAng = driveController.getAxis(DriveAxis::RIGHT_X);
@@ -152,19 +150,19 @@ void Controls::doDrive() {
         return std::sin(axis * (std::numbers::pi / 2.0));
     };
 
-    if (std::fabs(xVel) > AXIS_DEADZONE) {
+    if (std::fabs(xVel) > PREFERENCE_CONTROLS.AXIS_DEADZONE) {
         finalXVel = improveAxis(xVel);
     }
-    if (std::fabs(yVel) > AXIS_DEADZONE) {
+    if (std::fabs(yVel) > PREFERENCE_CONTROLS.AXIS_DEADZONE) {
         finalYVel = improveAxis(yVel);
     }
-    if (std::fabs(angVel) > AXIS_DEADZONE) {
+    if (std::fabs(angVel) > PREFERENCE_CONTROLS.AXIS_DEADZONE) {
         finalAngVel = improveAxis(angVel);
     }
-    if (std::fabs(xAng) > AXIS_DEADZONE) {
+    if (std::fabs(xAng) > PREFERENCE_CONTROLS.AXIS_DEADZONE) {
         finalXAng = xAng;
     }
-    if (std::fabs(yAng) > AXIS_DEADZONE) {
+    if (std::fabs(yAng) > PREFERENCE_CONTROLS.AXIS_DEADZONE) {
         finalYAng = yAng;
     }
 
@@ -422,7 +420,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
 
 void Controls::sendFeedback() {
     frc::SmartDashboard::PutString("Arm_currentmode", armMode ? "arm mode" : "hang mode");
-    frc::SmartDashboard::PutNumber("Hang_Speed", MAX_ARM_SPEED);
+    frc::SmartDashboard::PutNumber("Hang_Speed", PREFERENCE_CONTROLS.MAX_HANG_SPEED);
     //frc::SmartDashboard::PutNumber("Arm_Speed", armSpeed);
 
 }

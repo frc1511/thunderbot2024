@@ -1,8 +1,6 @@
 #include <GamEpiece/Arm.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#define ARM_ENCODER_OFFSET 116.28_deg
-
 Arm::Arm() {
     armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
     armMotor.SetInverted(false);
@@ -61,7 +59,7 @@ double Arm::getBoreNormalizedPosition() {
 
 units::degree_t Arm::getBoreDegrees() {
     units::degree_t degrees = getRawBorePosition();
-    return units::math::fmod(degrees - ARM_ENCODER_OFFSET, 360_deg);
+    return units::math::fmod(degrees - PREFERENCE_ARM.ENCODER_OFFSET, 360_deg);
 }
 
 bool Arm::isAtLowerLimit() {

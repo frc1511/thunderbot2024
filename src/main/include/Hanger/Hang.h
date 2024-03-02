@@ -1,7 +1,10 @@
 #pragma once
+
+#include <Basic/IOMap.h>
+#include <Util/Preferences.h>
+
 #include <frc/DigitalInput.h>
 #include <frc/Relay.h>
-#include <Basic/IOMap.h>
 #include <rev/CANSparkMax.h>
 #include <Basic/Mechanism.h>
 

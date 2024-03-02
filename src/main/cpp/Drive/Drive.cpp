@@ -115,9 +115,9 @@ void Drive::manualControlRelRotation(double xPct, double yPct, double angPct, un
      * Calculate chassis velocities using percentages of the configured max
      * manual control velocities.
      */
-    units::meters_per_second_t xVel    = xPct * DRIVE_MANUAL_MAX_VEL;
-    units::meters_per_second_t yVel    = yPct * DRIVE_MANUAL_MAX_VEL;
-    units::radians_per_second_t angVel = angPct * DRIVE_MANUAL_MAX_ANG_VEL;
+    units::meters_per_second_t xVel    = xPct * PREFERENCE_DRIVE.DRIVE_MANUAL_MAX_VEL;
+    units::meters_per_second_t yVel    = yPct * PREFERENCE_DRIVE.DRIVE_MANUAL_MAX_VEL;
+    units::radians_per_second_t angVel = angPct * PREFERENCE_DRIVE.DRIVE_MANUAL_MAX_ANG_VEL;
 
     // Pass the velocities to the velocity control function.
     velocityControlRelRotation(xVel, yVel, angVel, flags);
@@ -128,8 +128,8 @@ void Drive::manualControlAbsRotation(double xPct, double yPct, units::radian_t a
      * Calculate chassis velocities using percentages of the configured max
      * manual control velocities.
      */
-    units::meters_per_second_t xVel    = xPct * DRIVE_MANUAL_MAX_VEL;
-    units::meters_per_second_t yVel    = yPct * DRIVE_MANUAL_MAX_VEL;
+    units::meters_per_second_t xVel    = xPct * PREFERENCE_DRIVE.DRIVE_MANUAL_MAX_VEL;
+    units::meters_per_second_t yVel    = yPct * PREFERENCE_DRIVE.DRIVE_MANUAL_MAX_VEL;
 
     // Pass the velocities to the velocity control function.
     velocityControlAbsRotation(xVel, yVel, angle, flags);
@@ -433,7 +433,7 @@ void Drive::setModuleStates(frc::ChassisSpeeds speeds) {
     // Generate individual module states using the chassis velocities.
     wpi::array<frc::SwerveModuleState, 4> moduleStates(kinematics.ToSwerveModuleStates(speeds));
     
-    kinematics.DesaturateWheelSpeeds(&moduleStates, DRIVE_MANUAL_MAX_VEL);
+    kinematics.DesaturateWheelSpeeds(&moduleStates, PREFERENCE_DRIVE.DRIVE_MANUAL_MAX_VEL);
 
     // Set the states of the individual modules.
     for(std::size_t i = 0; i < swerveModules.size(); i++) {
