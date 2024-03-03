@@ -4,6 +4,7 @@
 
 #include <Basic/Robot.h>
 #include <Autonomous/Auto.h>
+#include <frc/DriverStation.h>
 
 void Robot::RobotInit() {
     AddPeriodic([&]() { 
@@ -12,6 +13,10 @@ void Robot::RobotInit() {
                 mech->sendFeedback();
             }
         }
+
+        // Dashboard timer page.
+        frc::SmartDashboard::PutNumber("thunderdashboard_match_remaining", frc::DriverStation::GetMatchTime().value());
+
     }, 80_ms);
 }
 void Robot::RobotPeriodic() {}

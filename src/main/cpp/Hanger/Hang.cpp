@@ -400,6 +400,10 @@ void Hang::sendFeedback() {
     frc::SmartDashboard::PutBoolean("Hang_isRightPawlOpen", isRightPawlOpen());
     frc::SmartDashboard::PutString("Hang_SolenoidStates", getSolenoidStateString());
     // frc::SmartDashboard::PutString("Leaf_Sensor_Right")
+
+    // Dashboard hang page (Implement once range of motion is determined).
+    frc::SmartDashboard::PutNumber("thunderdashboard_2024_hang_left_percent", 0.0); // getLeftMotorPosition() / MAX_HANG_POSITION
+    frc::SmartDashboard::PutNumber("thunderdashboard_2024_hang_right_percent", 0.0); // getRightMotorPosition() / MAX_HANG_POSITION
 }
 void Hang::setSolenoids(Hang::SolenoidStates state) {
     solenoidRelay.Set((frc::Relay::Value)state);

@@ -30,10 +30,20 @@ Shamptake::~Shamptake() {
 
 void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutString("Shamptake_intakeMode", intakeModeString());
-    frc::SmartDashboard::PutNumber("Shamptake_shooterLeftRPM", shooterMotorLeftEncoder.GetVelocity());
-    frc::SmartDashboard::PutNumber("Shamptake_shooterRightRPM", shooterMotorRightEncoder.GetVelocity());
+
+    const double shooterLeftRPM = shooterMotorLeftEncoder.GetVelocity();
+    const double shooterRightRPM = shooterMotorRightEncoder.GetVelocity();
+    frc::SmartDashboard::PutNumber("Shamptake_shooterLeftRPM", shooterLeftRPM);
+    frc::SmartDashboard::PutNumber("Shamptake_shooterRightRPM", shooterRightRPM);
     frc::SmartDashboard::PutNumber("Shamptake_shooterTargetRPM", targetShooterRPM);
     frc::SmartDashboard::PutBoolean("Shamptake_shooterAtRPM", atTargetRPM());
+
+    // Dashboard GamePiece page.
+    frc::SmartDashboard::PutBoolean("thunderdashboard_2024_has_gamepiece", hasGamepiece());
+
+    // Dashboard Shooter page.
+    frc::SmartDashboard::PutNumber("thunderdashboard_rpm_max", 5000.0);
+    frc::SmartDashboard::PutNumber("thunderdashboard_rpm", shooterLeftRPM);
 }
 
 bool Shamptake::isNoteSensorTripped()
