@@ -153,30 +153,174 @@ void Hang::enableBrakeMode(bool enabled) {
     }
 }
 void Hang::process() {
-    if (isLeftRelayOn()) {
-        if (!isLeftPawlOpen()) {
-            hangMotorLeft.Set(0.1); // If Left Pawl/Relay is not working reverse motor
-        }
+    switch (leftMotorState) {
+        case BACKTRACKING:
+            if (isLeftPawlOpen()) {
+                backtrackLeft();
+            } else {
+                leftMotorState = motorState::IDLE;
+            }
+            break;
+        case AWAITING_CHECK:
+            hangMotorLeft.Set(0);
+            if (backtrackingLeftCheckTimer.Get() >= 0.3_s) {
+                if (isLeftRelayOn()) {
+                    if (isLeftPawlOpen()) {
+                        backtrackingLeftCheckTimer.Stop();
+                        leftMotorState = motorState::BACKTRACKING;
+                        setSolenoids(SolenoidStates::OFF);
+                        targetLeftEncoderRotation = getLeftMotorPosition() + BACKTRACK_ROTATIONS;
+                    } else {
+                        backtrackingLeftCheckTimer.Stop();
+                        leftMotorState = motorState::IDLE;
+                    }
+                } else {
+                    backtrackingLeftCheckTimer.Stop();
+                    leftMotorState = motorState::IDLE;
+                }
+            }
+            break;
+        case IDLE:
+            hangMotorLeft.Set(0);
+            if (isLeftRelayOn() && isLeftPawlOpen()) {
+                backtrackingLeftCheckTimer.Restart();
+                leftMotorState = motorState::AWAITING_CHECK;
+            }
+            break;
+        case MOVING_UP:
+            if (!isLeftReflectiveSensorTripped()) {
+                hangMotorLeft.Set(-0.2);
+            }
+            break;
+        case MOVING_DOWN:
+            if (isLeftRelayOn() && !isLeftPawlOpen() && !isLeftReflectiveSensorTripped()) {
+                hangMotorLeft.Set(0.2);
+            } else {
+                hangMotorLeft.Set(0);
+            }
+            break;
     }
-    if (isRightRelayOn()) {
-        if (!isRightPawlOpen()) {
-            hangMotorRight.Set(-0.1); // If Right Pawl/Relay is not working reverse motor
+    switch (rightMotorState) {
+        case BACKTRACKING:
+            if (isRightPawlOpen()) {
+                backtrackRight();
+            } else {
+                rightMotorState = motorState::IDLE;
+            }
+            break;
+        case AWAITING_CHECK:
+            hangMotorRight.Set(0);
+            if (backtrackingRightCheckTimer.Get() >= 0.3_s) {
+                if (isRightRelayOn()) {
+                    if (isRightPawlOpen()) {
+                        backtrackingRightCheckTimer.Stop();
+                        rightMotorState = motorState::BACKTRACKING;
+                        setSolenoids(SolenoidStates::OFF);
+                        targetRightEncoderRotation = getRightMotorPosition() - BACKTRACK_ROTATIONS;
+                    } else {
+                        backtrackingRightCheckTimer.Stop();
+                        rightMotorState = motorState::IDLE;
+                    }
+                } else {
+                    backtrackingRightCheckTimer.Stop();
+                    rightMotorState = motorState::IDLE;
+                }
+            }
+            break;
+        case IDLE:
+            hangMotorRight.Set(0);
+            if (isRightRelayOn() && isRightPawlOpen()) {
+                backtrackingRightCheckTimer.Restart();
+                rightMotorState = motorState::AWAITING_CHECK;
+            }
+            break;
+        case MOVING_UP:
+            if (!isLeftReflectiveSensorTripped()) {
+                hangMotorLeft.Set(0.2);
+            }
+            break;
+        case MOVING_DOWN:
+            if (isRightRelayOn() && !isRightPawlOpen() && !isRightReflectiveSensorTripped()) {
+                hangMotorRight.Set(-0.2);
+            } else {
+                hangMotorRight.Set(0);
+            }
+            break;
+    }
+    // if (backtrackRight) {
+    //     if (!isRightPawlOpen()) {
+    //         backtrackRight();
+    //     }
+    // }
+}
+void Hang::backtrackLeft() {
+    if (getLeftMotorPosition() <= targetLeftEncoderRotation) {
+        leftMotorState = motorState::AWAITING_CHECK;
+        backtrackingLeftCheckTimer.Restart();
+        setLeftSolenoid(true);
+    } else {
+        hangMotorLeft.Set(0.1);
+    }
+}
+void Hang::backtrackRight() {
+    if (getRightMotorPosition() >= targetRightEncoderRotation) {
+        rightMotorState = motorState::AWAITING_CHECK;
+        backtrackingRightCheckTimer.Restart();
+        setRightSolenoid(true);
+    } else {
+        hangMotorRight.Set(-0.1);
+    }
+}
+
+void Hang::setMotorLeftState(motorState state) { // Motor is reversed
+    leftMotorState = state;
+}
+void Hang::setMotorRightState(motorState state) {
+    rightMotorState = state;
+}
+
+void Hang::setMotorLeftStateSafe(motorState state) {
+    if (leftMotorState != motorState::AWAITING_CHECK && leftMotorState != motorState::BACKTRACKING) {
+        setMotorLeftState(state);
+    }
+}
+void Hang::setMotorRightStateSafe(motorState state) {
+    if (rightMotorState != motorState::AWAITING_CHECK && rightMotorState != motorState::BACKTRACKING) {
+        setMotorRightState(state);
+    }
+}
+void Hang::setRightSolenoid(bool onOff) {
+    SolenoidStates currentState = getSolenoidState();
+    SolenoidStates nextState = SolenoidStates::OFF;
+    if (onOff) {
+        if (currentState == SolenoidStates::LEFT || currentState == SolenoidStates::BOTH) {
+            nextState = SolenoidStates::BOTH;
+        } else {
+            nextState = SolenoidStates::RIGHT;
+        }
+    } else {
+        if (currentState == SolenoidStates::LEFT || currentState == SolenoidStates::BOTH) {
+            nextState = SolenoidStates::LEFT;
+        } else {
+            nextState = SolenoidStates::OFF;
         }
     }
 }
-void Hang::setMotorLeftSpeed(double speed) { // Motor is reversed
-    if (isLeftRelayOn() && isLeftPawlOpen()) {
-        if (reflectiveHangSensorLeft.Get()) {
-            hangMotorLeft.Set(speed);
-        }
-        else if (speed < 0) {
-            hangMotorLeft.Set(speed);
-        } 
-        else {
-            hangMotorLeft.Set(0);
+void Hang::setLeftSolenoid(bool onOff) {
+    SolenoidStates currentState = getSolenoidState();
+    SolenoidStates nextState = SolenoidStates::OFF;
+    if (onOff) {
+        if (currentState == SolenoidStates::RIGHT || currentState == SolenoidStates::BOTH) {
+            nextState = SolenoidStates::BOTH;
+        } else {
+            nextState = SolenoidStates::LEFT;
         }
     } else {
-        hangMotorLeft.Set(0);
+        if (currentState == SolenoidStates::RIGHT || currentState == SolenoidStates::BOTH) {
+            nextState = SolenoidStates::RIGHT;
+        } else {
+            nextState = SolenoidStates::OFF;
+        }
     }
 }
 void Hang::setMotorRightSpeed(double speed) {
@@ -193,10 +337,6 @@ void Hang::setMotorRightSpeed(double speed) {
     } else {
         hangMotorRight.Set(0);
     }
-}
-void Hang::setSpeed(double speed){
-    setMotorLeftSpeed(-speed);
-    setMotorRightSpeed(speed);
 }
 double Hang::getLeftMotorPosition()
 {
@@ -249,17 +389,48 @@ void Hang::sendFeedback() {
     // frc::SmartDashboard::PutString("Hang_LeftMotorTemp", ConvertTemperatureToString(hangMotorLeft.GetMotorTemperature()));
     // frc::SmartDashboard::PutString("Hang_RightMotorTemp", ConvertTemperatureToString(hangMotorRight.GetMotorTemperature()));
     frc::SmartDashboard::PutString("Hang_LeftmotorMode", getMotorLeftModeString());
+    frc::SmartDashboard::PutString("Hang_LeftMotorState", getMotorStateString(leftMotorState));
     frc::SmartDashboard::PutString("Hang_RightmotorMode", getMotorRightModeString());
+    frc::SmartDashboard::PutString("Hang_RightMotorState", getMotorStateString(rightMotorState));
     frc::SmartDashboard::PutBoolean("Hang_LeftRRSensor", reflectiveHangSensorLeft.Get());
+    frc::SmartDashboard::PutNumber("Hang_Left_Timer", backtrackingLeftCheckTimer.Get().value());
+    frc::SmartDashboard::PutBoolean("Hang_isLeftPawlOpen", isLeftPawlOpen());
     frc::SmartDashboard::PutBoolean("Hang_RightRRSensor", reflectiveHangSensorRight.Get());
-    frc::SmartDashboard::PutString("Hang_SolenoidStates", getSolenoidState());
+    frc::SmartDashboard::PutNumber("Hang_Right_Timer", backtrackingRightCheckTimer.Get().value());
+    frc::SmartDashboard::PutBoolean("Hang_isRightPawlOpen", isRightPawlOpen());
+    frc::SmartDashboard::PutString("Hang_SolenoidStates", getSolenoidStateString());
+    // frc::SmartDashboard::PutString("Leaf_Sensor_Right")
 }
 void Hang::setSolenoids(Hang::SolenoidStates state) {
     solenoidRelay.Set((frc::Relay::Value)state);
 }
-std::string Hang::getSolenoidState() {
+std::string Hang::getMotorStateString(motorState state) {
+    std::string backtrackStateString = "IDLE";
+    switch (state)
+    {
+    case motorState::AWAITING_CHECK:
+        backtrackStateString = "Awaiting Check";
+        break;
+    case motorState::BACKTRACKING:
+        backtrackStateString = "Backtracking";
+        break;
+    case motorState::MOVING_UP:
+        backtrackStateString = "Moving Up";
+        break;
+    case motorState::MOVING_DOWN:
+        backtrackStateString = "Moving Down";
+        break;
+    default:
+        break;
+    }
+    return backtrackStateString;
+}
+Hang::SolenoidStates Hang::getSolenoidState() {
+    return (SolenoidStates)solenoidRelay.Get();
+}
+std::string Hang::getSolenoidStateString() {
     std::string solenoidState = "Off";
-    switch (solenoidRelay.Get())
+    switch (getSolenoidState())
     {
     case SolenoidStates::BOTH:
         solenoidState = "Both";
@@ -277,10 +448,12 @@ std::string Hang::getSolenoidState() {
 }
 
 bool Hang::isLeftRelayOn() {
-    return (solenoidRelay.Get() == SolenoidStates::LEFT || solenoidRelay.Get() == SolenoidStates::BOTH);
+    SolenoidStates state = (SolenoidStates)solenoidRelay.Get(); 
+    return (state == SolenoidStates::LEFT || state == SolenoidStates::BOTH);
 }
 bool Hang::isRightRelayOn() {
-    return (solenoidRelay.Get() == SolenoidStates::RIGHT || solenoidRelay.Get() == SolenoidStates::BOTH);
+    SolenoidStates state = (SolenoidStates)solenoidRelay.Get();
+    return (state == SolenoidStates::RIGHT || state == SolenoidStates::BOTH);
 }
 bool Hang::isLeftPawlOpen() {
     return leafSensorLeft.Get();

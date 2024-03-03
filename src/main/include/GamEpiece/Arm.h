@@ -13,7 +13,7 @@
 #include <units/angle.h>
 
 //might be differnet values
-#define ARM_MOTOR_P 0.02
+#define ARM_MOTOR_P 0.03
 #define ARM_MOTOR_I 0.0
 #define ARM_MOTOR_D 0.0
 #define ARM_MAX_VEL 90_deg_per_s //75_deg_per_s
@@ -71,7 +71,7 @@ private:
     rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     units::degree_t presetAngles [Presets::MAX_PRESETS] = {
         0_deg,
-        34.6_deg,
+        30_deg,
         85_deg,
         0_deg,
         20.3_deg

@@ -97,9 +97,9 @@ class Shamptake : public Mechanism{
     bool isAuto = false;
 
     double presetIntakeSpeeds [IntakeSpeed::MAX_INTAKE_SPEED] = {
-        0.7,
+        0.9,
         0,
-        0.2,
+        0.4,
         0.8,
         -0.4
     };
