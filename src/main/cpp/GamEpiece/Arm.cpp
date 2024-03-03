@@ -1,6 +1,6 @@
 #include <GamEpiece/Arm.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-
+#include <Util/Preferences.h>
 Arm::Arm() {
     armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
     armMotor.SetInverted(false);
@@ -81,6 +81,15 @@ void Arm::moveToAngle(units::angle::degree_t angle) {
 
 void Arm::moveToPreset(Presets preset) {
     units::angle::degree_t movingTo = presetAngles[preset];
+    if (preset == Presets::AMP) { // Normal PID will not work when at the AMP position, use this to configure PID for AMP
+        armPIDController.SetP(PREFERENCE_ARM.AMP_PID.Kp);
+        armPIDController.SetI(PREFERENCE_ARM.AMP_PID.Ki);
+        armPIDController.SetD(PREFERENCE_ARM.AMP_PID.Kd);
+    } else {
+        armPIDController.SetP(PREFERENCE_ARM.PID.Kp);
+        armPIDController.SetI(PREFERENCE_ARM.PID.Ki);
+        armPIDController.SetD(PREFERENCE_ARM.PID.Kd);
+    }
     moveToAngle(movingTo);
 }
 

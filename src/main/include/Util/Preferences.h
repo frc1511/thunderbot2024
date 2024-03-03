@@ -106,13 +106,14 @@ struct PreferencesArm
     PID_t PID;
     double TARGET_ANGLE_THRESHOLD = 5;
     double PRESET_ANGLE_THRESHOLD = 15;
+    PID_t AMP_PID; // Normal PID will not work when at the AMP position, use this to configure PID for AMP
     units::degree_t ENCODER_OFFSET = 116.28_deg;
-
     PreferencesArm()
     {
         PID.Kp = 0.03;
         PID.MaxVel = 90_deg_per_s;
         PID.MaxAccel = 90_deg_per_s_sq;
+        AMP_PID.Kp = 0.01;
     }
 
 };
