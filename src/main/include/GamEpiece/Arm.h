@@ -68,7 +68,7 @@ private:
     units::degree_t presetAngles [Presets::MAX_PRESETS] = {
         0_deg,
         30_deg,
-        85_deg,
+        90_deg,
         10_deg,
         20.3_deg,
         5_deg

@@ -226,13 +226,15 @@ void Controls::doAux() {
 
     if (!hangModeControls) {
         //double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
-        bool intakePreset = auxController.getButton(AuxButton::CROSS);
+        bool mediumPreset = auxController.getButton(AuxButton::CROSS);
         bool linePreset = auxController.getButton(AuxButton::CIRCLE);
         bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
         bool ampPreset = auxController.getButton(AuxButton::SQUARE);
-        bool travelPreset = dpadDown;
-
+        bool intakePreset = dpadDown;
+        bool travelPreset = dpadUp;
         if (intakePreset) {
+            arm->moveToPreset(Arm::BASE);
+        } else if (mediumPreset) {
             arm->moveToPreset(Arm::MEDIUM);
         } else if (linePreset) {
             arm->moveToPreset(Arm::LINE);

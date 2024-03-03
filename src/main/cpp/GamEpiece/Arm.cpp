@@ -1,6 +1,8 @@
 #include <GamEpiece/Arm.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <Util/Preferences.h>
+#include <basic/Settings.h>
+
 Arm::Arm() {
     armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
     armMotor.SetInverted(false);
@@ -15,10 +17,12 @@ Arm::~Arm() {
 
 void Arm::process()
 {
-    units::degree_t degrees = getBoreDegrees();
+    if (!settings.isCraterMode) {
+        units::degree_t degrees = getBoreDegrees();
 
-    double power = armPIDController.Calculate(degrees, targetAngle);
-    setPower(-power);
+        double power = armPIDController.Calculate(degrees, targetAngle);
+        setPower(-power);
+    }
 }
 
 void Arm::sendFeedback() {
@@ -76,7 +80,7 @@ std::string Arm::getMotorModeString() {
 }
 
 void Arm::moveToAngle(units::angle::degree_t angle) {
-    targetAngle = std::clamp(angle, 0_deg, 85_deg);
+    targetAngle = std::clamp(angle, 0_deg, 87_deg);
 }
 
 void Arm::moveToPreset(Presets preset) {
