@@ -28,6 +28,7 @@ void Arm::sendFeedback() {
     //frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
     frc::SmartDashboard::PutNumber("Arm_targetAngle", targetAngle.value());
+    frc::SmartDashboard::PutBoolean("Arm_NearAMP", isNearPreset(Presets::AMP));
 }
 
 void Arm::doPersistentConfiguration() {

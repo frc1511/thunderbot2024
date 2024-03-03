@@ -230,6 +230,7 @@ void Controls::doAux() {
         bool linePreset = auxController.getButton(AuxButton::CIRCLE);
         bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
         bool ampPreset = auxController.getButton(AuxButton::SQUARE);
+        bool travelPreset = dpadDown;
 
         if (intakePreset) {
             arm->moveToPreset(Arm::MEDIUM);
@@ -239,6 +240,8 @@ void Controls::doAux() {
             arm->moveToPreset(Arm::SUBWOOFER);
         } else if (ampPreset) {
             arm->moveToPreset(Arm::AMP); // Don't forget to update Arm::isAtAmp()
+        } else if (travelPreset) {
+            arm->moveToPreset(Arm::TRAVEL);
         }
     } else { //Hang mode
         bool rightHang = auxController.getButton(AuxButton::CROSS);
@@ -247,26 +250,26 @@ void Controls::doAux() {
         double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);
         double hangMotorRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
 
-        if (std::fabs(hangMotorLeft) < AXIS_DEADZONE) {
+        if (std::fabs(hangMotorLeft) < PREFERENCE_CONTROLS.AXIS_DEADZONE) {
             hangMotorLeft = 0;
         }
 
-        if (hangMotorLeft > MAX_HANG_SPEED) {
-            hangMotorLeft = MAX_HANG_SPEED;
+        if (hangMotorLeft > PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
+            hangMotorLeft = PREFERENCE_CONTROLS.MAX_HANG_SPEED;
         }
-        if (hangMotorLeft < -MAX_HANG_SPEED) {
-            hangMotorLeft = -MAX_HANG_SPEED;
+        if (hangMotorLeft < -PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
+            hangMotorLeft = -PREFERENCE_CONTROLS.MAX_HANG_SPEED;
         }
 
-        if (std::fabs(hangMotorRight) < AXIS_DEADZONE) {
+        if (std::fabs(hangMotorRight) < PREFERENCE_CONTROLS.AXIS_DEADZONE) {
             hangMotorRight = 0;
         }
 
-        if (hangMotorRight > MAX_HANG_SPEED) {
-            hangMotorRight = MAX_HANG_SPEED;
+        if (hangMotorRight > PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
+            hangMotorRight = PREFERENCE_CONTROLS.MAX_HANG_SPEED;
         }
-        if (hangMotorRight < -MAX_HANG_SPEED) {
-            hangMotorRight = -MAX_HANG_SPEED;
+        if (hangMotorRight < -PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
+            hangMotorRight = -PREFERENCE_CONTROLS.MAX_HANG_SPEED;
         }
         if (hang != nullptr)
         {

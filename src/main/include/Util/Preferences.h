@@ -110,7 +110,7 @@ struct PreferencesArm
 
     PreferencesArm()
     {
-        PID.Kp = 0.02;
+        PID.Kp = 0.03;
         PID.MaxVel = 90_deg_per_s;
         PID.MaxAccel = 90_deg_per_s_sq;
     }
