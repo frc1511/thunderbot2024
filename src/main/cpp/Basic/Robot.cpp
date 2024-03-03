@@ -39,7 +39,7 @@ void Robot::TeleopPeriodic() {
     shampTake.process();
     controls.process();
     arm.process();
-    //hang.process();
+    hang.process();
     shampTake.runMotors();
 
     drive.process();

@@ -5,12 +5,15 @@
 
 #include <frc/DigitalInput.h>
 #include <frc/Relay.h>
+#include <frc/Timer.h>
 #include <rev/CANSparkMax.h>
 #include <Basic/Mechanism.h>
 
 // #include <ThunderSparkMax/ThunderSparkMax.h>
 // #include <Feedback/Feedback.h>
 // #include <BlinkyBlinky/BlinkyBlinky.h>
+
+#define BACKTRACK_ROTATIONS -2.072
 
 class Hang : public Mechanism {
     public:
@@ -29,14 +32,29 @@ class Hang : public Mechanism {
 //     void debug(Feedback* feedback);
 //     //void lights(Lights* lights);
 
+    enum motorState {
+        IDLE,
+        BACKTRACKING,
+        AWAITING_CHECK,
+        MOVING_UP,
+        MOVING_DOWN
+    };
+
     /**
      *  Moves the mechanism to the target position 
      */
     void move(HangMovement direction);
 
-    void setMotorLeftSpeed(double speed);
+    void setMotorLeftState(motorState state);
+    void setMotorLeftStateSafe(motorState state);
+
+    void setMotorRightState(motorState state);
+    void setMotorRightStateSafe(motorState state);
+
+    void setRightSolenoid(bool onOff);
+    void setLeftSolenoid(bool onOff);
+
     void setMotorRightSpeed(double speed);
-    void setSpeed(double speed);
 
     void enableBrakeMode(bool enabled);
 
@@ -46,7 +64,7 @@ class Hang : public Mechanism {
     std::string getMotorLeftModeString();
     std::string getMotorRightModeString();
 
-    std::string getSolenoidState();
+    std::string getSolenoidStateString();
 
     std::string ConvertTemperatureToString(double temp);
 
@@ -86,6 +104,9 @@ class Hang : public Mechanism {
 
 //     void setHangIdleMode(bool idleModeEnabled);
 
+    motorState leftMotorState = motorState::IDLE;
+    motorState rightMotorState = motorState::IDLE;
+
 private:
     rev::CANSparkMax hangMotorLeft {CAN_HANG_ARM_LEFT, rev::CANSparkMax::MotorType::kBrushless};
     rev::SparkRelativeEncoder hangLeftEncoder;
@@ -103,6 +124,17 @@ private:
     double hangEncoderLeftPosition;
     double hangEncoderRightPosition;
 
+    double targetRightEncoderRotation = 0;
+    double targetLeftEncoderRotation = 0;
+
+    frc::Timer backtrackingLeftCheckTimer;
+    frc::Timer backtrackingRightCheckTimer;
+
+    void backtrackLeft();
+    void backtrackRight();
+
+    std::string getMotorStateString(motorState state);
+    SolenoidStates getSolenoidState();
 //     bool lastSensorReading = false; 
 
 //     HangMovement moveDirection = STOP; // Default movement is stop
