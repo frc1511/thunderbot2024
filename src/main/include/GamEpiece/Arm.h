@@ -2,6 +2,8 @@
 
 #include <Basic/IOMap.h>
 #include <Basic/Mechanism.h>
+#include <Util/Preferences.h>
+
 #include <frc/DigitalInput.h>
 #include <rev/CANSparkMax.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -100,7 +102,7 @@ private:
     units::angle::degree_t targetAngle = 10_deg;
 
     frc::ProfiledPIDController<units::degrees> armPIDController{
-        ARM_MOTOR_P, ARM_MOTOR_I, ARM_MOTOR_D, 
-        frc::TrapezoidProfile<units::degrees>::Constraints(ARM_MAX_VEL, ARM_MAX_ACCEL)
+        PREFERENCE_ARM.PID.Kp, PREFERENCE_ARM.PID.Ki, PREFERENCE_ARM.PID.Kd, 
+        frc::TrapezoidProfile<units::degrees>::Constraints(PREFERENCE_ARM.PID.MaxVel, PREFERENCE_ARM.PID.MaxAccel)
     };
 };

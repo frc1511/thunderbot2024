@@ -9,14 +9,13 @@
 #include <GamEpiece/Shamptake.h>
 #include <Controls/Controls.h>
 #include <BlinkyBlinky/BlinkyBlinky.h>
+#include <Util/Preferences.h>
 
 using DriveControllerType = ThunderPS4Controller;
 using AuxControllerType = ThunderPS4Controller;
 
 class Controls : public Mechanism {
 public:
-    double MAX_ARM_SPEED = 0.5;
-    double MAX_HANG_SPEED = 0.2;
     //Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
     Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, bool* _debugMode);
 

@@ -8,18 +8,18 @@ Shamptake::Shamptake()
     shooterMotorRight.SetInverted(false);
     shooterMotorLeft.SetInverted(true);
 
-    shooterMotorRightPIDController.SetP(SHAMPTANK_RIGHT_MOTOR_P);
-    shooterMotorRightPIDController.SetI(SHAMPTANK_RIGHT_MOTOR_I);
-    shooterMotorRightPIDController.SetD(SHAMPTANK_RIGHT_MOTOR_D);
-    shooterMotorRightPIDController.SetIZone(SHAMPTANK_RIGHT_MOTOR_I_ZONE);
-    shooterMotorRightPIDController.SetFF(SHAMPTANK_RIGHT_MOTOR_FEED_FOWARD);
+    shooterMotorRightPIDController.SetP(PREFERENCE_SHAMPTAKE.PID_RIGHT.Kp);
+    shooterMotorRightPIDController.SetI(PREFERENCE_SHAMPTAKE.PID_RIGHT.Ki);
+    shooterMotorRightPIDController.SetD(PREFERENCE_SHAMPTAKE.PID_RIGHT.Kd);
+    shooterMotorRightPIDController.SetIZone(PREFERENCE_SHAMPTAKE.PID_RIGHT.Kizone);
+    shooterMotorRightPIDController.SetFF(PREFERENCE_SHAMPTAKE.PID_RIGHT.Kff);
     shooterMotorRightPIDController.SetOutputRange(0, 1);
 
-    shooterMotorLeftPIDController.SetP(SHAMPTANK_LEFT_MOTOR_P);
-    shooterMotorLeftPIDController.SetI(SHAMPTANK_LEFT_MOTOR_I);
-    shooterMotorLeftPIDController.SetD(SHAMPTANK_LEFT_MOTOR_D);
-    shooterMotorLeftPIDController.SetIZone(SHAMPTANK_LEFT_MOTOR_I_ZONE);
-    shooterMotorLeftPIDController.SetFF(SHAMPTANK_LEFT_MOTOR_FEED_FOWARD);
+    shooterMotorLeftPIDController.SetP(PREFERENCE_SHAMPTAKE.PID_LEFT.Kp);
+    shooterMotorLeftPIDController.SetI(PREFERENCE_SHAMPTAKE.PID_LEFT.Ki);
+    shooterMotorLeftPIDController.SetD(PREFERENCE_SHAMPTAKE.PID_LEFT.Kd);
+    shooterMotorLeftPIDController.SetIZone(PREFERENCE_SHAMPTAKE.PID_LEFT.Kizone);
+    shooterMotorLeftPIDController.SetFF(PREFERENCE_SHAMPTAKE.PID_LEFT.Kff);
     shooterMotorLeftPIDController.SetOutputRange(0, 1);
     stop();
 }

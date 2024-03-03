@@ -2,6 +2,8 @@
 
 #include <Basic/IOMap.h>
 #include <Basic/Mechanism.h>
+#include <Util/Preferences.h>
+
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <units/angle.h>
@@ -112,5 +114,5 @@ private:
     ctre::phoenix6::hardware::CANcoder turningAbsEncoder;
 
     // The offset of the turning absolute encoder.
-    units::radian_t absEncoderOffset = 0_rad;
+    units::radian_t absEncoderOffset = PREFERENCE_SWERVE.TURN_MOTOR.ABS_ENCODER_OFFSET;
 };

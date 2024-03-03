@@ -2,6 +2,7 @@
 
 #include <Drive/Trajectory.h>
 #include <filesystem>
+#include <Util/Preferences.h>
 
 /**
  * Represents a ThunderAuto-style CSV trajectory for the robot to follow.

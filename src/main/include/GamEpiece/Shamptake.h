@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Basic/IOMap.h>
+#include <Util/Preferences.h>
+
 #include <rev/CANSparkMax.h>
 #include <rev/SparkPIDController.h>
 #include <rev/ControlType.h>
@@ -10,18 +12,6 @@
 #include <frc/Timer.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#define SHAMPTANK_RIGHT_MOTOR_P 0.0002
-#define SHAMPTANK_RIGHT_MOTOR_I 0.0
-#define SHAMPTANK_RIGHT_MOTOR_D 0.0
-#define SHAMPTANK_RIGHT_MOTOR_FEED_FOWARD 0.000170
-#define SHAMPTANK_RIGHT_MOTOR_I_ZONE 0.0
-
-
-#define SHAMPTANK_LEFT_MOTOR_P 0.0002
-#define SHAMPTANK_LEFT_MOTOR_I 0.0
-#define SHAMPTANK_LEFT_MOTOR_D 0.0
-#define SHAMPTANK_LEFT_MOTOR_FEED_FOWARD 0.000170
-#define SHAMPTANK_LEFT_MOTOR_I_ZONE 0.0
 class Shamptake : public Mechanism{
   
   rev::CANSparkMax shooterMotorRight {CAN_SHOOTER_RIGHT, rev::CANSparkMax::MotorType::kBrushless}; //right side (top)

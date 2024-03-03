@@ -1,9 +1,6 @@
 #include <Drive/CSVTrajectory.h>
 #include <Util/Parser.h>
 
-#define FIELD_X 16.54175_m
-#define FIELD_Y 8.0137_m
-
 CSVTrajectory::CSVTrajectory(std::filesystem::path path, bool inverted) {
     std::string fileStr = Parser::getFile(path);
     if (fileStr.empty()) exit(1);
@@ -24,7 +21,7 @@ CSVTrajectory::CSVTrajectory(std::filesystem::path path, bool inverted) {
         u_int32_t action = static_cast<u_int32_t>(Parser::parseNumber(currIter, fileStr.cend())); ++currIter;
 
         if (inverted) {
-            xPos = FIELD_X - xPos;
+            xPos = PREFERENCE_TRAJECTORY.FIELD_X - xPos;
             rotation = frc::Rotation2d(180_deg - rotation.Degrees());
         }
 
