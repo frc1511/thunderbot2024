@@ -34,7 +34,7 @@ static PreferencesControls PREFERENCE_CONTROLS;
 
 struct PreferencesHang
 {
-    double MAX_POSTION = 60;
+    double MAX_POSTION = 160;
 };
 static PreferencesHang PREFERENCE_HANG;
 
