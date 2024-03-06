@@ -32,6 +32,12 @@ struct PreferencesControls
 };
 static PreferencesControls PREFERENCE_CONTROLS;
 
+struct PreferencesHang
+{
+    double MAX_POSTION = 160;
+};
+static PreferencesHang PREFERENCE_HANG;
+
 struct PreferencesTrajectory
 {
         units::meter_t FIELD_X = 16.54175_m;
@@ -49,7 +55,7 @@ struct PreferencesDrive
     units::radians_per_second_t DRIVE_AUTO_MAX_ANG_VEL = 6.28_rad_per_s;
     units::radians_per_second_squared_t DRIVE_AUTO_MAX_ANG_ACCEL = 3.14_rad_per_s_sq;
 
-    units::meters_per_second_t DRIVE_MANUAL_MAX_VEL = 4.2_mps;
+    units::meters_per_second_t DRIVE_MANUAL_MAX_VEL = 5_mps;
     units::degrees_per_second_t DRIVE_MANUAL_MAX_ANG_VEL = 360_deg_per_s;
     units::radians_per_second_squared_t DRIVE_MANUAL_MAX_ANG_ACCEL = 6.28_rad_per_s_sq;
 
@@ -106,13 +112,14 @@ struct PreferencesArm
     PID_t PID;
     double TARGET_ANGLE_THRESHOLD = 5;
     double PRESET_ANGLE_THRESHOLD = 15;
+    PID_t AMP_PID; // Normal PID will not work when at the AMP position, use this to configure PID for AMP
     units::degree_t ENCODER_OFFSET = 116.28_deg;
-
     PreferencesArm()
     {
-        PID.Kp = 0.02;
+        PID.Kp = 0.03;
         PID.MaxVel = 90_deg_per_s;
         PID.MaxAccel = 90_deg_per_s_sq;
+        AMP_PID.Kp = 0.01;
     }
 
 };

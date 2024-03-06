@@ -97,7 +97,7 @@ class Shamptake : public Mechanism{
         0,
         5000,
         1000,
-        4000
+        4300
     };
 };
 

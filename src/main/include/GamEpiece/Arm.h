@@ -14,19 +14,12 @@
 #include <units/acceleration.h>
 #include <units/angle.h>
 
-//might be differnet values
-#define ARM_MOTOR_P 0.03
-#define ARM_MOTOR_I 0.0
-#define ARM_MOTOR_D 0.0
-#define ARM_MAX_VEL 90_deg_per_s //75_deg_per_s
-#define ARM_MAX_ACCEL 90_deg_per_s_sq //75_deg_per_s_sq
-
 class Arm : public Mechanism {
 public:
     Arm();
     ~Arm();
 
-    void  process() override;
+    void process() override;
     void sendFeedback() override;
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
@@ -48,6 +41,7 @@ public:
         AMP,
         SUBWOOFER,
         MEDIUM,
+        TRAVEL,
         MAX_PRESETS
     };
 
@@ -74,9 +68,10 @@ private:
     units::degree_t presetAngles [Presets::MAX_PRESETS] = {
         0_deg,
         30_deg,
-        85_deg,
-        0_deg,
-        20.3_deg
+        90_deg,
+        10_deg,
+        20.3_deg,
+        5_deg
     };
 
     double targetAngleThreshold = 5;
@@ -99,7 +94,7 @@ private:
     bool backingOffMinimum = false;
     bool backingOffMaximum = false;
 
-    units::angle::degree_t targetAngle = 10_deg;
+    units::angle::degree_t targetAngle = 2_deg;
 
     frc::ProfiledPIDController<units::degrees> armPIDController{
         PREFERENCE_ARM.PID.Kp, PREFERENCE_ARM.PID.Ki, PREFERENCE_ARM.PID.Kd, 

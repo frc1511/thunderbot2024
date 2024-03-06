@@ -51,6 +51,18 @@ void Auto::process() { //called during auto
         case SPEAKER_2_GP:
             speaker2();
             break;
+        case HAVOC:
+            havoc();
+            break;
+        case BASIC_LOC_1:
+            basic_loc_1();
+            break;
+        case BASIC_LOC_2:
+            basic_loc_2();
+            break;
+        case BASIC_LOC_3:
+            basic_loc_3();
+            break;
     }
 }
 
@@ -102,12 +114,94 @@ void Auto::speaker2() {
     }
 }
 
+void Auto::havoc() {
+    if (step == 0) {
+        frc::Pose2d initPose(paths->at(Path::HAVOC).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        drive->runTrajectory(&paths->at(Path::HAVOC), actions);
+        step++;
+    }
+}
+
+void Auto::basic_loc_1() {
+    if (step == 0) {
+        frc::Pose2d initPose(paths->at(Path::BASIC_LOC_1).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
+        step++;
+    } else if (step == 1 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 2 && shamptake->notShooting()) {
+        drive->runTrajectory(&paths->at(Path::BASIC_LOC_1), actions);
+        arm->moveToPreset(Arm::Presets::BASE);
+        shamptake->autoIntake();
+        step++;
+    } else if (step == 3 && shamptake->hasGamepiece() && drive->isFinished() && arm->isMoveDone()) {
+        arm->moveToPreset(Arm::Presets::LINE);
+        step++;
+    } else if (step == 4 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 5 && shamptake->notShooting()) {
+        step++;
+    }
+}
+
+void Auto::basic_loc_2() {
+    if (step == 0) {
+        frc::Pose2d initPose(paths->at(Path::BASIC_LOC_2).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
+        step++;
+    } else if (step == 1 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 2 && shamptake->notShooting()) {
+        drive->runTrajectory(&paths->at(Path::BASIC_LOC_2), actions);
+        arm->moveToPreset(Arm::Presets::BASE);
+        shamptake->autoIntake();
+        step++;
+    } else if (step == 3 && shamptake->hasGamepiece() && drive->isFinished() && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 4 && shamptake->notShooting()) {
+        step++;
+    }
+}
+
+void Auto::basic_loc_3() {
+    if (step == 0) {
+        frc::Pose2d initPose(paths->at(Path::BASIC_LOC_3).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
+        step++;
+    } else if (step == 1 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 2 && shamptake->notShooting()) {
+        drive->runTrajectory(&paths->at(Path::BASIC_LOC_3), actions);
+        arm->moveToPreset(Arm::Presets::BASE);
+        shamptake->autoIntake();
+        step++;
+    } else if (step == 3 && shamptake->hasGamepiece() && drive->isFinished() && arm->isMoveDone()) {
+        arm->moveToPreset(Arm::Presets::LINE);
+        step++;
+    } else if (step == 4 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 5 && shamptake->notShooting()) {
+        step++;
+    }
+}
+
 void Auto::doNothing() {
     // If it does nothing is it doing something or nothing? - trevor(2020)
         //it does something because it is doing nothing - ishan(2022)
         //I disagree - peter(2022)
         //I agree with peter -L Wrench
         //I still disagree with ishan - peter(2023)
+        //it does something because this function exists and can be called as an action for the robot - ben d(2024)
 
     // Good function.
     // Very good function. - jeff downs

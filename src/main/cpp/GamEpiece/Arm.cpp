@@ -1,5 +1,7 @@
 #include <GamEpiece/Arm.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <Util/Preferences.h>
+#include <basic/Settings.h>
 
 Arm::Arm() {
     armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
@@ -15,10 +17,12 @@ Arm::~Arm() {
 
 void Arm::process()
 {
-    units::degree_t degrees = getBoreDegrees();
+    if (!settings.isCraterMode) {
+        units::degree_t degrees = getBoreDegrees();
 
-    double power = armPIDController.Calculate(degrees, targetAngle);
-    setPower(-power);
+        double power = armPIDController.Calculate(degrees, targetAngle);
+        setPower(-power);
+    }
 }
 
 void Arm::sendFeedback() {
@@ -28,6 +32,7 @@ void Arm::sendFeedback() {
     //frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
     frc::SmartDashboard::PutNumber("Arm_targetAngle", targetAngle.value());
+    frc::SmartDashboard::PutBoolean("Arm_NearAMP", isNearPreset(Presets::AMP));
 }
 
 void Arm::doPersistentConfiguration() {
@@ -75,11 +80,20 @@ std::string Arm::getMotorModeString() {
 }
 
 void Arm::moveToAngle(units::angle::degree_t angle) {
-    targetAngle = std::clamp(angle, 0_deg, 85_deg);
+    targetAngle = std::clamp(angle, 0_deg, 87_deg);
 }
 
 void Arm::moveToPreset(Presets preset) {
     units::angle::degree_t movingTo = presetAngles[preset];
+    if (preset == Presets::AMP) { // Normal PID will not work when at the AMP position, use this to configure PID for AMP
+        armPIDController.SetP(PREFERENCE_ARM.AMP_PID.Kp);
+        armPIDController.SetI(PREFERENCE_ARM.AMP_PID.Ki);
+        armPIDController.SetD(PREFERENCE_ARM.AMP_PID.Kd);
+    } else {
+        armPIDController.SetP(PREFERENCE_ARM.PID.Kp);
+        armPIDController.SetI(PREFERENCE_ARM.PID.Ki);
+        armPIDController.SetD(PREFERENCE_ARM.PID.Kd);
+    }
     moveToAngle(movingTo);
 }
 

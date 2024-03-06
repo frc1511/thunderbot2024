@@ -33,6 +33,7 @@ void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutNumber("Shamptake_shooterLeftRPM", shooterMotorLeftEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Shamptake_shooterRightRPM", shooterMotorRightEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Shamptake_shooterTargetRPM", targetShooterRPM);
+    frc::SmartDashboard::PutNumber("Shamptake_shooterAtTargetRPM", atTargetRPM());
     frc::SmartDashboard::PutBoolean("Shamptake_shooterAtRPM", atTargetRPM());
 }
 
