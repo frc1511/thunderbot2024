@@ -4,6 +4,7 @@
 #include <Basic/Mechanism.h>
 #include <Util/Preferences.h>
 
+#include <frc/Timer.h>
 #include <frc/DigitalInput.h>
 #include <rev/CANSparkMax.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -53,6 +54,20 @@ public:
 
     bool isAtLowerLimit();
 
+    void engageBrake();
+
+    void disengageBrake();
+
+    void manualBrakePower(double power);
+
+    enum BrakeModes {
+        NONE,
+        DISENGAGE,
+        ENGAGE
+    };
+
+    void doBrake();
+
 private:
 
     units::degree_t getRawBorePosition();
@@ -64,6 +79,8 @@ private:
     frc::DutyCycleEncoder encoder{DIO_GAMEPIECE_BORE_ENCODER};
     rev::CANSparkMax armMotor {CAN_PIVOT_ARM, rev::CANSparkMax::MotorType::kBrushless};
 
+    rev::CANSparkMax armBrake {CAN_PIVOT_ARM_BRAKE, rev::CANSparkMax::MotorType::kBrushless};
+
     rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     units::degree_t presetAngles [Presets::MAX_PRESETS] = {
         0_deg,
@@ -74,8 +91,14 @@ private:
         5_deg
     };
 
-    double targetAngleThreshold = 5;
-    double presetAngleThreshold = 15;
+    bool braked = true;
+    BrakeModes currentBrakeMode = BrakeModes::NONE;
+    frc::Timer brakeTimer;
+
+    bool withinLegalLimit();
+
+    double targetAngleThreshold = PREFERENCE_ARM.TARGET_ANGLE_THRESHOLD;
+    double presetAngleThreshold = PREFERENCE_ARM.PRESET_ANGLE_THRESHOLD;
     
 
     //rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);

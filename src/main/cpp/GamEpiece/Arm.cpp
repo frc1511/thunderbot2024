@@ -6,6 +6,8 @@
 Arm::Arm() {
     armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
     armMotor.SetInverted(false);
+    armBrake.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+    armBrake.SetInverted(false);
     encoder.SetDistancePerRotation(360);
     armPIDController.Reset(getBoreDegrees());
     forwardarmLimitSwitch.EnableLimitSwitch(true);
@@ -23,6 +25,7 @@ void Arm::process()
         double power = armPIDController.Calculate(degrees, targetAngle);
         setPower(-power);
     }
+    doBrake();
 }
 
 void Arm::sendFeedback() {
@@ -32,9 +35,18 @@ void Arm::sendFeedback() {
     //frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
     frc::SmartDashboard::PutNumber("Arm_targetAngle", targetAngle.value());
+    frc::SmartDashboard::PutBoolean("Arm_legal", withinLegalLimit());
+    frc::SmartDashboard::PutBoolean("Arm_Braked", braked);
     frc::SmartDashboard::PutBoolean("Arm_NearAMP", isNearPreset(Presets::AMP));
 }
-
+bool Arm::withinLegalLimit() {
+    bool legal = false;
+    units::degree_t degrees = getBoreDegrees();
+    if (degrees <= PREFERENCE_ARM.MAX_LEGAL_LIMIT && degrees >= PREFERENCE_ARM.MIN_LEGAL_LIMIT) {
+        legal = true;
+    }
+    return legal;
+}
 void Arm::doPersistentConfiguration() {
     
 }
@@ -43,6 +55,9 @@ void Arm::resetToMode(MatchMode mode) {
     setMotorBrake(true);
     stop();
     armPIDController.Reset(getBoreDegrees());
+    if (mode == MatchMode::AUTO || mode == MatchMode::TELEOP) {
+        disengageBrake();
+    }
 }
 
 void Arm::setMotorBrake(bool armBrakeOn) {
@@ -113,6 +128,47 @@ bool Arm::isNearPreset(Presets preset) {
 void Arm::setPower(double power) {
     armMotor.Set(power);
 }
+
+void Arm::engageBrake() {
+    currentBrakeMode = BrakeModes::ENGAGE;
+}
+
+void Arm::disengageBrake() {
+    currentBrakeMode = BrakeModes::DISENGAGE;
+}
+
+void Arm::manualBrakePower(double power) {
+    armBrake.Set(power);
+}
+
+void Arm::doBrake() {
+    if (currentBrakeMode == BrakeModes::DISENGAGE) {
+        if (braked) {
+        brakeTimer.Reset();
+        armBrake.Set(-.05);
+        brakeTimer.Start();
+        if (brakeTimer.Get() >= 1_s) {
+            armBrake.Set(0.0);
+            braked = false;
+            brakeTimer.Stop();
+            currentBrakeMode = BrakeModes::NONE;
+        }
+    }
+    } else if (currentBrakeMode == BrakeModes::ENGAGE) {
+        if (!braked) {
+        brakeTimer.Reset();
+        armBrake.Set(.05);
+        brakeTimer.Start();
+        if (brakeTimer.Get() >= 1_s) {
+            armBrake.Set(0.0);
+            braked = true;
+            brakeTimer.Stop();
+            currentBrakeMode = BrakeModes::NONE;
+        }
+    }
+    }
+}
+
 void Arm::stop() {
     setPower(0);
 }

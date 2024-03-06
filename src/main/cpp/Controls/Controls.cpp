@@ -333,7 +333,6 @@ void Controls::doAux() {
         shamptake->trippedBefore = false;
     }
 
-
    /* if (!armmode){
         //HANG
         // Hang stuff - MAKE A FUNCTION OUTTA THIS STUFF
