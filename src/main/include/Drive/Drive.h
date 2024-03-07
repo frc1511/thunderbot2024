@@ -6,6 +6,9 @@
 #include <Drive/SwerveModule.h>
 #include <Autonomous/Action.h>
 #include <ctre/phoenix6/Pigeon2.hpp>
+#include <frc/smartdashboard/Field2d.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/Sendable.h>
 
 #include <frc/geometry/Translation2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -37,6 +40,14 @@
 #include <map>
 #include <algorithm>
 #include <Util/Preferences.h>
+
+class SwerveFeedback : public wpi::Sendable {
+public:
+    SwerveFeedback(wpi::array<SwerveModule*, 4>* _swerveModules);
+    void InitSendable(wpi::SendableBuilder& builder);
+    frc::Rotation2d robotRotation = frc::Rotation2d(0_deg);
+    wpi::array<SwerveModule*, 4>* swerveModules;
+};
 
 class Drive : public Mechanism {
 public:
@@ -299,6 +310,9 @@ private:
         frc::TrapezoidProfile<units::radians>::Constraints(PREFERENCE_DRIVE.DRIVE_AUTO_MAX_ANG_VEL, PREFERENCE_DRIVE.DRIVE_AUTO_MAX_ANG_ACCEL)
     };
 
+    frc::Field2d feedbackField {};
+
+    SwerveFeedback swerveFeedback {&swerveModules};
         // The drive controller that will handle the drivetrain movement.
     frc::HolonomicDriveController driveController;
 };
