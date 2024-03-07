@@ -56,7 +56,8 @@ void Arm::resetToMode(MatchMode mode) {
     stop();
     armPIDController.Reset(getBoreDegrees());
     if (mode == MatchMode::AUTO || mode == MatchMode::TELEOP) {
-        disengageBrake();
+        //disengageBrake();
+        moveToAngle(getBoreDegrees() + 5_deg);
     }
 }
 

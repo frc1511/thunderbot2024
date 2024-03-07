@@ -61,7 +61,7 @@ void Hang::process() {
             }
             break;
         case MOVING_UP:
-            if (isLeftRelayOn() && !isLeftPawlOpen() && !isLeftReflectiveSensorTripped() && getLeftMotorPosition() >= -PREFERENCE_HANG.MAX_POSTION) {
+            if (isLeftRelayOn() && !isLeftPawlOpen() && getLeftMotorPosition() >= -PREFERENCE_HANG.MAX_POSTION) {
                 hangMotorLeft.Set(-0.2);
             } else {
                 hangMotorLeft.Set(0);
@@ -111,7 +111,7 @@ void Hang::process() {
             }
             break;
         case MOVING_UP:
-            if (isRightRelayOn() && !isRightPawlOpen() && !isRightReflectiveSensorTripped() && getRightMotorPosition() <= PREFERENCE_HANG.MAX_POSTION) {
+            if (isRightRelayOn() && !isRightPawlOpen() && getRightMotorPosition() <= PREFERENCE_HANG.MAX_POSTION) {
                 hangMotorRight.Set(0.2);
             } else {
                 hangMotorRight.Set(0);
@@ -263,7 +263,7 @@ bool Hang::isRightPawlUp()
 }
 
 void Hang::sendFeedback() {
-    frc::SmartDashboard::PutNumber("Hang_Left_Position", getLeftMotorPosition());
+    frc::SmartDashboard::PutNumber("Hang_Left_Position", -getLeftMotorPosition());
     frc::SmartDashboard::PutNumber("Hang_Right_Position", getRightMotorPosition());
     // frc::SmartDashboard::PutString("Hang_LeftMotorTemp", ConvertTemperatureToString(hangMotorLeft.GetMotorTemperature()));
     // frc::SmartDashboard::PutString("Hang_RightMotorTemp", ConvertTemperatureToString(hangMotorRight.GetMotorTemperature()));
