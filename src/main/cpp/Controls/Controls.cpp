@@ -256,23 +256,18 @@ void Controls::doAux() {
             hangMotorLeft = 0;
         }
 
-        if (hangMotorLeft > PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
-            hangMotorLeft = PREFERENCE_CONTROLS.MAX_HANG_SPEED;
-        }
-        if (hangMotorLeft < -PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
-            hangMotorLeft = -PREFERENCE_CONTROLS.MAX_HANG_SPEED;
-        }
-
         if (std::fabs(hangMotorRight) < PREFERENCE_CONTROLS.AXIS_DEADZONE) {
             hangMotorRight = 0;
         }
 
-        if (hangMotorRight > PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
-            hangMotorRight = PREFERENCE_CONTROLS.MAX_HANG_SPEED;
+        if (hangMotorLeft > 0) {
+            leftHang = true;
         }
-        if (hangMotorRight < -PREFERENCE_CONTROLS.MAX_HANG_SPEED) {
-            hangMotorRight = -PREFERENCE_CONTROLS.MAX_HANG_SPEED;
+
+        if (hangMotorRight > 0) {
+            rightHang = true;
         }
+
         if (hang != nullptr)
         {
             if (rightHang && leftHang) {//TEMP, to be removed after hang gets automatic solenoids when doing motors (manual mode right now)
@@ -285,18 +280,18 @@ void Controls::doAux() {
                 hang->setSolenoids(Hang::SolenoidStates::OFF);
             }
 
-            if (hangMotorLeft >= 0.2) {
+            if (hangMotorLeft > 0) {
                 hang->setMotorLeftStateSafe(Hang::motorState::MOVING_UP);
-            } else if (hangMotorLeft <= -0.2) {
+            } else if (hangMotorLeft < 0) {
                 hang->setMotorLeftStateSafe(Hang::motorState::MOVING_DOWN);
             } else {
                 hang->setMotorLeftStateSafe(Hang::motorState::IDLE);
             }
             
 
-            if (hangMotorRight >= 0.2) {
+            if (hangMotorRight > 0) {
                 hang->setMotorRightStateSafe(Hang::motorState::MOVING_UP);
-            } else if (hangMotorRight <= -0.2) {
+            } else if (hangMotorRight < 0) {
                 hang->setMotorRightStateSafe(Hang::motorState::MOVING_DOWN);
             } else {
                 hang->setMotorRightStateSafe(Hang::motorState::IDLE);
@@ -314,9 +309,10 @@ void Controls::doAux() {
 
     if (shooter) {
         if (fire) {
-            shamptake->intakeSpeed = shamptake->FIRE_INTAKE;
-            shamptake->hasNote = false;
+            shamptake->finishedDebouncing = false;
+            shamptake->isDebouncing = false;
             shamptake->trippedBefore = false;
+            shamptake->intakeSpeed = shamptake->FIRE_INTAKE;
         }
         if (arm->isNearPreset(Arm::Presets::AMP)) {
             shamptake->shooterSpeed = shamptake->AMP_SHOOTER;
@@ -328,8 +324,9 @@ void Controls::doAux() {
     }
     
     if (outtake) {
+        shamptake->finishedDebouncing = false;
+        shamptake->isDebouncing = false;
         shamptake->intakeSpeed = shamptake->OUTTAKE_INTAKE;
-        shamptake->hasNote = false;
         shamptake->trippedBefore = false;
     }
 
@@ -428,7 +425,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
         arm->setMotorBrake(true);
     }
     int ledMode = frc::SmartDashboard::GetNumber("thunderdashboard_led_mode", 0.0);
-
+    
     if (ledEnable){
         blink->setLEDMode(BlinkyBlinky::LEDMode::OFF);
     }
@@ -448,7 +445,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
     else if (shamptake->intakeSpeed == Shamptake::IntakeSpeed::NORMAL_INTAKE){
         blink->setLEDMode(BlinkyBlinky::LEDMode::INTAKE);
     }
-    else if (shamptake->hasNote){
+    else if (shamptake->trippedBefore){
         blink->setLEDMode(BlinkyBlinky::LEDMode::HAS_GAMEPIECE);
     }
     else if (ampLight){
@@ -478,7 +475,6 @@ void Controls::doSwitchPanel(bool isDissabled) {
 
 void Controls::sendFeedback() {
     frc::SmartDashboard::PutString("Arm_currentmode", armMode ? "arm mode" : "hang mode");
-    frc::SmartDashboard::PutNumber("Hang_Speed", PREFERENCE_CONTROLS.MAX_HANG_SPEED);
     //frc::SmartDashboard::PutNumber("Arm_Speed", armSpeed);
 
 }

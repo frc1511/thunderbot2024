@@ -27,7 +27,8 @@ struct PID_t
 struct PreferencesControls
 {
     double MAX_ARM_SPEED = 0.5;
-    double MAX_HANG_SPEED = 0.2;
+    double MAX_HANG_UP_SPEED = 0.6;
+    double MAX_HANG_DOWN_SPEED = 0.4;
     double AXIS_DEADZONE = 0.1;
 };
 static PreferencesControls PREFERENCE_CONTROLS;
