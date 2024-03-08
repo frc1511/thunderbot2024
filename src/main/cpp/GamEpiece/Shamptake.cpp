@@ -35,6 +35,10 @@ void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutNumber("Shamptake_shooterTargetRPM", targetShooterRPM);
     frc::SmartDashboard::PutNumber("Shamptake_shooterAtTargetRPM", atTargetRPM());
     frc::SmartDashboard::PutBoolean("Shamptake_shooterAtRPM", atTargetRPM());
+
+    frc::SmartDashboard::PutBoolean("Shamptake_debouncing", isDebouncing);
+    frc::SmartDashboard::PutBoolean("Shamptake_debouncingFinished", finishedDebouncing);
+    frc::SmartDashboard::PutNumber("Shamptake_debouncingStep", step);
 }
 
 bool Shamptake::isNoteSensorTripped()
@@ -88,9 +92,14 @@ void Shamptake::process() {
         if (trippedBefore) { // Past Sensor
             //sleep(0.7);
             intakeSpeed = IntakeSpeed::STOP_INTAKE;
-            if (autoIntaking) {
-                autoIntaking = false;
-                stopIntake();
+            if (!finishedDebouncing && !isDebouncing) {
+                step = 0;
+                isDebouncing = true;
+            } else {
+                if (autoIntaking) {
+                    autoIntaking = false;
+                    stopIntake();
+                }
             }
         } else { // Before Sensor
             intakeSpeed = IntakeSpeed::NORMAL_INTAKE;
@@ -98,8 +107,8 @@ void Shamptake::process() {
     } else { // Sensor Tripped
         intakeSpeed = IntakeSpeed::SLOW_INTAKE;
         trippedBefore = true;
-        hasNote = true;
     }
+    debounceNote();
 
     if (autoShooting) {
         if (atTargetRPM() && notIntaking()) {
@@ -184,4 +193,26 @@ void Shamptake::stopShooter() {
 void Shamptake::stop() {
     stopIntake();
     stopShooter();
+}
+
+void Shamptake::debounceNote() {
+    if (isDebouncing && !finishedDebouncing) {
+        if (step == 0 && !isNoteSensorTripped()) {
+            // outake
+            intakeSpeed = IntakeSpeed::OUTTAKE_INTAKE;
+            step++;
+        }
+        else if (step == 1 && isNoteSensorTripped()) {
+            //intake
+            intakeSpeed = IntakeSpeed::SLOW_INTAKE;
+            step++;
+        }
+        else if (step == 2 && !isNoteSensorTripped()) {
+            // stop
+            finishedDebouncing = true;
+            isDebouncing = false;
+            intakeSpeed = IntakeSpeed::STOP_INTAKE;
+            step++;
+        }
+    }
 }

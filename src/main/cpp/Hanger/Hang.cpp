@@ -62,14 +62,14 @@ void Hang::process() {
             break;
         case MOVING_UP:
             if (isLeftRelayOn() && !isLeftPawlOpen() && getLeftMotorPosition() >= -PREFERENCE_HANG.MAX_POSTION) {
-                hangMotorLeft.Set(-0.2);
+                hangMotorLeft.Set(-PREFERENCE_CONTROLS.MAX_HANG_UP_SPEED);
             } else {
                 hangMotorLeft.Set(0);
             }
             break;
         case MOVING_DOWN:
             if (!isLeftReflectiveSensorTripped()) {
-                hangMotorLeft.Set(0.2);
+                hangMotorLeft.Set(PREFERENCE_CONTROLS.MAX_HANG_DOWN_SPEED);
             } else {
                 hangLeftEncoder.SetPosition(0);
                 hangMotorLeft.Set(0);
@@ -112,14 +112,14 @@ void Hang::process() {
             break;
         case MOVING_UP:
             if (isRightRelayOn() && !isRightPawlOpen() && getRightMotorPosition() <= PREFERENCE_HANG.MAX_POSTION) {
-                hangMotorRight.Set(0.2);
+                hangMotorRight.Set(PREFERENCE_CONTROLS.MAX_HANG_UP_SPEED);
             } else {
                 hangMotorRight.Set(0);
             }
             break;
         case MOVING_DOWN:
             if (!isRightReflectiveSensorTripped()) {
-                hangMotorRight.Set(-0.2);
+                hangMotorRight.Set(-PREFERENCE_CONTROLS.MAX_HANG_DOWN_SPEED);
             } else {
                 hangMotorRight.Set(0);
                 hangRightEncoder.SetPosition(0);

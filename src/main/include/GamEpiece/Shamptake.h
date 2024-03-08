@@ -71,13 +71,15 @@ class Shamptake : public Mechanism{
     bool trippedBefore = false;
     bool autoIntaking = false;
     bool autoShooting = false;
-    bool hasNote = false;
 
     frc::Timer shooterTimer;
 
-
+    
+    bool isDebouncing = false;
+    bool finishedDebouncing = false;
   private:
     void intake(double power);
+    void debounceNote();
     std::string intakeModeString();
     rev::SparkPIDController shooterMotorRightPIDController;
     rev::SparkRelativeEncoder shooterMotorRightEncoder;
@@ -85,6 +87,7 @@ class Shamptake : public Mechanism{
     rev::SparkRelativeEncoder shooterMotorLeftEncoder;
     double targetShooterRPM = 0;
     bool isAuto = false;
+    int step = 0;
 
     double presetIntakeSpeeds [IntakeSpeed::MAX_INTAKE_SPEED] = {
         0.9,
