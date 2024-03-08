@@ -65,6 +65,10 @@ void Hang::process() {
                 hangMotorLeft.Set(-PREFERENCE_CONTROLS.MAX_HANG_UP_SPEED);
             } else {
                 hangMotorLeft.Set(0);
+                if (isLeftRelayOn() && isLeftPawlOpen()) {
+                    backtrackingLeftCheckTimer.Restart();
+                    leftMotorState = motorState::AWAITING_CHECK;
+                }
             }
             break;
         case MOVING_DOWN:
@@ -115,6 +119,10 @@ void Hang::process() {
                 hangMotorRight.Set(PREFERENCE_CONTROLS.MAX_HANG_UP_SPEED);
             } else {
                 hangMotorRight.Set(0);
+                if (isRightRelayOn() && isRightPawlOpen()) {
+                    backtrackingRightCheckTimer.Restart();
+                    rightMotorState = motorState::AWAITING_CHECK;
+                }
             }
             break;
         case MOVING_DOWN:
