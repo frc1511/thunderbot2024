@@ -42,7 +42,8 @@ class Shamptake : public Mechanism{
     bool notShooting();
     bool notIntaking();
     bool hasGamepiece();
-    
+    void overrideGamePieceState(bool state);
+
     void autoIntake();
     void autoShoot();
 
@@ -54,6 +55,7 @@ class Shamptake : public Mechanism{
         SLOW_INTAKE,
         FIRE_INTAKE,
         OUTTAKE_INTAKE,
+        DEBOUNCE_INTAKE,
         MAX_INTAKE_SPEED
     };
 
@@ -77,7 +79,7 @@ class Shamptake : public Mechanism{
 
     frc::Timer shooterTimer;
 
-    void controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton);
+    void controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton, bool overrideGamePieceYes, bool overrideGamePieceNo);
 
     void autoSetToPreloadedState();
 
@@ -105,7 +107,8 @@ class Shamptake : public Mechanism{
         0,
         0.4,
         0.8,
-        -0.4
+        -0.4,
+        0.3
     };
     double presetShooterSpeeds [ShooterSpeed::MAX_SHOOTER_SPEED] = {
         0,

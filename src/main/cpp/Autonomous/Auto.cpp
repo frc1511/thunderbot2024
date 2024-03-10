@@ -128,6 +128,7 @@ void Auto::havoc() {
 
 void Auto::basic_loc_1() {
     if (step == 0 && arm->isMoveDone()) {
+        shamptake->autoSetToPreloadedState();
         frc::Pose2d initPose(paths->at(Path::BASIC_LOC_1).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         arm->moveToPreset(Arm::Presets::SUBWOOFER);
@@ -141,7 +142,7 @@ void Auto::basic_loc_1() {
         shamptake->autoIntake();
         step++;
     } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
-        arm->moveToPreset(Arm::Presets::STAGE);
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
         step++;
     } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
@@ -149,6 +150,7 @@ void Auto::basic_loc_1() {
     } else if (step == 5 && shamptake->notShooting()) {
         frc::Pose2d finPose(paths->at(Path::BASIC_LOC_1).getFinalPose());
         drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
+        shamptake->overrideGamePieceState(false);
         step++;
     }
 }
@@ -169,7 +171,7 @@ void Auto::basic_loc_2() {
         shamptake->autoIntake();
         step++;
     } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
-        arm->moveToPreset(Arm::Presets::STAGE);
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
         step++;
     } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
@@ -177,6 +179,7 @@ void Auto::basic_loc_2() {
     } else if (step == 5 && shamptake->notShooting()) {
         frc::Pose2d finPose(paths->at(Path::BASIC_LOC_2).getFinalPose());
         drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
+        shamptake->overrideGamePieceState(false);
         step++;
     }
 }
@@ -204,6 +207,7 @@ void Auto::basic_loc_3() {
     } else if (step == 5 && shamptake->notShooting()) {
         frc::Pose2d finPose(paths->at(Path::BASIC_LOC_3).getFinalPose());
         drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
+        shamptake->overrideGamePieceState(false);
         step++;
     }
 }

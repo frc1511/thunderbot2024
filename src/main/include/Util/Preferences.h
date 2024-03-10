@@ -57,8 +57,8 @@ struct PreferencesDrive
     units::radians_per_second_squared_t DRIVE_AUTO_MAX_ANG_ACCEL = 3.14_rad_per_s_sq;
 
     units::meters_per_second_t DRIVE_MANUAL_MAX_VEL = 5_mps;
-    units::degrees_per_second_t DRIVE_MANUAL_MAX_ANG_VEL = 360_deg_per_s;
-    units::radians_per_second_squared_t DRIVE_MANUAL_MAX_ANG_ACCEL = 6.28_rad_per_s_sq;
+    units::degrees_per_second_t DRIVE_MANUAL_MAX_ANG_VEL = 540_deg_per_s;
+    units::radians_per_second_squared_t DRIVE_MANUAL_MAX_ANG_ACCEL = 9.42_rad_per_s_sq;
 
     PreferencesDrive()
     {
@@ -120,7 +120,7 @@ struct PreferencesArm
     PreferencesArm()
     {
         PID.Kp = 0.03;
-        PID.Ki = 0.001;
+        PID.Ki = 0.002;
         PID.MaxVel = 90_deg_per_s;
         PID.MaxAccel = 90_deg_per_s_sq;
         AMP_PID.Kp = 0.01;

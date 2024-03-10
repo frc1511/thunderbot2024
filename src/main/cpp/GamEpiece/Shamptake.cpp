@@ -45,6 +45,8 @@ void Shamptake::configureShooterMotors() {
 }
 
 void Shamptake::sendFeedback() {
+    frc::SmartDashboard::PutNumber("Shamptake_shooterTimeout", autoPreheatTimeout.Get().value());
+    frc::SmartDashboard::PutNumber("Shamptake_intakeTimeout", autoIntakeTimeout.Get().value());
     frc::SmartDashboard::PutString("Shamptake_intakeMode", intakeModeString());
     frc::SmartDashboard::PutNumber("Shamptake_shooterLeftRPM", shooterMotorLeftEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Shamptake_shooterRightRPM", shooterMotorRightEncoder.GetVelocity());
@@ -138,7 +140,7 @@ void Shamptake::process() {
         autoSetToPreloadedState();
     }
     if (autoShooting) {
-        if ((atTargetRPM() || autoPreheatTimeout.Get() >= 1.5_s) && autoIntakeFinished()) {
+        if (((atTargetRPM() && autoIntakeFinished()) || autoPreheatTimeout.Get() >= 1.5_s)) {
             autoPreheatTimeout.Stop();
             autoIntakeTimeout.Stop();
             intakeSpeed = IntakeSpeed::FIRE_INTAKE;
@@ -254,7 +256,7 @@ void Shamptake::debounceNote() {
         else if (step == 1) {
             if (isNoteSensorTripped()) {
                 //intake
-                intakeSpeed = IntakeSpeed::SLOW_INTAKE;
+                intakeSpeed = IntakeSpeed::DEBOUNCE_INTAKE;
                 step++;
             } else {
                 intakeSpeed = IntakeSpeed::OUTTAKE_INTAKE;
@@ -268,16 +270,30 @@ void Shamptake::debounceNote() {
                 intakeSpeed = IntakeSpeed::STOP_INTAKE;
                 step++;
             } else {
-                intakeSpeed = IntakeSpeed::SLOW_INTAKE;
+                intakeSpeed = IntakeSpeed::DEBOUNCE_INTAKE;
             }
         }
     }
 }
 
+void Shamptake::overrideGamePieceState(bool state) {
+    trippedBefore = state;
+    isDebouncing = false;
+    finishedDebouncing = state;
+    autoIntaking = false;
+    printf("Override\n");
+}
+
 bool Shamptake::autoIntakeFinished() {
     return hasGamepiece() && finishedDebouncing && !isDebouncing && notIntaking();
 }
-void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton) {
+void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton, bool overrideGamePieceYes, bool overrideGamePieceNo) {
+    if (overrideGamePieceYes) {
+        overrideGamePieceState(true);
+    }
+    if (overrideGamePieceNo) {
+        overrideGamePieceState(false);
+    }
     if (!intakeButton) {
         intakeSpeed = STOP_INTAKE;
     }

@@ -39,7 +39,7 @@ void Controls::process() {
             doAux();
         }
     } else {
-        shamptake->controlProcess(false, false, false, false);
+        shamptake->controlProcess(false, false, false, false, false, false);
     }
 }
 
@@ -301,7 +301,7 @@ void Controls::doAux() {
     }
 
     //SHAMPTAKE
-    shamptake->controlProcess(intake, outtake, fire, shooter);
+    shamptake->controlProcess(intake, outtake, fire, shooter, overrideGamePieceYes, overrideGamePieceNo);
 }
 
 void Controls::doAuxManual() {
@@ -353,7 +353,6 @@ void Controls::doSwitchPanel(bool isDissabled) {
     }
     else if (hangModeControls){
         blink->setLEDMode(BlinkyBlinky::LEDMode::HANG_MODE);
-
     }
     else if (shouldStrobe){
         blink->setLEDMode(BlinkyBlinky::LEDMode::PARTY);
@@ -361,10 +360,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
     else if (fire){
         blink->setLEDMode(BlinkyBlinky::LEDMode::SCORE);
     }
-    else if (shamptake->intakeSpeed == Shamptake::IntakeSpeed::NORMAL_INTAKE){
-        blink->setLEDMode(BlinkyBlinky::LEDMode::INTAKE);
-    }
-    else if (shamptake->trippedBefore){
+    else if (shamptake->hasGamepiece()){
         blink->setLEDMode(BlinkyBlinky::LEDMode::HAS_GAMEPIECE);
     }
     else if (ampLight){
@@ -375,6 +371,9 @@ void Controls::doSwitchPanel(bool isDissabled) {
     }
     else if (sourceLight){
         blink->setLEDMode(BlinkyBlinky::LEDMode::SOURCE);
+    }
+    else if (shamptake->intakeSpeed == Shamptake::IntakeSpeed::NORMAL_INTAKE){
+        blink->setLEDMode(BlinkyBlinky::LEDMode::INTAKE);
     }
     else {
         if (getCurrentMode () == MatchMode::DISABLED){
