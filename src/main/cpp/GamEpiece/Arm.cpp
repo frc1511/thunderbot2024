@@ -4,6 +4,15 @@
 #include <basic/Settings.h>
 
 Arm::Arm() {
+    configureMotors();
+}
+
+Arm::~Arm() {
+    
+}
+void Arm::configureMotors() {
+    armMotor.RestoreFactoryDefaults();
+    armBrake.RestoreFactoryDefaults();
     armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
     armMotor.SetInverted(false);
     armBrake.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
@@ -12,11 +21,6 @@ Arm::Arm() {
     armPIDController.Reset(getBoreDegrees());
     forwardarmLimitSwitch.EnableLimitSwitch(true);
 }
-
-Arm::~Arm() {
-    
-}
-
 void Arm::process()
 {
     if (!settings.isCraterMode) {
@@ -35,6 +39,7 @@ void Arm::sendFeedback() {
     //frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
     frc::SmartDashboard::PutNumber("Arm_targetAngle", targetAngle.value());
+    frc::SmartDashboard::PutBoolean("Arm_atTargetAngle", isMoveDone());
     frc::SmartDashboard::PutBoolean("Arm_legal", withinLegalLimit());
     frc::SmartDashboard::PutBoolean("Arm_Braked", braked);
     frc::SmartDashboard::PutBoolean("Arm_NearAMP", isNearPreset(Presets::AMP));
@@ -48,7 +53,9 @@ bool Arm::withinLegalLimit() {
     return legal;
 }
 void Arm::doPersistentConfiguration() {
-    
+    configureMotors();
+    armMotor.BurnFlash();
+    armBrake.BurnFlash();
 }
 
 void Arm::resetToMode(MatchMode mode) {
@@ -57,15 +64,20 @@ void Arm::resetToMode(MatchMode mode) {
     armPIDController.Reset(getBoreDegrees());
     if (mode == MatchMode::AUTO || mode == MatchMode::TELEOP) {
         //disengageBrake();
-        moveToAngle(getBoreDegrees() + 5_deg);
+        moveToAngle(getBoreDegrees() + 10_deg);
     }
 }
 
 void Arm::setMotorBrake(bool armBrakeOn) {
+    rev::CANSparkBase::IdleMode currentMode = armMotor.GetIdleMode();
     if (armBrakeOn) {
-        armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+        if (currentMode != rev::CANSparkBase::IdleMode::kBrake) {
+            armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+        }
     } else {
-        armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+        if (currentMode != rev::CANSparkBase::IdleMode::kCoast) {
+            armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+        }
     }
 }
 

@@ -87,7 +87,7 @@ private:
         30_deg,
         90_deg,
         10_deg,
-        20.3_deg,
+        22.3_deg,
         5_deg
     };
 
@@ -123,4 +123,7 @@ private:
         PREFERENCE_ARM.PID.Kp, PREFERENCE_ARM.PID.Ki, PREFERENCE_ARM.PID.Kd, 
         frc::TrapezoidProfile<units::degrees>::Constraints(PREFERENCE_ARM.PID.MaxVel, PREFERENCE_ARM.PID.MaxAccel)
     };
+
+    void configureMotors();
+
 };

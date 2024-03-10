@@ -2,6 +2,7 @@
 
 #include <Basic/IOMap.h>
 #include <Util/Preferences.h>
+#include <GamEpiece/Arm.h>
 
 #include <rev/CANSparkMax.h>
 #include <rev/SparkPIDController.h>
@@ -20,7 +21,7 @@ class Shamptake : public Mechanism{
   //rev::CANSparkMax intakeMotor2 {2, rev::CANSparkMax::MotorType::kBrushless};
 
   public:
-    Shamptake();
+    Shamptake(Arm* _arm/*, Auto* _auto*/);
     ~Shamptake();
 
     void process() override;
@@ -72,9 +73,12 @@ class Shamptake : public Mechanism{
     bool autoIntaking = false;
     bool autoShooting = false;
 
+    bool autoIntakeFinished();
+
     frc::Timer shooterTimer;
 
-    
+    void controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton);
+
     bool isDebouncing = false;
     bool finishedDebouncing = false;
   private:
@@ -85,6 +89,8 @@ class Shamptake : public Mechanism{
     rev::SparkRelativeEncoder shooterMotorRightEncoder;
     rev::SparkPIDController shooterMotorLeftPIDController;
     rev::SparkRelativeEncoder shooterMotorLeftEncoder;
+    Arm* arm;
+    //Auto* autoCode; //Was working with this, but had to leave. Probably just didnt use it right, if i dont fix it, then can someone else try? Thx, 
     double targetShooterRPM = 0;
     bool isAuto = false;
     int step = 0;
@@ -100,8 +106,9 @@ class Shamptake : public Mechanism{
         0,
         5000,
         1000,
-        4300
+        4000
     };
+    void configureShooterMotors();
 };
 
 

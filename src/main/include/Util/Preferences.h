@@ -133,13 +133,13 @@ struct PreferencesShamptake
 {
     PID_t PID_LEFT;
     PID_t PID_RIGHT;
-
+    double VELOCITY_NOISE = 5;
     PreferencesShamptake()
     {
-        PID_LEFT.Kp = 0.0002;
+        PID_LEFT.Kp = 0.0004;
         PID_LEFT.Kff = 0.000170;
 
-        PID_RIGHT.Kp = 0.0002;
+        PID_RIGHT.Kp = 0.0004;
         PID_RIGHT.Kff = 0.000170;
     }
 };

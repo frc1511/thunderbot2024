@@ -22,8 +22,6 @@ void Controls::resetToMode(MatchMode mode) { }
 void Controls::process() {
     driveController.process();
     auxController.process();
-    doAux();
-
 
     doSwitchPanel(false);
     if (callaDisable) {
@@ -33,14 +31,14 @@ void Controls::process() {
         doDrive();
     }
 
-    // if (!sashaDisable) {
-    //     if (manualAux) {
-    //         doAuxManual();
-    //     }
-    //     else {
-    //         doAux();
-    //     }
-    // }
+    if (!sashaDisable) {
+        if (manualAux) {
+            doAuxManual();
+        }
+        else {
+            doAux();
+        }
+    }
 }
 
 void Controls::processInDisabled() {
@@ -60,15 +58,23 @@ void Controls::processInDisabled() {
     }
 }
 
-bool Controls::getShouldPersistConfig() {
+bool Controls::getShouldPersistConfig() { //this will flash ALL motor controllers, use sparingly and probably only when swapping controllers
     doSwitchPanel(false);
 
     using DriveButton = DriveControllerType::Button;
     using AuxButton = AuxControllerType::Button;
 
-    return settings.isCraterMode
-        && driveController.getButton(DriveButton::TRIANGLE) && driveController.getDPad() == ThunderGameController::DPad::DOWN
-        && auxController.getButton(AuxButton::CROSS) && auxController.getDPad() == ThunderGameController::DPad::UP;
+    return ledEnable &&
+           callaDisable &&
+           debugMode &&
+           driveController.getButton(DriveButton::LEFT_BUMPER) &&
+           driveController.getButton(DriveButton::RIGHT_BUMPER) &&
+           driveController.getButton(DriveButton::LEFT_STICK) &&
+           driveController.getButton(DriveButton::RIGHT_STICK) &&
+           auxController.getButton(AuxButton::LEFT_BUMPER) &&
+           auxController.getButton(AuxButton::RIGHT_BUMPER) &&
+           auxController.getButton(AuxButton::LEFT_STICK) &&
+           auxController.getButton(AuxButton::RIGHT_STICK);
 }
 
 void Controls::doDrive() {
@@ -130,7 +136,7 @@ void Controls::doDrive() {
 
     if (resetOdometry) {
         drive->resetOdometry();
-        driveAbsAngle = drive->getEstimatedPose().Rotation().Radians();
+        //driveAbsAngle = drive->getEstimatedPose().Rotation().Radians();
     }
 
     if (calIMU) {
@@ -303,86 +309,7 @@ void Controls::doAux() {
     }
 
     //SHAMPTAKE
-    if (!intake) {
-        shamptake->intakeSpeed = shamptake->STOP_INTAKE;
-    }
-
-    if (shooter) {
-        if (fire) {
-            shamptake->finishedDebouncing = false;
-            shamptake->isDebouncing = false;
-            shamptake->trippedBefore = false;
-            shamptake->intakeSpeed = shamptake->FIRE_INTAKE;
-        }
-        if (arm->isNearPreset(Arm::Presets::AMP)) {
-            shamptake->shooterSpeed = shamptake->AMP_SHOOTER;
-        } else {
-            shamptake->shooterSpeed = shamptake->FIRE_SHOOTER;
-        }
-    } else {
-        shamptake->stopShooter();
-    }
-    
-    if (outtake) {
-        shamptake->finishedDebouncing = false;
-        shamptake->isDebouncing = false;
-        shamptake->intakeSpeed = shamptake->OUTTAKE_INTAKE;
-        shamptake->trippedBefore = false;
-    }
-
-   /* if (!armmode){
-        //HANG
-        // Hang stuff - MAKE A FUNCTION OUTTA THIS STUFF
-        
-
-        if (std::fabs(hangMotorLeft) < AXIS_DEADZONE) {
-            hangMotorLeft = 0;
-        }
-
-        if (hangMotorLeft > MAX_HANG_SPEED) {
-            hangMotorLeft = MAX_HANG_SPEED;
-        }
-        if (hangMotorLeft < -MAX_HANG_SPEED) {
-            hangMotorLeft = -MAX_HANG_SPEED;
-        }
-
-        if (std::fabs(hangMotorRight) < AXIS_DEADZONE) {
-            hangMotorRight = 0;
-        }
-
-        if (hangMotorRight > MAX_HANG_SPEED) {
-            hangMotorRight = MAX_HANG_SPEED;
-        }
-        if (hangMotorRight < -MAX_HANG_SPEED) {
-            hangMotorRight = -MAX_HANG_SPEED;
-        }
-        if (hang != nullptr)
-        {
-            if (otherPreset && linePreset) {//TEMP, to be removed after hang gets automatic solenoids when doing motors (manual mode right now)
-                hang->setSolenoids(Hang::SolenoidStates::BOTH);
-            } else if (otherPreset) {
-                hang->setSolenoids(Hang::SolenoidStates::LEFT);
-            } else if (linePreset) {
-                hang->setSolenoids(Hang::SolenoidStates::RIGHT);
-            } else {
-                hang->setSolenoids(Hang::SolenoidStates::OFF);
-            }
-            hang->setMotorLeftSpeed(-hangMotorLeft);
-            hang->setMotorRightSpeed(hangMotorRight);
-        }
-    }
-    // if (armModeToggle){
-    //     armMode = !armMode;
-    //     armModeToggle = false;
-    // }
-    //HANG
-    if (hangModeControls == true){
-         hang and trap controls 
-
-
-        
-       
-    }*/
+    shamptake->controlProcess(intake, outtake, fire, shooter);
 }
 
 void Controls::doAuxManual() {

@@ -42,6 +42,7 @@ private:
     void doAux();
     void doAuxManual();
     void doSwitchPanel(bool isDissabled);
+    bool ledEnable = false;
     bool driveLockX = false;
     bool manualAux = false;
     bool ampLight = false;

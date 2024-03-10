@@ -63,11 +63,14 @@ void Auto::process() { //called during auto
         case BASIC_LOC_3:
             basic_loc_3();
             break;
+        case SQUARE:
+            squareTest();
+            break;
     }
 }
 
 void Auto::test() { //test auto, leave, grab a note, and shoot
-    if (step == 0) {
+    if (step == 0 && arm->isMoveDone()) {
         frc::Pose2d initPose(paths->at(Path::SPEAKER_1).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         drive->runTrajectory(&paths->at(Path::SPEAKER_1), actions);
@@ -79,7 +82,7 @@ void Auto::test() { //test auto, leave, grab a note, and shoot
 }
 
 void Auto::speaker1() {
-    if (step == 0) {
+    if (step == 0 && arm->isMoveDone()) {
         //Make shamptake function to make shooter go fast
         arm->moveToPreset(Arm::Presets::MEDIUM);
         frc::Pose2d initPose(paths->at(Path::SPEAKER_1).getInitialPose());
@@ -103,7 +106,7 @@ void Auto::speaker2() {
         shamptake->autoIntake();
         drive->runTrajectory(&paths->at(Path::SPEAKER_2_STAGE_2), actions);
         step++;
-    } else if (step == 5 && drive->isFinished() && shamptake->hasGamepiece()) {
+    } else if (step == 5 && drive->isFinished() && shamptake->autoIntakeFinished()) {
         arm->moveToPreset(Arm::Presets::MEDIUM);
         step++;
     } else if (step == 6 && arm->isMoveDone()) {
@@ -115,7 +118,7 @@ void Auto::speaker2() {
 }
 
 void Auto::havoc() {
-    if (step == 0) {
+    if (step == 0 && arm->isMoveDone()) {
         frc::Pose2d initPose(paths->at(Path::HAVOC).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         drive->runTrajectory(&paths->at(Path::HAVOC), actions);
@@ -124,7 +127,7 @@ void Auto::havoc() {
 }
 
 void Auto::basic_loc_1() {
-    if (step == 0) {
+    if (step == 0 && arm->isMoveDone()) {
         frc::Pose2d initPose(paths->at(Path::BASIC_LOC_1).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         arm->moveToPreset(Arm::Presets::SUBWOOFER);
@@ -137,8 +140,8 @@ void Auto::basic_loc_1() {
         arm->moveToPreset(Arm::Presets::BASE);
         shamptake->autoIntake();
         step++;
-    } else if (step == 3 && shamptake->hasGamepiece() && drive->isFinished() && arm->isMoveDone()) {
-        arm->moveToPreset(Arm::Presets::LINE);
+    } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
+        arm->moveToPreset(Arm::Presets::MEDIUM);
         step++;
     } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
@@ -149,29 +152,34 @@ void Auto::basic_loc_1() {
 }
 
 void Auto::basic_loc_2() {
-    if (step == 0) {
+    if (step == 0 && arm->isMoveDone()) {
+        preloaded = true;
         frc::Pose2d initPose(paths->at(Path::BASIC_LOC_2).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
-        arm->moveToPreset(Arm::Presets::SUBWOOFER);
+        arm->moveToPreset(Arm::Presets::BASE);
         step++;
     } else if (step == 1 && arm->isMoveDone()) {
         shamptake->autoShoot();
+        preloaded = false;
         step++;
     } else if (step == 2 && shamptake->notShooting()) {
         drive->runTrajectory(&paths->at(Path::BASIC_LOC_2), actions);
         arm->moveToPreset(Arm::Presets::BASE);
         shamptake->autoIntake();
         step++;
-    } else if (step == 3 && shamptake->hasGamepiece() && drive->isFinished() && arm->isMoveDone()) {
+    } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
+        arm->moveToPreset(Arm::Presets::LINE);
+        step++;
+    } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
         step++;
-    } else if (step == 4 && shamptake->notShooting()) {
+    } else if (step == 5 && shamptake->notShooting()) {
         step++;
     }
 }
 
 void Auto::basic_loc_3() {
-    if (step == 0) {
+    if (step == 0 && arm->isMoveDone()) {
         frc::Pose2d initPose(paths->at(Path::BASIC_LOC_3).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         arm->moveToPreset(Arm::Presets::SUBWOOFER);
@@ -184,13 +192,22 @@ void Auto::basic_loc_3() {
         arm->moveToPreset(Arm::Presets::BASE);
         shamptake->autoIntake();
         step++;
-    } else if (step == 3 && shamptake->hasGamepiece() && drive->isFinished() && arm->isMoveDone()) {
-        arm->moveToPreset(Arm::Presets::LINE);
+    } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
+        arm->moveToPreset(Arm::Presets::MEDIUM);
         step++;
     } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
         step++;
     } else if (step == 5 && shamptake->notShooting()) {
+        step++;
+    }
+}
+
+    void Auto::squareTest() {
+        if (step == 0 && arm->isMoveDone()) {
+        frc::Pose2d initPose(paths->at(Path::SQUARE).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        drive->runTrajectory(&paths->at(Path::SQUARE), actions);
         step++;
     }
 }
@@ -211,8 +228,17 @@ void Auto::doNothing() {
     // Well technically it's doing something - chris(2023)
 }
 
+void Auto::autoSelectorInit() {
+    autoSelector.SetDefaultOption("Do Nothing", 0);
+    autoSelector.AddOption("2 Note Loc 1", 4);
+    autoSelector.AddOption("2 Note Loc 2", 5);
+    autoSelector.AddOption("2 Note Loc 3", 6);
+    autoSelector.AddOption("Square test" , 7);
+}
+
 void Auto::sendFeedback() {
-    int desiredAutoMode = static_cast<int>(frc::SmartDashboard::GetNumber("Auto_Mode", 0.0));
+    //int desiredAutoMode = static_cast<int>(frc::SmartDashboard::GetNumber("Auto_Mode", 0.0));
+    int desiredAutoMode = autoSelector.GetSelected();
     if (desiredAutoMode < (int)autoModeNames.size() && desiredAutoMode >= 0) {
         mode = static_cast<AutoMode>(desiredAutoMode);
     }
@@ -220,6 +246,8 @@ void Auto::sendFeedback() {
         mode = AutoMode::DO_NOTHING;
     }
 
+    frc::SmartDashboard::PutData("Auto Modes", &autoSelector);
+    
 
     frc::SmartDashboard::PutNumber("Autonomous_Step", step);
     frc::SmartDashboard::PutBoolean("Autonomous_DriveFinished", drive->isFinished());

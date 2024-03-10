@@ -7,6 +7,7 @@
 #include <frc/Timer.h>
 #include <Drive/CSVTrajectory.h>
 #include <Autonomous/Action.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 #define DEPLOY_DIR "/home/lvuser/deploy/"
 
@@ -19,6 +20,10 @@ public:
     void sendFeedback() override;
     void resetToMode(MatchMode mode) override;
 
+    frc::SendableChooser<int> autoSelector;
+    void autoSelectorInit();
+    bool isPreloaded();
+
 private:
     enum class AutoMode
     {
@@ -29,16 +34,20 @@ private:
         BASIC_LOC_1  = 4,
         BASIC_LOC_2  = 5,
         BASIC_LOC_3  = 6,
-        TEST         = 7
+        SQUARE       = 7,
+        TEST         = 8
     };
     Drive *drive;
     Shamptake *shamptake;
     Arm *arm;
 
+    bool preloaded = false;
+
     Auto::AutoMode mode = AutoMode::DO_NOTHING;
 
     frc::Timer delayTimer,
                autoTimer;
+
 
     void doNothing();
     void test();
@@ -48,6 +57,7 @@ private:
     void basic_loc_1();
     void basic_loc_2();
     void basic_loc_3();
+    void squareTest();
 
     const std::map<AutoMode, const char*> autoModeNames {
         { AutoMode::DO_NOTHING,     "Do Nothing"        },
@@ -57,6 +67,7 @@ private:
         { AutoMode::BASIC_LOC_1,    "Shamptake Loc 1"   },
         { AutoMode::BASIC_LOC_2,    "Shamptake Loc 2"   },
         { AutoMode::BASIC_LOC_3,    "Shamptake Loc 3"   },
+        { AutoMode::SQUARE,         "Square Test"       },
         { AutoMode::TEST,           "Test"              }
 
     };
@@ -68,7 +79,8 @@ private:
         HAVOC,
         BASIC_LOC_1,
         BASIC_LOC_2,
-        BASIC_LOC_3
+        BASIC_LOC_3,
+        SQUARE
     };
     const std::map<Path, CSVTrajectory> bluePaths {
         { Path::SPEAKER_1,          CSVTrajectory{ DEPLOY_DIR "ThunderAuto/speaker_1.csv",          false } },
@@ -76,7 +88,9 @@ private:
         { Path::HAVOC,              CSVTrajectory{ DEPLOY_DIR "ThunderAuto/havoc.csv",              false } },
         { Path::BASIC_LOC_1,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_1.csv",     false } },
         { Path::BASIC_LOC_2,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_2.csv",     false } },
-        { Path::BASIC_LOC_3,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_3.csv",     false } }
+        { Path::BASIC_LOC_3,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_3.csv",     false } },
+        { Path::SQUARE,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/square_test.csv",        false } }
+
     };
     const std::map<Path, CSVTrajectory> redPaths {
         { Path::SPEAKER_1,          CSVTrajectory{ DEPLOY_DIR "ThunderAuto/speaker_1.csv",          true  } },
@@ -84,11 +98,14 @@ private:
         { Path::HAVOC,              CSVTrajectory{ DEPLOY_DIR "ThunderAuto/havoc.csv",              true  } },
         { Path::BASIC_LOC_1,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_1.csv",     true  } },
         { Path::BASIC_LOC_2,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_2.csv",     true  } },
-        { Path::BASIC_LOC_3,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_3.csv",     true  } }
+        { Path::BASIC_LOC_3,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_3.csv",     true  } },
+        { Path::SQUARE,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/square_test.csv",        true  } }
     };
     const std::map<Path, CSVTrajectory>* paths = nullptr;
 
     std::map<u_int32_t, Action*> actions {
 
     };
+
+    std::string autoSelected;
 };

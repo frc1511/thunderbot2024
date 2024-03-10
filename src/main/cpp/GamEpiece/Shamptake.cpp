@@ -1,12 +1,33 @@
 #include <GamEpiece/Shamptake.h>
+#include <Util/Preferences.h>
 
-Shamptake::Shamptake()
+Shamptake::Shamptake(Arm* _arm) //, Auto* _auto)
 : shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
   shooterMotorRightEncoder(shooterMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
   shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()),
-  shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)) {
+  shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  arm(_arm) {
+    configureShooterMotors();
+    stop();
+}
+
+
+Shamptake::~Shamptake() {
+    
+}
+
+void Shamptake::configureShooterMotors() {
+    shooterMotorLeft.RestoreFactoryDefaults();
+    shooterMotorRight.RestoreFactoryDefaults();
+    intakeMotor1.RestoreFactoryDefaults();
+    intakeMotor1.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+
+
     shooterMotorRight.SetInverted(false);
     shooterMotorLeft.SetInverted(true);
+
+    shooterMotorRight.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
+    shooterMotorLeft.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
 
     shooterMotorRightPIDController.SetP(PREFERENCE_SHAMPTAKE.PID_RIGHT.Kp);
     shooterMotorRightPIDController.SetI(PREFERENCE_SHAMPTAKE.PID_RIGHT.Ki);
@@ -21,11 +42,6 @@ Shamptake::Shamptake()
     shooterMotorLeftPIDController.SetIZone(PREFERENCE_SHAMPTAKE.PID_LEFT.Kizone);
     shooterMotorLeftPIDController.SetFF(PREFERENCE_SHAMPTAKE.PID_LEFT.Kff);
     shooterMotorLeftPIDController.SetOutputRange(0, 1);
-    stop();
-}
-
-Shamptake::~Shamptake() {
-    
 }
 
 void Shamptake::sendFeedback() {
@@ -47,6 +63,10 @@ bool Shamptake::isNoteSensorTripped()
 }
 
 void Shamptake::doPersistentConfiguration() {
+    configureShooterMotors();
+    shooterMotorLeft.BurnFlash();
+    shooterMotorRight.BurnFlash();
+    intakeMotor1.BurnFlash();
 }
 
 void Shamptake::resetToMode(MatchMode mode) {
@@ -57,8 +77,12 @@ void Shamptake::resetToMode(MatchMode mode) {
 }
 
 bool Shamptake::atTargetRPM() {
-    bool isAtTarget = (shooterMotorRightEncoder.GetVelocity() >= targetShooterRPM &&
-                       shooterMotorLeftEncoder.GetVelocity() >= targetShooterRPM);
+    double rightVelocity = shooterMotorRightEncoder.GetVelocity();
+    double leftVelocity = shooterMotorLeftEncoder.GetVelocity();
+    bool isAtTarget = (rightVelocity >= targetShooterRPM &&
+                       leftVelocity  >= targetShooterRPM && 
+                       rightVelocity >= PREFERENCE_SHAMPTAKE.VELOCITY_NOISE && 
+                       leftVelocity  >= PREFERENCE_SHAMPTAKE.VELOCITY_NOISE);
     return isAtTarget;
 }
 
@@ -96,7 +120,7 @@ void Shamptake::process() {
                 step = 0;
                 isDebouncing = true;
             } else {
-                if (autoIntaking) {
+                if (autoIntaking && finishedDebouncing && !isDebouncing) {
                     autoIntaking = false;
                     stopIntake();
                 }
@@ -109,10 +133,11 @@ void Shamptake::process() {
         trippedBefore = true;
     }
     debounceNote();
-
+/*
     if (autoShooting) {
-        if (atTargetRPM() && notIntaking()) {
+        if (atTargetRPM() && notIntaking() && (autoIntakeFinished() || autoCode->isPreloaded())) {
             intakeSpeed = IntakeSpeed::FIRE_INTAKE;
+            shooterTimer.Reset();
             shooterTimer.Start();
             autoIntaking = true;
         }
@@ -124,6 +149,7 @@ void Shamptake::process() {
     if (!autoIntaking && isAuto) {
         intakeSpeed = IntakeSpeed::STOP_INTAKE;
     }
+    */
 }
 
 std::string Shamptake::intakeModeString() {
@@ -176,7 +202,6 @@ void Shamptake::autoIntake() {
 
 void Shamptake::autoShoot() {
     autoShooting = true;
-    shooterTimer.Reset();
     shooterSpeed = ShooterSpeed::AUTO_FIRE_SHOOTER;
 }
 
@@ -197,22 +222,70 @@ void Shamptake::stop() {
 
 void Shamptake::debounceNote() {
     if (isDebouncing && !finishedDebouncing) {
-        if (step == 0 && !isNoteSensorTripped()) {
-            // outake
-            intakeSpeed = IntakeSpeed::OUTTAKE_INTAKE;
-            step++;
+        if (step == 0) {
+            if (!isNoteSensorTripped()) {
+                // outake
+                intakeSpeed = IntakeSpeed::OUTTAKE_INTAKE;
+                step++;
+            } else {
+                intakeSpeed = IntakeSpeed::SLOW_INTAKE;
+            }
         }
-        else if (step == 1 && isNoteSensorTripped()) {
-            //intake
-            intakeSpeed = IntakeSpeed::SLOW_INTAKE;
-            step++;
+        else if (step == 1) {
+            if (isNoteSensorTripped()) {
+                //intake
+                intakeSpeed = IntakeSpeed::SLOW_INTAKE;
+                step++;
+            } else {
+                intakeSpeed = IntakeSpeed::OUTTAKE_INTAKE;
+            }
         }
-        else if (step == 2 && !isNoteSensorTripped()) {
-            // stop
-            finishedDebouncing = true;
-            isDebouncing = false;
-            intakeSpeed = IntakeSpeed::STOP_INTAKE;
-            step++;
+        else if (step == 2) {
+            if (!isNoteSensorTripped()) {
+                // stop
+                finishedDebouncing = true;
+                isDebouncing = false;
+                intakeSpeed = IntakeSpeed::STOP_INTAKE;
+                step++;
+            } else {
+                intakeSpeed = IntakeSpeed::SLOW_INTAKE;
+            }
         }
     }
 }
+
+bool Shamptake::autoIntakeFinished() {
+    return hasGamepiece() && finishedDebouncing && !isDebouncing && !autoIntaking;
+}
+void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton) {
+    if (!intakeButton) {
+        intakeSpeed = STOP_INTAKE;
+    }
+
+    if (preheatButton) {
+        if (fireButton) {
+            finishedDebouncing = false;
+            isDebouncing = false;
+            trippedBefore = false;
+            intakeSpeed = FIRE_INTAKE;
+        }
+        if (arm->isNearPreset(Arm::Presets::AMP)) {
+            shooterSpeed = AMP_SHOOTER;
+        } else {
+            shooterSpeed = FIRE_SHOOTER;
+        }
+    } else {
+        stopShooter();
+    }
+    
+    if (outtakeButton) {
+        finishedDebouncing = false;
+        isDebouncing = false;
+        intakeSpeed = OUTTAKE_INTAKE;
+        trippedBefore = false;
+    }
+}
+
+/*bool Shamptake::isPreloaded() {
+    return preloaded;
+}*/

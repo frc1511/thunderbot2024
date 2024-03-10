@@ -19,7 +19,7 @@ class Hang : public Mechanism {
     public:
     Hang();
     ~Hang();
-
+    void doPersistentConfiguration();
 
     enum HangMovement {
         UP, 
@@ -55,8 +55,6 @@ class Hang : public Mechanism {
     void setLeftSolenoid(bool onOff);
 
     void setMotorRightSpeed(double speed);
-
-    void enableBrakeMode(bool enabled);
 
     double getLeftMotorPosition();
     double getRightMotorPosition();
@@ -135,29 +133,5 @@ private:
 
     std::string getMotorStateString(motorState state);
     SolenoidStates getSolenoidState();
-//     bool lastSensorReading = false; 
-
-//     HangMovement moveDirection = STOP; // Default movement is stop
-//     bool slowRetract = false; 
-
-//     enum HangState {
-//         STOPPED,
-//         DIVORCED,
-//         MOVING_UP,
-//         MOVING_DOWN
-//     };
-
-//     HangState currentState = STOPPED; // Default state is stopped
-
-//     double moveDownRamp = 0; // ???
-
-//     void setRatchetPawlMarried(bool married);
-//     bool ratchetPawlMarried = false; // Default is not engaged
-
-//     double preEngageEncoder = 0;
-
-//     bool zeroSensorBroke = false;
-
-//     bool hangSensorTripped = false;
-//
+    void configureMotors();
 };

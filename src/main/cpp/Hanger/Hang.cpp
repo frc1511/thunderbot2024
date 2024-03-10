@@ -7,7 +7,7 @@ Hang::Hang() :
  hangLeftEncoder(hangMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42)) ,
  hangRightEncoder(hangMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42))
  {
-
+    configureMotors();
 }
 
 Hang::~Hang()
@@ -15,16 +15,21 @@ Hang::~Hang()
 
 }
 
-void Hang::enableBrakeMode(bool enabled) {
-    if(enabled){
-        hangMotorLeft.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
-        hangMotorRight.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
-    }
-    else{
-        hangMotorLeft.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
-        hangMotorRight.SetIdleMode(rev::CANSparkBase::IdleMode::kCoast);
-    }
+void Hang::configureMotors() {
+    hangMotorLeft.RestoreFactoryDefaults();
+    hangMotorRight.RestoreFactoryDefaults();
+    hangMotorLeft.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+    hangMotorLeft.SetInverted(false);
+    hangMotorRight.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
+    hangMotorRight.SetInverted(false);
 }
+
+void Hang::doPersistentConfiguration() {
+    configureMotors();
+    hangMotorLeft.BurnFlash();
+    hangMotorRight.BurnFlash();
+}
+
 void Hang::process() {
     switch (leftMotorState) {
         case BACKTRACKING:

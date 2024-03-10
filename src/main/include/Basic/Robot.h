@@ -35,8 +35,8 @@ private:
     bool debugMode = false;
     Mechanism::MatchMode lastMode = Mechanism::MatchMode::DISABLED;
     Drive drive;
-    Shamptake shampTake;
     Arm arm;
+    Shamptake shampTake{&arm};
     Hang hang;
     BlinkyBlinky blinky{&hang, &arm, &shampTake};
     

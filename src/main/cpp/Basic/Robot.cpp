@@ -13,6 +13,7 @@ void Robot::RobotInit() {
             }
         }
     }, 80_ms);
+    autoCode.autoSelectorInit();
 }
 void Robot::RobotPeriodic() {}
 
@@ -49,6 +50,12 @@ void Robot::TeleopPeriodic() {
 void Robot::DisabledInit() {
     reset(Mechanism::MatchMode::DISABLED);
     blinky.setLEDMode(BlinkyBlinky::LEDMode::PIT_MODE);
+    if (controls.getShouldPersistConfig()) {
+        for (Mechanism* mech : allMechanisms) {
+            mech->doPersistentConfiguration();
+        }
+        printf("[!!!] All Mechanisms Configured");
+    }
 }
 void Robot::DisabledPeriodic() {
     controls.processInDisabled();
