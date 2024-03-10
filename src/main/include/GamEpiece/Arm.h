@@ -38,11 +38,11 @@ public:
 
     enum Presets {
         BASE,
-        LINE,
+        STAGE,
         AMP,
-        SUBWOOFER,
-        MEDIUM,
         TRAVEL,
+        LINE,
+        SUBWOOFER,
         MAX_PRESETS
     };
 
@@ -83,12 +83,12 @@ private:
 
     rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     units::degree_t presetAngles [Presets::MAX_PRESETS] = {
-        0_deg,
-        30_deg,
-        90_deg,
-        10_deg,
-        22.3_deg,
-        5_deg
+        0_deg, // BASE (INTAKE)
+        30_deg, // STAGE
+        90_deg, // AMP 87?
+        10_deg, // No Idea (TRAVEL)
+        22.3_deg, // LINE
+        10_deg // SUBWOOFER
     };
 
     bool braked = true;

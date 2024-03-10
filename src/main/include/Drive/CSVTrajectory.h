@@ -28,6 +28,11 @@ public:
     frc::Pose2d getInitialPose() const;
 
     /**
+     * Returns the final position of the robot.
+    */
+   frc::Pose2d getFinalPose() const;
+
+    /**
      * Returns the actions with their attributed timestamps.
      */
     inline const std::map<units::second_t, u_int32_t>& getActions() const override { return actions; }

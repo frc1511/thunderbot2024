@@ -79,12 +79,14 @@ class Shamptake : public Mechanism{
 
     void controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton);
 
-    bool isDebouncing = false;
-    bool finishedDebouncing = false;
+    void autoSetToPreloadedState();
+
   private:
     void intake(double power);
     void debounceNote();
     std::string intakeModeString();
+    bool isDebouncing = false;
+    bool finishedDebouncing = false;
     rev::SparkPIDController shooterMotorRightPIDController;
     rev::SparkRelativeEncoder shooterMotorRightEncoder;
     rev::SparkPIDController shooterMotorLeftPIDController;
@@ -94,6 +96,9 @@ class Shamptake : public Mechanism{
     double targetShooterRPM = 0;
     bool isAuto = false;
     int step = 0;
+
+    frc::Timer autoPreheatTimeout;
+    frc::Timer autoIntakeTimeout;
 
     double presetIntakeSpeeds [IntakeSpeed::MAX_INTAKE_SPEED] = {
         0.9,
@@ -106,7 +111,7 @@ class Shamptake : public Mechanism{
         0,
         5000,
         1000,
-        4000
+        4500
     };
     void configureShooterMotors();
 };

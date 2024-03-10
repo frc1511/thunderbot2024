@@ -84,7 +84,7 @@ void Auto::test() { //test auto, leave, grab a note, and shoot
 void Auto::speaker1() {
     if (step == 0 && arm->isMoveDone()) {
         //Make shamptake function to make shooter go fast
-        arm->moveToPreset(Arm::Presets::MEDIUM);
+        arm->moveToPreset(Arm::Presets::STAGE);
         frc::Pose2d initPose(paths->at(Path::SPEAKER_1).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         drive->runTrajectory(&paths->at(Path::SPEAKER_1), actions);
@@ -107,7 +107,7 @@ void Auto::speaker2() {
         drive->runTrajectory(&paths->at(Path::SPEAKER_2_STAGE_2), actions);
         step++;
     } else if (step == 5 && drive->isFinished() && shamptake->autoIntakeFinished()) {
-        arm->moveToPreset(Arm::Presets::MEDIUM);
+        arm->moveToPreset(Arm::Presets::STAGE);
         step++;
     } else if (step == 6 && arm->isMoveDone()) {
         shamptake->autoShoot();
@@ -141,26 +141,27 @@ void Auto::basic_loc_1() {
         shamptake->autoIntake();
         step++;
     } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
-        arm->moveToPreset(Arm::Presets::MEDIUM);
+        arm->moveToPreset(Arm::Presets::STAGE);
         step++;
     } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
         step++;
     } else if (step == 5 && shamptake->notShooting()) {
+        frc::Pose2d finPose(paths->at(Path::BASIC_LOC_1).getFinalPose());
+        drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
         step++;
     }
 }
 
 void Auto::basic_loc_2() {
     if (step == 0 && arm->isMoveDone()) {
-        preloaded = true;
+        shamptake->autoSetToPreloadedState();
         frc::Pose2d initPose(paths->at(Path::BASIC_LOC_2).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
-        arm->moveToPreset(Arm::Presets::BASE);
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
         step++;
     } else if (step == 1 && arm->isMoveDone()) {
         shamptake->autoShoot();
-        preloaded = false;
         step++;
     } else if (step == 2 && shamptake->notShooting()) {
         drive->runTrajectory(&paths->at(Path::BASIC_LOC_2), actions);
@@ -168,12 +169,14 @@ void Auto::basic_loc_2() {
         shamptake->autoIntake();
         step++;
     } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
-        arm->moveToPreset(Arm::Presets::LINE);
+        arm->moveToPreset(Arm::Presets::STAGE);
         step++;
     } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
         step++;
     } else if (step == 5 && shamptake->notShooting()) {
+        frc::Pose2d finPose(paths->at(Path::BASIC_LOC_2).getFinalPose());
+        drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
         step++;
     }
 }
@@ -193,12 +196,14 @@ void Auto::basic_loc_3() {
         shamptake->autoIntake();
         step++;
     } else if (step == 3 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
-        arm->moveToPreset(Arm::Presets::MEDIUM);
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
         step++;
     } else if (step == 4 && arm->isMoveDone()) {
         shamptake->autoShoot();
         step++;
     } else if (step == 5 && shamptake->notShooting()) {
+        frc::Pose2d finPose(paths->at(Path::BASIC_LOC_3).getFinalPose());
+        drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
         step++;
     }
 }

@@ -88,3 +88,9 @@ frc::Pose2d CSVTrajectory::getInitialPose() const {
 
     return state.pose;
 }
+
+frc::Pose2d CSVTrajectory::getFinalPose() const {
+    const State& state(states.cend()->second);
+
+    return state.pose;
+}

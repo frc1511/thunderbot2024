@@ -54,7 +54,7 @@ void Robot::DisabledInit() {
         for (Mechanism* mech : allMechanisms) {
             mech->doPersistentConfiguration();
         }
-        printf("[!!!] All Mechanisms Configured");
+        printf("[!!!] All Mechanisms Configured\n");
     }
 }
 void Robot::DisabledPeriodic() {

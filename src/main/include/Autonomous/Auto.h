@@ -22,7 +22,6 @@ public:
 
     frc::SendableChooser<int> autoSelector;
     void autoSelectorInit();
-    bool isPreloaded();
 
 private:
     enum class AutoMode
@@ -40,8 +39,6 @@ private:
     Drive *drive;
     Shamptake *shamptake;
     Arm *arm;
-
-    bool preloaded = false;
 
     Auto::AutoMode mode = AutoMode::DO_NOTHING;
 

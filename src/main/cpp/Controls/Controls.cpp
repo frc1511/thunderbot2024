@@ -38,6 +38,8 @@ void Controls::process() {
         else {
             doAux();
         }
+    } else {
+        shamptake->controlProcess(false, false, false, false);
     }
 }
 
@@ -64,17 +66,7 @@ bool Controls::getShouldPersistConfig() { //this will flash ALL motor controller
     using DriveButton = DriveControllerType::Button;
     using AuxButton = AuxControllerType::Button;
 
-    return ledEnable &&
-           callaDisable &&
-           debugMode &&
-           driveController.getButton(DriveButton::LEFT_BUMPER) &&
-           driveController.getButton(DriveButton::RIGHT_BUMPER) &&
-           driveController.getButton(DriveButton::LEFT_STICK) &&
-           driveController.getButton(DriveButton::RIGHT_STICK) &&
-           auxController.getButton(AuxButton::LEFT_BUMPER) &&
-           auxController.getButton(AuxButton::RIGHT_BUMPER) &&
-           auxController.getButton(AuxButton::LEFT_STICK) &&
-           auxController.getButton(AuxButton::RIGHT_STICK);
+    return settings.isCraterMode && driveController.getButton(DriveButton::CROSS, ThunderGameController::ButtonState::PRESSED) && auxController.getButton(AuxButton::CROSS, ThunderGameController::ButtonState::PRESSED);
 }
 
 void Controls::doDrive() {
@@ -232,7 +224,7 @@ void Controls::doAux() {
 
     if (!hangModeControls) {
         //double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
-        bool mediumPreset = auxController.getButton(AuxButton::CROSS);
+        bool stagePreset = auxController.getButton(AuxButton::CROSS);
         bool linePreset = auxController.getButton(AuxButton::CIRCLE);
         bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
         bool ampPreset = auxController.getButton(AuxButton::SQUARE);
@@ -240,14 +232,14 @@ void Controls::doAux() {
         bool travelPreset = dpadUp;
         if (intakePreset) {
             arm->moveToPreset(Arm::BASE);
-        } else if (mediumPreset) {
-            arm->moveToPreset(Arm::MEDIUM);
+        } else if (stagePreset) {
+            arm->moveToPreset(Arm::STAGE);
         } else if (linePreset) {
             arm->moveToPreset(Arm::LINE);
         } else if (subwooferPreset) {
             arm->moveToPreset(Arm::SUBWOOFER);
         } else if (ampPreset) {
-            arm->moveToPreset(Arm::AMP); // Don't forget to update Arm::isAtAmp()
+            arm->moveToPreset(Arm::AMP);
         } else if (travelPreset) {
             arm->moveToPreset(Arm::TRAVEL);
         }

@@ -1,7 +1,7 @@
 #include <GamEpiece/Shamptake.h>
 #include <Util/Preferences.h>
 
-Shamptake::Shamptake(Arm* _arm) //, Auto* _auto)
+Shamptake::Shamptake(Arm* _arm)
 : shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
   shooterMotorRightEncoder(shooterMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
   shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()),
@@ -133,9 +133,14 @@ void Shamptake::process() {
         trippedBefore = true;
     }
     debounceNote();
-/*
+    if (autoIntakeTimeout.Get() >= 3_s && !autoIntakeFinished()) {
+        autoIntakeTimeout.Stop();
+        autoSetToPreloadedState();
+    }
     if (autoShooting) {
-        if (atTargetRPM() && notIntaking() && (autoIntakeFinished() || autoCode->isPreloaded())) {
+        if ((atTargetRPM() || autoPreheatTimeout.Get() >= 1.5_s) && autoIntakeFinished()) {
+            autoPreheatTimeout.Stop();
+            autoIntakeTimeout.Stop();
             intakeSpeed = IntakeSpeed::FIRE_INTAKE;
             shooterTimer.Reset();
             shooterTimer.Start();
@@ -143,13 +148,23 @@ void Shamptake::process() {
         }
         if (shooterTimer.Get() >= 1_s) {
             shooterTimer.Stop();
+            trippedBefore = false;
+            isDebouncing = false;
+            finishedDebouncing = false;
             stop();
         }
     }
     if (!autoIntaking && isAuto) {
         intakeSpeed = IntakeSpeed::STOP_INTAKE;
     }
-    */
+    
+}
+
+void Shamptake::autoSetToPreloadedState() {
+    trippedBefore = true;
+    isDebouncing = false;
+    finishedDebouncing = true;
+    autoIntaking = false;
 }
 
 std::string Shamptake::intakeModeString() {
@@ -196,11 +211,16 @@ void Shamptake::shooter(double RPM) {
 }
 
 void Shamptake::autoIntake() {
+    autoIntakeTimeout.Reset();
+    autoIntakeTimeout.Start();
     autoIntaking = true;
     intakeSpeed = IntakeSpeed::NORMAL_INTAKE;
 }
 
 void Shamptake::autoShoot() {
+    shooterTimer.Reset();
+    autoPreheatTimeout.Reset();
+    autoPreheatTimeout.Start();
     autoShooting = true;
     shooterSpeed = ShooterSpeed::AUTO_FIRE_SHOOTER;
 }
@@ -255,7 +275,7 @@ void Shamptake::debounceNote() {
 }
 
 bool Shamptake::autoIntakeFinished() {
-    return hasGamepiece() && finishedDebouncing && !isDebouncing && !autoIntaking;
+    return hasGamepiece() && finishedDebouncing && !isDebouncing && notIntaking();
 }
 void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton) {
     if (!intakeButton) {
@@ -285,7 +305,3 @@ void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireB
         trippedBefore = false;
     }
 }
-
-/*bool Shamptake::isPreloaded() {
-    return preloaded;
-}*/
