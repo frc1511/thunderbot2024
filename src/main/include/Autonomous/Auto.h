@@ -34,7 +34,8 @@ private:
         BASIC_LOC_2  = 5,
         BASIC_LOC_3  = 6,
         SQUARE       = 7,
-        TEST         = 8
+        TEST         = 8,
+        LEAVE        = 9
     };
     Drive *drive;
     Shamptake *shamptake;
@@ -55,6 +56,7 @@ private:
     void basic_loc_2();
     void basic_loc_3();
     void squareTest();
+    void leave();
 
     const std::map<AutoMode, const char*> autoModeNames {
         { AutoMode::DO_NOTHING,     "Do Nothing"        },
@@ -65,7 +67,8 @@ private:
         { AutoMode::BASIC_LOC_2,    "Shamptake Loc 2"   },
         { AutoMode::BASIC_LOC_3,    "Shamptake Loc 3"   },
         { AutoMode::SQUARE,         "Square Test"       },
-        { AutoMode::TEST,           "Test"              }
+        { AutoMode::TEST,           "Test"              },
+        { AutoMode::LEAVE,          "Leave"             }
 
     };
     int step = 0;
@@ -77,7 +80,8 @@ private:
         BASIC_LOC_1,
         BASIC_LOC_2,
         BASIC_LOC_3,
-        SQUARE
+        SQUARE,
+        LEAVE
     };
     const std::map<Path, CSVTrajectory> bluePaths {
         { Path::SPEAKER_1,          CSVTrajectory{ DEPLOY_DIR "ThunderAuto/speaker_1.csv",          false } },
@@ -86,7 +90,8 @@ private:
         { Path::BASIC_LOC_1,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_1.csv",     false } },
         { Path::BASIC_LOC_2,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_2.csv",     false } },
         { Path::BASIC_LOC_3,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_3.csv",     false } },
-        { Path::SQUARE,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/square_test.csv",        false } }
+        { Path::SQUARE,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/square_test.csv",        false } },
+        { Path::LEAVE,              CSVTrajectory{ DEPLOY_DIR "ThunderAuto/leave.csv",              false } }
 
     };
     const std::map<Path, CSVTrajectory> redPaths {
@@ -96,7 +101,8 @@ private:
         { Path::BASIC_LOC_1,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_1.csv",     true  } },
         { Path::BASIC_LOC_2,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_2.csv",     true  } },
         { Path::BASIC_LOC_3,        CSVTrajectory{ DEPLOY_DIR "ThunderAuto/basic_pickup_3.csv",     true  } },
-        { Path::SQUARE,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/square_test.csv",        true  } }
+        { Path::SQUARE,             CSVTrajectory{ DEPLOY_DIR "ThunderAuto/square_test.csv",        true  } },
+        { Path::LEAVE,              CSVTrajectory{ DEPLOY_DIR "ThunderAuto/leave.csv",              true  } }
     };
     const std::map<Path, CSVTrajectory>* paths = nullptr;
 

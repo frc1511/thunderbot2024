@@ -55,6 +55,7 @@ void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutBoolean("Shamptake_shooterAtRPM", atTargetRPM());
 
     frc::SmartDashboard::PutBoolean("Shamptake_debouncing", isDebouncing);
+    frc::SmartDashboard::PutBoolean("Shamptake_hasGamepiece", hasGamepiece());
     frc::SmartDashboard::PutBoolean("Shamptake_debouncingFinished", finishedDebouncing);
     frc::SmartDashboard::PutNumber("Shamptake_debouncingStep", step);
 }
@@ -74,6 +75,9 @@ void Shamptake::doPersistentConfiguration() {
 void Shamptake::resetToMode(MatchMode mode) {
     sensorDetected = false;
     trippedBefore = false;
+    isDebouncing = false;
+    finishedDebouncing = false;
+    step = 0;
     isAuto = (mode == MatchMode::AUTO);
     stop();
 }
@@ -137,6 +141,7 @@ void Shamptake::process() {
     debounceNote();
     if (autoIntakeTimeout.Get() >= 3_s && !autoIntakeFinished()) {
         autoIntakeTimeout.Stop();
+        autoIntakeTimeout.Reset();
         autoSetToPreloadedState();
     }
     if (autoShooting) {
@@ -281,6 +286,8 @@ void Shamptake::overrideGamePieceState(bool state) {
     isDebouncing = false;
     finishedDebouncing = state;
     autoIntaking = false;
+    autoShooting = false;
+    step = state ? 3 : 0;
     printf("Override\n");
 }
 

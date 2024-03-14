@@ -19,9 +19,8 @@ void Auto::resetToMode(MatchMode mode) {
     autoTimer.Reset();
     autoTimer.Start();
 
-    step = 0;
-
     if (mode == MatchMode::AUTO) {
+        step = 0;
         drive->calibrateIMU();
     }
 }
@@ -65,6 +64,9 @@ void Auto::process() { //called during auto
             break;
         case SQUARE:
             squareTest();
+            break;
+        case LEAVE:
+            leave();
             break;
     }
 }
@@ -148,8 +150,6 @@ void Auto::basic_loc_1() {
         shamptake->autoShoot();
         step++;
     } else if (step == 5 && shamptake->notShooting()) {
-        frc::Pose2d finPose(paths->at(Path::BASIC_LOC_1).getFinalPose());
-        drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
         shamptake->overrideGamePieceState(false);
         step++;
     }
@@ -177,8 +177,6 @@ void Auto::basic_loc_2() {
         shamptake->autoShoot();
         step++;
     } else if (step == 5 && shamptake->notShooting()) {
-        frc::Pose2d finPose(paths->at(Path::BASIC_LOC_2).getFinalPose());
-        drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
         shamptake->overrideGamePieceState(false);
         step++;
     }
@@ -186,6 +184,7 @@ void Auto::basic_loc_2() {
 
 void Auto::basic_loc_3() {
     if (step == 0 && arm->isMoveDone()) {
+        shamptake->autoSetToPreloadedState();
         frc::Pose2d initPose(paths->at(Path::BASIC_LOC_3).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         arm->moveToPreset(Arm::Presets::SUBWOOFER);
@@ -205,23 +204,34 @@ void Auto::basic_loc_3() {
         shamptake->autoShoot();
         step++;
     } else if (step == 5 && shamptake->notShooting()) {
-        frc::Pose2d finPose(paths->at(Path::BASIC_LOC_3).getFinalPose());
-        drive->resetOdometry(frc::Pose2d(finPose.X(), finPose.Y(), finPose.Rotation().Degrees() - 90_deg));
         shamptake->overrideGamePieceState(false);
         step++;
     }
 }
 
-    void Auto::squareTest() {
-        if (step == 0 && arm->isMoveDone()) {
+void Auto::squareTest() {
+    if (step == 0 && arm->isMoveDone()) {
+        shamptake->autoSetToPreloadedState();
         frc::Pose2d initPose(paths->at(Path::SQUARE).getInitialPose());
         drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
         drive->runTrajectory(&paths->at(Path::SQUARE), actions);
         step++;
     }
 }
-
+void Auto::leave() {
+    if (step == 0 && arm->isMoveDone()) {
+        shamptake->autoSetToPreloadedState();
+        frc::Pose2d initPose(paths->at(Path::LEAVE).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+        drive->runTrajectory(&paths->at(Path::LEAVE), actions);
+        step++;
+    }
+}
 void Auto::doNothing() {
+    if (step == 0) {
+        shamptake->autoSetToPreloadedState(); // :(
+        step++;
+    }
     // If it does nothing is it doing something or nothing? - trevor(2020)
         //it does something because it is doing nothing - ishan(2022)
         //I disagree - peter(2022)
@@ -239,10 +249,11 @@ void Auto::doNothing() {
 
 void Auto::autoSelectorInit() {
     autoSelector.SetDefaultOption("Do Nothing", 0);
-    autoSelector.AddOption("2 Note Loc 1", 4);
-    autoSelector.AddOption("2 Note Loc 2", 5);
-    autoSelector.AddOption("2 Note Loc 3", 6);
-    autoSelector.AddOption("Square test" , 7);
+    autoSelector.AddOption("2 Note Loc 1",      4);
+    autoSelector.AddOption("2 Note Loc 2",      5);
+    autoSelector.AddOption("2 Note Loc 3",      6);
+    autoSelector.AddOption("Square test" ,      7);
+    autoSelector.AddOption("Leave" ,            9);
 }
 
 void Auto::sendFeedback() {
