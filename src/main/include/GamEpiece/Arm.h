@@ -86,7 +86,7 @@ private:
         0_deg, // BASE (INTAKE)
         30_deg, // STAGE
         90_deg, // AMP 87?
-        10_deg, // No Idea (TRAVEL)
+        22.3_deg, // TRAVEL (was 10_deg)
         22.3_deg, // LINE
         10_deg // SUBWOOFER
     };

@@ -220,84 +220,80 @@ void Controls::doAux() {
     bool shooter = auxController.getButton(AuxButton::LEFT_BUMPER);//Preheat, for running shooter motors
     bool fire = auxController.getAxis(AuxAxis::LEFT_TRIGGER) > 0.5;//Shoot, for running shooter and intake motors
     bool outtake = auxController.getButton(AuxButton::RIGHT_BUMPER);//Outtake, for running intake motors in reverse
+    
+    //double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
+    bool stagePreset = auxController.getButton(AuxButton::CROSS);
+    bool linePreset = auxController.getButton(AuxButton::CIRCLE);
+    bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
+    bool ampPreset = auxController.getButton(AuxButton::SQUARE);
+    bool intakePreset = dpadDown;
+    bool travelPreset = false; // [Deprecated] still works (10_deg)
+    if (intakePreset) {
+        arm->moveToPreset(Arm::BASE);
+    } else if (stagePreset) {
+        arm->moveToPreset(Arm::STAGE);
+    } else if (linePreset) {
+        arm->moveToPreset(Arm::LINE);
+    } else if (subwooferPreset) {
+        arm->moveToPreset(Arm::SUBWOOFER);
+    } else if (ampPreset) {
+        arm->moveToPreset(Arm::AMP);
+    } else if (travelPreset) {
+        arm->moveToPreset(Arm::TRAVEL);
+    }
 
 
-    if (!hangModeControls) {
-        //double armSpeed = -auxController.getAxis(AuxAxis::LEFT_Y);//Arm movement, gets speed for arm movement + direction
-        bool stagePreset = auxController.getButton(AuxButton::CROSS);
-        bool linePreset = auxController.getButton(AuxButton::CIRCLE);
-        bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
-        bool ampPreset = auxController.getButton(AuxButton::SQUARE);
-        bool intakePreset = dpadDown;
-        bool travelPreset = dpadUp;
-        if (intakePreset) {
-            arm->moveToPreset(Arm::BASE);
-        } else if (stagePreset) {
-            arm->moveToPreset(Arm::STAGE);
-        } else if (linePreset) {
-            arm->moveToPreset(Arm::LINE);
-        } else if (subwooferPreset) {
-            arm->moveToPreset(Arm::SUBWOOFER);
-        } else if (ampPreset) {
-            arm->moveToPreset(Arm::AMP);
-        } else if (travelPreset) {
-            arm->moveToPreset(Arm::TRAVEL);
-        }
-    } else { //Hang mode
-        bool rightHang = auxController.getButton(AuxButton::CROSS);
-        bool leftHang = auxController.getButton(AuxButton::CIRCLE);
-        
-        double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);
-        double hangMotorRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
+    bool rightHang = dpadRight;
+    bool leftHang = dpadLeft;
+    bool bothHang = dpadUp;
 
-        if (std::fabs(hangMotorLeft) < PREFERENCE_CONTROLS.AXIS_DEADZONE) {
-            hangMotorLeft = 0;
-        }
+    double hangMotorLeft = -auxController.getAxis(AuxAxis::LEFT_Y);
+    double hangMotorRight = -auxController.getAxis(AuxAxis::RIGHT_Y);
 
-        if (std::fabs(hangMotorRight) < PREFERENCE_CONTROLS.AXIS_DEADZONE) {
-            hangMotorRight = 0;
+    if (std::fabs(hangMotorLeft) < PREFERENCE_CONTROLS.AXIS_DEADZONE) {
+        hangMotorLeft = 0;
+    }
+
+    if (std::fabs(hangMotorRight) < PREFERENCE_CONTROLS.AXIS_DEADZONE) {
+        hangMotorRight = 0;
+    }
+
+    if (hangMotorLeft > 0) {
+        leftHang = true;
+    }
+
+    if (hangMotorRight > 0) {
+        rightHang = true;
+    }
+
+    if (hang != nullptr)
+    {
+        if ((rightHang && leftHang) || bothHang) {//TEMP, to be removed after hang gets automatic solenoids when doing motors (manual mode right now)
+            hang->setSolenoids(Hang::SolenoidStates::BOTH);
+        } else if (leftHang) {
+            hang->setSolenoids(Hang::SolenoidStates::LEFT);
+        } else if (rightHang) {
+            hang->setSolenoids(Hang::SolenoidStates::RIGHT);
+        } else {
+            hang->setSolenoids(Hang::SolenoidStates::OFF);
         }
 
         if (hangMotorLeft > 0) {
-            leftHang = true;
+            hang->setMotorLeftStateSafe(Hang::motorState::MOVING_UP);
+        } else if (hangMotorLeft < 0) {
+            hang->setMotorLeftStateSafe(Hang::motorState::MOVING_DOWN);
+        } else {
+            hang->setMotorLeftStateSafe(Hang::motorState::IDLE);
         }
+        
 
         if (hangMotorRight > 0) {
-            rightHang = true;
+            hang->setMotorRightStateSafe(Hang::motorState::MOVING_UP);
+        } else if (hangMotorRight < 0) {
+            hang->setMotorRightStateSafe(Hang::motorState::MOVING_DOWN);
+        } else {
+            hang->setMotorRightStateSafe(Hang::motorState::IDLE);
         }
-
-        if (hang != nullptr)
-        {
-            if (rightHang && leftHang) {//TEMP, to be removed after hang gets automatic solenoids when doing motors (manual mode right now)
-                hang->setSolenoids(Hang::SolenoidStates::BOTH);
-            } else if (leftHang) {
-                hang->setSolenoids(Hang::SolenoidStates::LEFT);
-            } else if (rightHang) {
-                hang->setSolenoids(Hang::SolenoidStates::RIGHT);
-            } else {
-                hang->setSolenoids(Hang::SolenoidStates::OFF);
-            }
-
-            if (hangMotorLeft > 0) {
-                hang->setMotorLeftStateSafe(Hang::motorState::MOVING_UP);
-            } else if (hangMotorLeft < 0) {
-                hang->setMotorLeftStateSafe(Hang::motorState::MOVING_DOWN);
-            } else {
-                hang->setMotorLeftStateSafe(Hang::motorState::IDLE);
-            }
-            
-
-            if (hangMotorRight > 0) {
-                hang->setMotorRightStateSafe(Hang::motorState::MOVING_UP);
-            } else if (hangMotorRight < 0) {
-                hang->setMotorRightStateSafe(Hang::motorState::MOVING_DOWN);
-            } else {
-                hang->setMotorRightStateSafe(Hang::motorState::IDLE);
-            }
-
-            // hang->setMotorRightSpeed(hangMotorRight);
-        }
-        //stuff for when hang gets automatic solenoids when doing motors
     }
 
     //SHAMPTAKE

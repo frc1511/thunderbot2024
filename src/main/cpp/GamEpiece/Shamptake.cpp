@@ -273,6 +273,7 @@ void Shamptake::debounceNote() {
                 finishedDebouncing = true;
                 isDebouncing = false;
                 intakeSpeed = IntakeSpeed::STOP_INTAKE;
+                //arm->moveToPreset(Arm::Presets::TRAVEL);
                 step++;
             } else {
                 intakeSpeed = IntakeSpeed::DEBOUNCE_INTAKE;
