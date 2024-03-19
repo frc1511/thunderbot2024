@@ -25,7 +25,11 @@ void Arm::process()
 {
     if (!settings.isCraterMode) {
         units::degree_t degrees = getBoreDegrees();
-
+        if (isNearPreset(Presets::AMP) && targetAngle == presetAngles[Presets::AMP]) {
+            armPIDController.SetP(PREFERENCE_ARM.AMPEND_PID.Kp);
+            armPIDController.SetI(PREFERENCE_ARM.AMPEND_PID.Ki);
+            armPIDController.SetD(PREFERENCE_ARM.AMPEND_PID.Kd);
+        }
         double power = armPIDController.Calculate(degrees, targetAngle);
         setPower(-power);
     }
@@ -43,6 +47,7 @@ void Arm::sendFeedback() {
     frc::SmartDashboard::PutBoolean("Arm_legal", withinLegalLimit());
     frc::SmartDashboard::PutBoolean("Arm_Braked", braked);
     frc::SmartDashboard::PutBoolean("Arm_NearAMP", isNearPreset(Presets::AMP));
+    frc::SmartDashboard::PutData("Arm_PID_Controller", &armPIDController);
 }
 bool Arm::withinLegalLimit() {
     bool legal = false;
@@ -135,7 +140,7 @@ bool Arm::isMoveDone() {
 }
 
 bool Arm::isNearPreset(Presets preset) {
-    return fabs(double(targetAngle - presetAngles[preset])) <= presetAngleThreshold;
+    return fabs((getBoreDegrees() - presetAngles[preset]).value()) <= presetAngleThreshold;
 }
 
 void Arm::setPower(double power) {
