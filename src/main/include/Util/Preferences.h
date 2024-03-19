@@ -121,7 +121,7 @@ struct PreferencesArm
     PreferencesArm()
     {
         PID.Kp = 0.03;
-        PID.Ki = 0.002;
+        PID.Ki = 0.02; // [0.008 - 3/18/2024 - 8:57:00], [0.015 - 3/18/2024 - 9:34:00]
         PID.MaxVel = 90_deg_per_s;
         PID.MaxAccel = 90_deg_per_s_sq;
         AMP_PID.Kp = 0.02;

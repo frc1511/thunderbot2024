@@ -59,7 +59,7 @@ private:
     void leave();
 
     const std::map<AutoMode, const char*> autoModeNames {
-        { AutoMode::DO_NOTHING,     "Do Nothing"        },
+        { AutoMode::DO_NOTHING,     "1 Note"            },
         { AutoMode::SPEAKER_1_GP,   "1 GP Speaker"      },
         { AutoMode::SPEAKER_2_GP,   "2 GP Speaker"      },
         { AutoMode::HAVOC,          "Hail Mary"         },

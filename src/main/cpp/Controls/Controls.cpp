@@ -227,7 +227,7 @@ void Controls::doAux() {
     bool subwooferPreset = auxController.getButton(AuxButton::TRIANGLE);
     bool ampPreset = auxController.getButton(AuxButton::SQUARE);
     bool intakePreset = dpadDown;
-    bool travelPreset = false; // [Deprecated] still works (10_deg)
+    bool travelPreset = auxController.getButton(AuxButton::TOUCH_PAD);
     if (intakePreset) {
         arm->moveToPreset(Arm::BASE);
     } else if (stagePreset) {

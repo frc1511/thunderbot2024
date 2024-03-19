@@ -228,8 +228,15 @@ void Auto::leave() {
     }
 }
 void Auto::doNothing() {
-    if (step == 0) {
+    if (step == 0 && arm->isMoveDone()) {
         shamptake->autoSetToPreloadedState(); // :(
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
+        step++;
+    } else if (step == 1 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 2 && shamptake->notShooting()) {
+        shamptake->overrideGamePieceState(false);
         step++;
     }
     // If it does nothing is it doing something or nothing? - trevor(2020)
