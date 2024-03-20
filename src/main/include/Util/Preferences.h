@@ -111,8 +111,8 @@ static PreferencesSwerve PREFERENCE_SWERVE;
 struct PreferencesArm
 {
     PID_t PID;
-    double TARGET_ANGLE_THRESHOLD = 5;
-    double PRESET_ANGLE_THRESHOLD = 15;
+    double TARGET_ANGLE_THRESHOLD = 1;
+    double PRESET_ANGLE_THRESHOLD = 3;
     PID_t AMP_PID; // Normal PID will not work when at the AMP position, use this to configure PID for AMP
     PID_t AMPEND_PID;
     units::degree_t ENCODER_OFFSET = 116.28_deg;
@@ -121,7 +121,7 @@ struct PreferencesArm
     PreferencesArm()
     {
         PID.Kp = 0.03;
-        PID.Ki = 0.02; // [0.008 - 3/18/2024 - 8:57:00], [0.015 - 3/18/2024 - 9:34:00]
+        PID.Ki = 0.03; // [0.008 - 3/18/2024 - 8:57:00], [0.015 - 3/18/2024 - 9:34:00]
         PID.MaxVel = 90_deg_per_s;
         PID.MaxAccel = 90_deg_per_s_sq;
         AMP_PID.Kp = 0.02;

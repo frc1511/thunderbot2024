@@ -68,6 +68,12 @@ void Auto::process() { //called during auto
         case LEAVE:
             leave();
             break;
+        case MIDDLE_LOC_2:
+            middle_loc_2();
+            break;
+        case LINE2_LOC_1:
+            line2_loc_1();
+            break;
     }
 }
 
@@ -227,6 +233,48 @@ void Auto::leave() {
         step++;
     }
 }
+void Auto::middle_loc_2() {
+    basic_loc_2();
+    if (step == 6 && arm->isMoveDone()) {
+        frc::Pose2d initPose(paths->at(Path::MIDDLE_LOC_2).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+
+        drive->runTrajectory(&paths->at(Path::MIDDLE_LOC_2), actions);
+        arm->moveToPreset(Arm::Presets::BASE);
+        shamptake->autoIntake();
+        step++;
+    } else if (step == 7 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
+        step++;
+    } else if (step == 8 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 9 && shamptake->notShooting()) {
+        shamptake->overrideGamePieceState(false);
+        step++;
+    }
+}
+void Auto::line2_loc_1() {
+    basic_loc_1();
+    if (step == 6 && arm->isMoveDone()) {
+        frc::Pose2d initPose(paths->at(Path::LINE2_LOC_1).getInitialPose());
+        drive->resetOdometry(frc::Pose2d(initPose.X(), initPose.Y(), initPose.Rotation().Degrees() - 90_deg));
+
+        drive->runTrajectory(&paths->at(Path::LINE2_LOC_1), actions);
+        arm->moveToPreset(Arm::Presets::BASE);
+        shamptake->autoIntake();
+        step++;
+    } else if (step == 7 && shamptake->autoIntakeFinished() && drive->isFinished() && arm->isMoveDone()) {
+        arm->moveToPreset(Arm::Presets::SUBWOOFER);
+        step++;
+    } else if (step == 8 && arm->isMoveDone()) {
+        shamptake->autoShoot();
+        step++;
+    } else if (step == 9 && shamptake->notShooting()) {
+        shamptake->overrideGamePieceState(false);
+        step++;
+    }
+}
 void Auto::doNothing() {
     if (step == 0 && arm->isMoveDone()) {
         shamptake->autoSetToPreloadedState(); // :(
@@ -245,6 +293,7 @@ void Auto::doNothing() {
         //I agree with peter -L Wrench
         //I still disagree with ishan - peter(2023)
         //it does something because this function exists and can be called as an action for the robot - ben d(2024)
+        //also for just this year we made it do stuff - also ben d(2024)
 
     // Good function.
     // Very good function. - jeff downs
@@ -255,12 +304,14 @@ void Auto::doNothing() {
 }
 
 void Auto::autoSelectorInit() {
-    autoSelector.SetDefaultOption("Do Nothing", 0);
-    autoSelector.AddOption("2 Note Loc 1",      4);
-    autoSelector.AddOption("2 Note Loc 2",      5);
-    autoSelector.AddOption("2 Note Loc 3",      6);
-    autoSelector.AddOption("Square test" ,      7);
-    autoSelector.AddOption("Leave" ,            9);
+    autoSelector.SetDefaultOption("1 Note",       0);
+    autoSelector.AddOption("2 Note Loc 1",        4);
+    autoSelector.AddOption("2 Note Loc 2",        5);
+    autoSelector.AddOption("2 Note Loc 3",        6);
+    autoSelector.AddOption("Square test" ,        7);
+    autoSelector.AddOption("Leave" ,              9);
+    //autoSelector.AddOption("Middle note loc 2",  10);
+    autoSelector.AddOption("3 Note Loc 1",        11);
 }
 
 void Auto::sendFeedback() {

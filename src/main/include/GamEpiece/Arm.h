@@ -83,12 +83,12 @@ private:
 
     rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     units::degree_t presetAngles [Presets::MAX_PRESETS] = {
-        0_deg, // BASE (INTAKE)
+        1_deg, // BASE (INTAKE)
         30_deg, // STAGE
         87_deg, // AMP
         58_deg, // TRAVEL (was 10_deg)
         22.3_deg, // LINE
-        10_deg // SUBWOOFER
+        7_deg // SUBWOOFER
     };
 
     bool braked = true;
