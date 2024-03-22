@@ -7,7 +7,7 @@ Hang::Hang() :
  hangLeftEncoder(hangMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42)) ,
  hangRightEncoder(hangMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42))
  {
-    configureMotors();
+    // configureMotors();
 }
 
 Hang::~Hang()

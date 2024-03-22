@@ -7,7 +7,7 @@ Shamptake::Shamptake(Arm* _arm)
   shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()),
   shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
   arm(_arm) {
-    configureShooterMotors();
+    // configureShooterMotors();
     stop();
 }
 
@@ -295,7 +295,7 @@ void Shamptake::overrideGamePieceState(bool state) {
 bool Shamptake::autoIntakeFinished() {
     return hasGamepiece() && finishedDebouncing && !isDebouncing && notIntaking();
 }
-void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton, bool overrideGamePieceYes, bool overrideGamePieceNo) {
+void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton, bool overrideGamePieceYes, bool overrideGamePieceNo, bool halfCourt) {
     if (overrideGamePieceYes) {
         overrideGamePieceState(true);
     }
@@ -315,6 +315,8 @@ void Shamptake::controlProcess(bool intakeButton, bool outtakeButton, bool fireB
         }
         if (arm->isNearPreset(Arm::Presets::AMP)) {
             shooterSpeed = AMP_SHOOTER;
+        } else if (halfCourt) {
+            shooterSpeed = HALF_COURT_SHOOTER;
         } else {
             shooterSpeed = FIRE_SHOOTER;
         }

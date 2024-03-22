@@ -11,8 +11,6 @@ Arm::~Arm() {
     
 }
 void Arm::configureMotors() {
-    armMotor.RestoreFactoryDefaults();
-    armBrake.RestoreFactoryDefaults();
     armMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
     armMotor.SetInverted(false);
     armBrake.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
@@ -20,6 +18,7 @@ void Arm::configureMotors() {
     encoder.SetDistancePerRotation(360);
     armPIDController.Reset(getBoreDegrees());
     forwardarmLimitSwitch.EnableLimitSwitch(true);
+    reversearmLimitSwitch.EnableLimitSwitch(true);
 }
 void Arm::process()
 {
@@ -58,6 +57,8 @@ bool Arm::withinLegalLimit() {
     return legal;
 }
 void Arm::doPersistentConfiguration() {
+    armMotor.RestoreFactoryDefaults();
+    armBrake.RestoreFactoryDefaults();
     configureMotors();
     armMotor.BurnFlash();
     armBrake.BurnFlash();
@@ -104,6 +105,9 @@ bool Arm::isAtLowerLimit() {
     return forwardarmLimitSwitch.Get();
 }
 
+bool Arm::isAtUpperLimit() {
+    return reversearmLimitSwitch.Get();
+}
 std::string Arm::getMotorModeString() {
     std::string motorMode = "Coast";
     if (armMotor.GetIdleMode() == rev::CANSparkBase::IdleMode::kBrake) {
