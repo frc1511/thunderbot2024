@@ -39,7 +39,7 @@ void Controls::process() {
             doAux();
         }
     } else {
-        shamptake->controlProcess(false, false, false, false, false, false);
+        shamptake->controlProcess(false, false, false, false, false, false, false);
     }
 }
 
@@ -83,7 +83,7 @@ void Controls::doDrive() {
     double angVel = driveController.getRightXAxis();
     bool xySlowMode = driveController.getLeftBumper();
     bool rotSlowMode = driveController.getRightBumper();
-    bool rotSlowerIThinkIDKReallyCallaJustWantedThisForSomeReasonSoHereItIsIGuess = driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE;
+    bool rotSlowerIThinkIDKReallyCallaJustWantedThisForSomeReasonSoHereItIsIGuess = false;//driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE;
     shouldStrobe = driveController.getButton(DriveButton::CIRCLE);
 
     double xAng = driveController.getAxis(DriveAxis::RIGHT_X);
@@ -297,7 +297,8 @@ void Controls::doAux() {
     }
 
     //SHAMPTAKE
-    shamptake->controlProcess(intake, outtake, fire, shooter, overrideGamePieceYes, overrideGamePieceNo);
+    bool halfCourt = driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE;
+    shamptake->controlProcess(intake, outtake, fire, shooter, overrideGamePieceYes, overrideGamePieceNo, halfCourt);
 }
 
 void Controls::doAuxManual() {

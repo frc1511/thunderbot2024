@@ -53,6 +53,7 @@ public:
     void moveToPreset(Presets preset);
 
     bool isAtLowerLimit();
+    bool isAtUpperLimit();
 
     void engageBrake();
 
@@ -82,6 +83,7 @@ private:
     rev::CANSparkMax armBrake {CAN_PIVOT_ARM_BRAKE, rev::CANSparkMax::MotorType::kBrushless};
 
     rev::SparkLimitSwitch forwardarmLimitSwitch = armMotor.GetForwardLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
+    rev::SparkLimitSwitch reversearmLimitSwitch = armMotor.GetReverseLimitSwitch(rev::SparkLimitSwitch::Type::kNormallyOpen);
     units::degree_t presetAngles [Presets::MAX_PRESETS] = {
         1_deg, // BASE (INTAKE)
         30_deg, // STAGE
@@ -125,5 +127,4 @@ private:
     };
 
     void configureMotors();
-
 };

@@ -310,8 +310,8 @@ void Auto::autoSelectorInit() {
     autoSelector.AddOption("2 Note Loc 3",        6);
     autoSelector.AddOption("Square test" ,        7);
     autoSelector.AddOption("Leave" ,              9);
-    //autoSelector.AddOption("Middle note loc 2",  10);
-    autoSelector.AddOption("3 Note Loc 1",        11);
+    autoSelector.AddOption("Middle note loc 2",  10);
+    autoSelector.AddOption("3 Note Loc 1",       11);
 }
 
 void Auto::sendFeedback() {

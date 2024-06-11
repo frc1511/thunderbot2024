@@ -35,7 +35,7 @@ void BlinkyBlinky::process() {
                     setPixel(i, hang->isLeftPawlUp() ? frc::Color::kGreen : frc::Color::kRed);
 
                 for (size_t i = 13; i < 17; i++)
-                    setPixel(i, arm->isAtLowerLimit() ? frc::Color::kGreen : frc::Color::kRed);
+                    setPixel(i, (arm->isAtLowerLimit() || arm->isAtUpperLimit()) ? frc::Color::kGreen : frc::Color::kRed);
                 double armPct = arm->getBoreNormalizedPosition();
                 size_t end = std::min((size_t)4, (size_t)(4 * armPct));
                 for (size_t i = 0; i < 4; i++)

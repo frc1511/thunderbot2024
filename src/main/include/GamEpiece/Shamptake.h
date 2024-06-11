@@ -64,6 +64,7 @@ class Shamptake : public Mechanism{
         FIRE_SHOOTER,
         AMP_SHOOTER,
         AUTO_FIRE_SHOOTER,
+        HALF_COURT_SHOOTER,
         MAX_SHOOTER_SPEED
     };
 
@@ -79,7 +80,7 @@ class Shamptake : public Mechanism{
 
     frc::Timer shooterTimer;
 
-    void controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton, bool overrideGamePieceYes, bool overrideGamePieceNo);
+    void controlProcess(bool intakeButton, bool outtakeButton, bool fireButton, bool preheatButton, bool overrideGamePieceYes, bool overrideGamePieceNo, bool halfCourt);
 
     void autoSetToPreloadedState();
 
@@ -114,7 +115,8 @@ class Shamptake : public Mechanism{
         0,
         5000,
         1000,
-        4500
+        4500,
+        4000
     };
     void configureShooterMotors();
 };
