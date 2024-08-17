@@ -270,8 +270,8 @@ bool Hang::isRightPawlUp()
 void Hang::sendFeedback() {
     frc::SmartDashboard::PutNumber("Hang_Left_Position", -getLeftMotorPosition());
     frc::SmartDashboard::PutNumber("Hang_Right_Position", getRightMotorPosition());
-    // frc::SmartDashboard::PutString("Hang_LeftMotorTemp", ConvertTemperatureToString(hangMotorLeft.GetMotorTemperature()));
-    // frc::SmartDashboard::PutString("Hang_RightMotorTemp", ConvertTemperatureToString(hangMotorRight.GetMotorTemperature()));
+    frc::SmartDashboard::PutNumber("Hang_LeftMotorTempC", hangMotorLeft.GetMotorTemperature());
+    frc::SmartDashboard::PutNumber("Hang_RightMotorTempC", hangMotorRight.GetMotorTemperature());
     frc::SmartDashboard::PutString("Hang_LeftmotorMode", getMotorLeftModeString());
     frc::SmartDashboard::PutString("Hang_LeftMotorState", getMotorStateString(leftMotorState));
     frc::SmartDashboard::PutString("Hang_RightmotorMode", getMotorRightModeString());
