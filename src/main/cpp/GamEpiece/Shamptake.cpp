@@ -1,11 +1,13 @@
 #include <GamEpiece/Shamptake.h>
 #include <Util/Preferences.h>
 
+#define SHOOTER_LEFT_COUNTS_PER_REV 42
+#define SHOOTER_RIGHT_COUNTS_PER_REV 42
 Shamptake::Shamptake(Arm* _arm)
 : shooterMotorRightPIDController(shooterMotorRight.GetPIDController()),
-  shooterMotorRightEncoder(shooterMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  shooterMotorRightEncoder(shooterMotorRight.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, SHOOTER_RIGHT_COUNTS_PER_REV)),
   shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()),
-  shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, SHOOTER_LEFT_COUNTS_PER_REV)),
   arm(_arm) {
     // configureShooterMotors();
     stop();
@@ -58,6 +60,9 @@ void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutBoolean("Shamptake_hasGamepiece", hasGamepiece());
     frc::SmartDashboard::PutBoolean("Shamptake_debouncingFinished", finishedDebouncing);
     frc::SmartDashboard::PutNumber("Shamptake_debouncingStep", step);
+    frc::SmartDashboard::PutNumber("Shamptake_intakeTemp_C", intakeMotor1.GetMotorTemperature());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterLeftTemp_C", shooterMotorLeft.GetMotorTemperature());
+    frc::SmartDashboard::PutNumber("Shamptake_shooterRightTemp_C", shooterMotorRight.GetMotorTemperature());
 }
 
 bool Shamptake::isNoteSensorTripped()
