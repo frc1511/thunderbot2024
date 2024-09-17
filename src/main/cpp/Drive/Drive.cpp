@@ -250,6 +250,10 @@ void Drive::resetPIDControllers() {
 
 }
 
+frc::SwerveDrivePoseEstimator<4>* Drive::getPoseEstimator() {
+    return &poseEstimator;
+}
+
 void Drive::updateOdometry() {
     /**
      * Update the pose estimator with encoder measurements from

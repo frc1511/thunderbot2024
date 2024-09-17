@@ -45,6 +45,7 @@ void Robot::TeleopPeriodic() {
 
     drive.process();
     blinky.process();
+    limelight.process();
 }
 
 void Robot::DisabledInit() {
