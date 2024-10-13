@@ -38,8 +38,7 @@ void Arm::process()
 void Arm::sendFeedback() {
     frc::SmartDashboard::PutNumber("Arm_rawBorePosition", getRawBorePosition().value());
     frc::SmartDashboard::PutNumber("Arm_boreDegrees", double(getBoreDegrees()));
-    //frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
-    //frc::SmartDashboard::PutNumber("Arm_motorTempF", armMotor.GetMotorTemperature() * 1.8 + 32);
+    frc::SmartDashboard::PutNumber("Arm_motorTempC", armMotor.GetMotorTemperature());
     frc::SmartDashboard::PutString("Arm_motorMode", getMotorModeString());  
     frc::SmartDashboard::PutNumber("Arm_targetAngle", targetAngle.value());
     frc::SmartDashboard::PutBoolean("Arm_atTargetAngle", isMoveDone());

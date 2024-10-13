@@ -1,12 +1,13 @@
 #include <Drive/SwerveModule.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+#define ALL_SWERVE_MODULES_COUNTS_PER_REV 42
 SwerveModule::SwerveModule(int driveID, int turningID, int canCoderID, units::degree_t offset)
 : driveMotor(driveID,rev::CANSparkMax::MotorType::kBrushless),
-  driveEncoder(driveMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  driveEncoder(driveMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, ALL_SWERVE_MODULES_COUNTS_PER_REV)),
   drivePIDController(driveMotor.GetPIDController()),
   turningMotor(turningID, rev::CANSparkMax::MotorType::kBrushless), 
-  turningEncoder(turningMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor)),
+  turningEncoder(turningMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, ALL_SWERVE_MODULES_COUNTS_PER_REV)),
   turningPIDController(turningMotor.GetPIDController()),
   turningAbsEncoder(canCoderID), 
   absEncoderOffset(offset) {
