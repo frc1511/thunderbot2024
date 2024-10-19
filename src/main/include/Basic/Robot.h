@@ -43,7 +43,7 @@ private:
     Limelight limelight{&drive};
     
     //Controls controls {nullptr, &shampTake, &arm, &hang};
-    Controls controls {&drive, &shampTake, &arm, &hang, &blinky, &debugMode};
+    Controls controls {&drive, &shampTake, &arm, &hang, &blinky, &limelight, &debugMode};
     Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
 

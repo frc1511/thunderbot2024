@@ -173,10 +173,10 @@ private:
 
     // The locations of the swerve modules on the robot.
     wpi::array<frc::Translation2d, 4> locations {
-        frc::Translation2d(-PREFERENCE_DRIVE.ROBOT_WIDTH/2, +PREFERENCE_DRIVE.ROBOT_LENGTH/2), // Front left.
         frc::Translation2d(-PREFERENCE_DRIVE.ROBOT_WIDTH/2, -PREFERENCE_DRIVE.ROBOT_LENGTH/2), // Back left.
         frc::Translation2d(+PREFERENCE_DRIVE.ROBOT_WIDTH/2, -PREFERENCE_DRIVE.ROBOT_LENGTH/2), // Back right.
         frc::Translation2d(+PREFERENCE_DRIVE.ROBOT_WIDTH/2, +PREFERENCE_DRIVE.ROBOT_LENGTH/2), // Front right.
+        frc::Translation2d(-PREFERENCE_DRIVE.ROBOT_WIDTH/2, +PREFERENCE_DRIVE.ROBOT_LENGTH/2), // Front left.
     };
     /**
      * The helper class that it used to convert chassis speeds into swerve
@@ -195,10 +195,10 @@ private:
         //new SwerveModule(CAN_SWERVE_DRIVE_BL, CAN_SWERVE_ROTATION_BL, CAN_SWERVE_CANCODER_BL, -17.666016_deg+180_deg - 90_deg),
         //new SwerveModule(CAN_SWERVE_DRIVE_BR, CAN_SWERVE_ROTATION_BR, CAN_SWERVE_CANCODER_BR, -62.753906_deg - 90_deg),
         //new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, -126.298828_deg - 90_deg)
-        new SwerveModule(CAN_SWERVE_DRIVE_FL, CAN_SWERVE_ROTATION_FL, CAN_SWERVE_CANCODER_FL, -125.332_deg+180_deg - 90_deg),
         new SwerveModule(CAN_SWERVE_DRIVE_BL, CAN_SWERVE_ROTATION_BL, CAN_SWERVE_CANCODER_BL, -16.963_deg+180_deg - 90_deg),
         new SwerveModule(CAN_SWERVE_DRIVE_BR, CAN_SWERVE_ROTATION_BR, CAN_SWERVE_CANCODER_BR, -61.963_deg - 90_deg),
-        new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, -128.408_deg - 90_deg)
+        new SwerveModule(CAN_SWERVE_DRIVE_FR, CAN_SWERVE_ROTATION_FR, CAN_SWERVE_CANCODER_FR, -128.408_deg - 90_deg),
+        new SwerveModule(CAN_SWERVE_DRIVE_FL, CAN_SWERVE_ROTATION_FL, CAN_SWERVE_CANCODER_FL, -125.332_deg+180_deg - 90_deg),
     };
     
     ctre::phoenix6::hardware::Pigeon2 pigeon { CAN_PIGEON };
@@ -212,7 +212,7 @@ private:
         getRotation(),
         getModulePositions(),
         frc::Pose2d(),
-        { 0.0, 0.0, 0.0 }, // Standard deviations of model states.
+        { 0.1, 0.1, 0.1 }, // Standard deviations of model states.
         { 0.9, 0.9, 0.9 } // Standard deviations of the vision measurements.
     };
     // PID Controller for angular drivetrain movement.
@@ -268,6 +268,7 @@ private:
      */
     wpi::array<frc::SwerveModulePosition, 4> getModulePositions();
 
+     wpi::array<frc::SwerveModulePosition, 4> getModulePositionsWith90JankyOffsetThing(); // Robot 90deg offset ig.
 
     bool imuCalibrated = false;
 

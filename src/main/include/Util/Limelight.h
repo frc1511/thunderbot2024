@@ -1,3 +1,5 @@
+#pragma once
+
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
@@ -17,6 +19,7 @@ public:
     void sendFeedback() override;
     void doPersistentConfiguration() override;
     void resetToMode(MatchMode mode) override;
+    bool limelightEnabled = true;
 private:
     frc::SwerveDrivePoseEstimator<4>* poseEstimator;
     std::shared_ptr<nt::NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");

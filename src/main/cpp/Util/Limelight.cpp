@@ -16,6 +16,7 @@ void Limelight::doPersistentConfiguration() {
 }
 
 void Limelight::updatePoseEstimator() {
+    if (!limelightEnabled) return;
     LimelightHelpers::PoseEstimate mt1 = LimelightHelpers::getBotPoseEstimate_wpiBlue("limelight");
 
     if (mt1.tagCount == 0) return;
@@ -25,6 +26,12 @@ void Limelight::updatePoseEstimator() {
             return;
         }
         if (mt1.rawFiducials[0].distToCamera > 3) {
+            return;
+        }
+    }
+
+    for (size_t i = 0; i < mt1.rawFiducials.size(); i++) {
+        if (mt1.rawFiducials[i].ambiguity > .7) {
             return;
         }
     }
