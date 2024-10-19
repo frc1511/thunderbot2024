@@ -43,6 +43,8 @@ public:
      */
     frc::SwerveModulePosition getPosition();
 
+    frc::SwerveModulePosition getPosition90JankyOffset();
+
     /**
      * Resets the drive encoder positions.
      */

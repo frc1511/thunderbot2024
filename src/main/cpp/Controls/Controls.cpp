@@ -5,12 +5,13 @@
 #include <BlinkyBlinky/BlinkyBlinky.h>
 
 
-Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, bool* _debugMode):
+Controls::Controls(Drive* _drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, Limelight* _limelight, bool* _debugMode):
     drive(_drive),
     shamptake(_shamptake),
     arm(_arm),
     hang(_hang),
     blink(_blink),
+    limelight(_limelight),
     armMode(true),
     debugMode(_debugMode)
 {
@@ -188,7 +189,7 @@ void Controls::doDrive() {
         finalAngVel *= .26;
     }
 
-    // Control the drivetrain.    
+    // Control the drivetrain.
     if (driveAbsRotation) {
         // If changed rotation.
         if (finalYAng || finalXAng) {
@@ -309,7 +310,7 @@ void Controls::doAuxManual() {
 
 #define SWITCH_LED_ENABLE 1
 #define SWITCH_ROBOT_CENTRIC 2
-#define SWITCH_HANG_MODE 3
+#define SWITCH_LIMELIGHT_ENABLE 3
 #define SWITCH_BALANCE_CONTROL 4
 #define SWITCH_CALLA_DISABLE 5
 #define SWITCH_SASHA_DISABLE 6
@@ -326,10 +327,11 @@ void Controls::doSwitchPanel(bool isDissabled) {
     sashaDisable = switchPanel.GetRawButton(SWITCH_SASHA_DISABLE);
     manualAux = switchPanel.GetRawButton(SWITCH_MANUAL_AUX);
     settings.isCraterMode = switchPanel.GetRawButton(SWITCH_CRATER_MODE);
-    hangModeControls = switchPanel.GetRawButton(SWITCH_HANG_MODE);
     balanceControlOff = switchPanel.GetRawButton(SWITCH_BALANCE_CONTROL);
     armBrakeDissable = switchPanel.GetRawButton(SWITCH_ARM_BRAKE);
     *debugMode = switchPanel.GetRawButton(SWITCH_DEBUG_MODE);
+
+    limelight->limelightEnabled = switchPanel.GetRawButton(SWITCH_LIMELIGHT_ENABLE);
 
     if (armBrakeDissable) {
         if (isDissabled) {

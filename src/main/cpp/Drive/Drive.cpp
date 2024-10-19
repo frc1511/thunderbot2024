@@ -235,7 +235,7 @@ frc::Pose2d Drive::getEstimatedPose() {
 
 frc::Rotation2d Drive::getRotation() {
     // The raw rotation from the IMU.
-    return frc::Rotation2d(pigeon.GetYaw().GetValue());
+    return frc::Rotation2d(pigeon.GetYaw().GetValue() - 90_deg);
 }
 
 void Drive::resetPIDControllers() {
@@ -259,7 +259,7 @@ void Drive::updateOdometry() {
      * Update the pose estimator with encoder measurements from
      * the swerve modules.
      */
-    poseEstimator.Update(getRotation(), getModulePositions());
+    poseEstimator.Update(getRotation(), getModulePositionsWith90JankyOffsetThing());
 }
 
 void Drive::execStopped() {
@@ -420,7 +420,7 @@ void Drive::makeBrick() {
         driveMode = DriveMode::STOPPED;
         
         // Turn the swerve module to point towards the center of the robot.
-        swerveModules.at(i)->setTurningMotor(angle);
+        swerveModules.at(i)->setTurningMotor(angle + 90_deg);
     }
 }
 
@@ -455,6 +455,11 @@ wpi::array<frc::SwerveModulePosition, 4> Drive::getModulePositions() {
              swerveModules.at(2)->getPosition(), swerveModules.at(3)->getPosition() };
 }
 
+wpi::array<frc::SwerveModulePosition, 4> Drive::getModulePositionsWith90JankyOffsetThing() {
+     return { swerveModules.at(0)->getPosition90JankyOffset(), swerveModules.at(1)->getPosition90JankyOffset(),
+              swerveModules.at(2)->getPosition90JankyOffset(), swerveModules.at(3)->getPosition90JankyOffset() };
+}
+
 void Drive::sendFeedback() {
     // Module feedback.
     for (std::size_t i = 0; i < swerveModules.size(); i++) {
@@ -469,8 +474,8 @@ void Drive::sendFeedback() {
     frc::SmartDashboard::PutData("Swerve_Feedback", &swerveFeedback);
 
     // Drive feedback.
-    frc::SmartDashboard::PutNumber("Drive_PoseY_m",                 pose.X().value());
-    frc::SmartDashboard::PutNumber("Drive_PoseX_m",                 pose.Y().value());
+    frc::SmartDashboard::PutNumber("Drive_PoseX_m",                 pose.X().value());
+    frc::SmartDashboard::PutNumber("Drive_PoseY_m",                 pose.Y().value());
     frc::SmartDashboard::PutNumber("Drive_PoseRot_deg",             getRotation().Degrees().value());
     frc::SmartDashboard::PutNumber("Drive_ControlVelX_mps",         controlData.xVel.value());
     frc::SmartDashboard::PutNumber("Drive_ControlVelY_mps",         controlData.yVel.value());

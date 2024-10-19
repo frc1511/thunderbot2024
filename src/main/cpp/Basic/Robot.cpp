@@ -25,6 +25,7 @@ void Robot::AutonomousInit() {
 }
 void Robot::AutonomousPeriodic() {
     //controls.process();
+    limelight.process();
     autoCode.process();
     drive.process();
     arm.process();
@@ -43,9 +44,9 @@ void Robot::TeleopPeriodic() {
     hang.process();
     shampTake.runMotors();
 
+    limelight.process();
     drive.process();
     blinky.process();
-    limelight.process();
 }
 
 void Robot::DisabledInit() {

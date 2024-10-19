@@ -9,6 +9,7 @@
 #include <GamEpiece/Shamptake.h>
 #include <Controls/Controls.h>
 #include <BlinkyBlinky/BlinkyBlinky.h>
+#include <Util/Limelight.h>
 #include <Util/Preferences.h>
 
 using DriveControllerType = ThunderPS4Controller;
@@ -17,7 +18,7 @@ using AuxControllerType = ThunderPS4Controller;
 class Controls : public Mechanism {
 public:
     //Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang);
-    Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, bool* _debugMode);
+    Controls(Drive* drive, Shamptake* _shamptake, Arm* _arm, Hang* _hang, BlinkyBlinky* _blink, Limelight* _limelight, bool* _debugMode);
 
     void resetToMode(MatchMode mode) override;
     void process() override;
@@ -33,6 +34,7 @@ private:
     Arm* arm;
     Hang* hang;
     BlinkyBlinky* blink;
+    Limelight* limelight;
     bool* debugMode;
     AuxControllerType auxController{ThunderGameController::Controller::AUX};
     frc::GenericHID switchPanel{2};

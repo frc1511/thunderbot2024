@@ -125,6 +125,10 @@ frc::SwerveModulePosition SwerveModule::getPosition() {
     return { getDrivePosition(), getAbsoluteRotation() };
 }
 
+frc::SwerveModulePosition SwerveModule::getPosition90JankyOffset() {
+    return { getDrivePosition(), frc::Rotation2d(getAbsoluteRotation().Degrees() - 90_deg) };
+}
+
 void SwerveModule::resetDrivePosition() {
     driveEncoder.SetPosition(0.0);
 }
