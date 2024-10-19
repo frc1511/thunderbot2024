@@ -12,6 +12,7 @@
 #include <GamEpiece/Arm.h>
 #include <Hanger/Hang.h>
 #include <BlinkyBlinky/BlinkyBlinky.h>
+#include <Util/Limelight.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -39,13 +40,14 @@ private:
     Shamptake shampTake{&arm};
     Hang hang;
     BlinkyBlinky blinky{&hang, &arm, &shampTake};
+    Limelight limelight{&drive};
     
     //Controls controls {nullptr, &shampTake, &arm, &hang};
     Controls controls {&drive, &shampTake, &arm, &hang, &blinky, &debugMode};
     Auto autoCode {&drive, &shampTake, &arm};
     std::vector<Mechanism*> allMechanisms {
 
-        &arm, &hang, &drive, &shampTake, &controls, &autoCode, &blinky
+        &arm, &hang, &drive, &shampTake, &controls, &autoCode, &blinky, &limelight
 
     };
 };

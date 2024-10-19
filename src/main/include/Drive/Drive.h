@@ -153,6 +153,8 @@ public:
      */
     void resetPIDControllers();
 
+    // Not risking moving the poseEstimator into public, use for limelight
+    frc::SwerveDrivePoseEstimator<4>* getPoseEstimator();
 
 private:
     enum class DriveMode {
@@ -211,7 +213,7 @@ private:
         getModulePositions(),
         frc::Pose2d(),
         { 0.0, 0.0, 0.0 }, // Standard deviations of model states.
-        { 1.0, 1.0, 1.0 } // Standard deviations of the vision measurements.
+        { 0.9, 0.9, 0.9 } // Standard deviations of the vision measurements.
     };
     // PID Controller for angular drivetrain movement.
     frc::ProfiledPIDController<units::radians> manualThetaPIDController {
