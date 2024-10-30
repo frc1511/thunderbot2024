@@ -26,6 +26,7 @@ void Controls::process() {
 
     doSwitchPanel(false);
     if (callaDisable) {
+        printf("===DRIVE DISABLED===\n");
         drive->manualControlRelRotation(0, 0, 0, Drive::ControlFlag::BRICK);
     }
     else {
@@ -40,6 +41,7 @@ void Controls::process() {
             doAux();
         }
     } else {
+        printf("===AUX DISABLED===\n");
         shamptake->controlProcess(false, false, false, false, false, false, false);
     }
 }

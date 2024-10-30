@@ -377,10 +377,10 @@ void Drive::execTrajectory() {
     // The angle at which the robot should be driving at.
     frc::Rotation2d heading;
     if (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed) {
-        heading = frc::Rotation2d(units::math::atan2(twist.dy, twist.dx) + 90_deg);
+        heading = frc::Rotation2d(units::math::atan2(twist.dy, twist.dx) + 180_deg);
     }
     else {
-        heading = frc::Rotation2d(units::math::atan2(twist.dy, twist.dx) - 90_deg);
+        heading = frc::Rotation2d(units::math::atan2(twist.dy, twist.dx) - 0_deg);
     }
     
 

@@ -111,7 +111,7 @@ static PreferencesSwerve PREFERENCE_SWERVE;
 struct PreferencesArm
 {
     PID_t PID;
-    double TARGET_ANGLE_THRESHOLD = 1;
+    double TARGET_ANGLE_THRESHOLD = 3;
     double PRESET_ANGLE_THRESHOLD = 3;
     PID_t AMP_PID; // Normal PID will not work when at the AMP position, use this to configure PID for AMP
     PID_t AMPEND_PID;

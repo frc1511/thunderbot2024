@@ -41,6 +41,9 @@ void Auto::process() { //called during auto
         case DO_NOTHING:
             doNothing();
             break;
+        case ONE_NOTE:
+            oneNote();
+            break;
         case TEST:
             test();
             break;
@@ -275,7 +278,7 @@ void Auto::line2_loc_1() {
         step++;
     }
 }
-void Auto::doNothing() {
+void Auto::oneNote() {
     if (step == 0 && arm->isMoveDone()) {
         shamptake->autoSetToPreloadedState(); // :(
         arm->moveToPreset(Arm::Presets::SUBWOOFER);
@@ -285,6 +288,12 @@ void Auto::doNothing() {
         step++;
     } else if (step == 2 && shamptake->notShooting()) {
         shamptake->overrideGamePieceState(false);
+        step++;
+    }
+}
+void Auto::doNothing() {
+    if (step == 0) {
+        shamptake->autoSetToPreloadedState();
         step++;
     }
     // If it does nothing is it doing something or nothing? - trevor(2020)
@@ -304,14 +313,15 @@ void Auto::doNothing() {
 }
 
 void Auto::autoSelectorInit() {
-    autoSelector.SetDefaultOption("1 Note",       0);
-    autoSelector.AddOption("2 Note Loc 1",        4);
-    autoSelector.AddOption("2 Note Loc 2",        5);
-    autoSelector.AddOption("2 Note Loc 3",        6);
-    autoSelector.AddOption("Square test" ,        7);
-    autoSelector.AddOption("Leave" ,              9);
-    autoSelector.AddOption("Middle note loc 2",  10);
-    autoSelector.AddOption("3 Note Loc 1",       11);
+    autoSelector.SetDefaultOption("Do Nothing",   (int)AutoMode::DO_NOTHING);
+    autoSelector.AddOption("1 Note",              (int)AutoMode::ONE_NOTE);
+    autoSelector.AddOption("2 Note Loc 1",        (int)AutoMode::BASIC_LOC_1);
+    autoSelector.AddOption("2 Note Loc 2",        (int)AutoMode::BASIC_LOC_2);
+    autoSelector.AddOption("2 Note Loc 3",        (int)AutoMode::BASIC_LOC_3);
+    autoSelector.AddOption("Square test" ,        (int)AutoMode::SQUARE);
+    autoSelector.AddOption("Leave" ,              (int)AutoMode::LEAVE);
+    autoSelector.AddOption("Middle note loc 2",   (int)AutoMode::MIDDLE_LOC_2);
+    autoSelector.AddOption("3 Note Loc 1",        (int)AutoMode::LINE2_LOC_1);
 }
 
 void Auto::sendFeedback() {

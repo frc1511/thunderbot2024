@@ -29,8 +29,12 @@ void Arm::process()
             armPIDController.SetI(PREFERENCE_ARM.AMPEND_PID.Ki);
             armPIDController.SetD(PREFERENCE_ARM.AMPEND_PID.Kd);
         }
-        double power = armPIDController.Calculate(degrees, targetAngle);
-        setPower(-power);
+        if (degrees >= -1_deg && degrees <= 101_deg) {
+            double power = armPIDController.Calculate(degrees, targetAngle);
+            setPower(-power);
+        } else {
+            setPower(0);
+        }
     }
     doBrake();
 }
