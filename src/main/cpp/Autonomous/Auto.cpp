@@ -25,59 +25,59 @@ void Auto::resetToMode(MatchMode mode) {
     }
 }
 void Auto::process() { //called during auto
-    if (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed) {
-        paths = &redPaths;
-    }
-    else {
-        paths = &bluePaths;
-    }
+    // if (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed) {
+    //     paths = &redPaths;
+    // }
+    // else {
+    //     paths = &bluePaths;
+    // }
 
-    // Autonomous delay.
-    if (delayTimer.Get().value() <= frc::SmartDashboard::GetNumber("thunderdashboard_auto_start_delay", 0.0)) {
-        return;
-    }
-    switch (mode) { //find what auto mode you are using and do it
-        using enum AutoMode;
-        case DO_NOTHING:
-            doNothing();
-            break;
-        case ONE_NOTE:
-            oneNote();
-            break;
-        case TEST:
-            test();
-            break;
-        case SPEAKER_1_GP:
-            speaker1();
-            break;
-        case SPEAKER_2_GP:
-            speaker2();
-            break;
-        case HAVOC:
-            havoc();
-            break;
-        case BASIC_LOC_1:
-            basic_loc_1();
-            break;
-        case BASIC_LOC_2:
-            basic_loc_2();
-            break;
-        case BASIC_LOC_3:
-            basic_loc_3();
-            break;
-        case SQUARE:
-            squareTest();
-            break;
-        case LEAVE:
-            leave();
-            break;
-        case MIDDLE_LOC_2:
-            middle_loc_2();
-            break;
-        case LINE2_LOC_1:
-            line2_loc_1();
-            break;
-    }
+    // // Autonomous delay.
+    // if (delayTimer.Get().value() <= frc::SmartDashboard::GetNumber("thunderdashboard_auto_start_delay", 0.0)) {
+    //     return;
+    // }
+    // switch (mode) { //find what auto mode you are using and do it
+    //     using enum AutoMode;
+    //     case DO_NOTHING:
+    //         doNothing();
+    //         break;
+    //     case ONE_NOTE:
+    //         oneNote();
+    //         break;
+    //     case TEST:
+    //         test();
+    //         break;
+    //     case SPEAKER_1_GP:
+    //         speaker1();
+    //         break;
+    //     case SPEAKER_2_GP:
+    //         speaker2();
+    //         break;
+    //     case HAVOC:
+    //         havoc();
+    //         break;
+    //     case BASIC_LOC_1:
+    //         basic_loc_1();
+    //         break;
+    //     case BASIC_LOC_2:
+    //         basic_loc_2();
+    //         break;
+    //     case BASIC_LOC_3:
+    //         basic_loc_3();
+    //         break;
+    //     case SQUARE:
+    //         squareTest();
+    //         break;
+    //     case LEAVE:
+    //         leave();
+    //         break;
+    //     case MIDDLE_LOC_2:
+    //         middle_loc_2();
+    //         break;
+    //     case LINE2_LOC_1:
+    //         line2_loc_1();
+    //         break;
+    // }
 }
 
 void Auto::test() { //test auto, leave, grab a note, and shoot
