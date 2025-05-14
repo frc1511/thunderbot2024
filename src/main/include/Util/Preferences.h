@@ -56,9 +56,9 @@ struct PreferencesDrive
     units::radians_per_second_t DRIVE_AUTO_MAX_ANG_VEL = 6.28_rad_per_s;
     units::radians_per_second_squared_t DRIVE_AUTO_MAX_ANG_ACCEL = 3.14_rad_per_s_sq;
 
-    units::meters_per_second_t DRIVE_MANUAL_MAX_VEL = 5_mps;
-    units::degrees_per_second_t DRIVE_MANUAL_MAX_ANG_VEL = 540_deg_per_s;
-    units::radians_per_second_squared_t DRIVE_MANUAL_MAX_ANG_ACCEL = 9.42_rad_per_s_sq;
+    units::meters_per_second_t DRIVE_MANUAL_MAX_VEL = 3_mps;
+    units::degrees_per_second_t DRIVE_MANUAL_MAX_ANG_VEL = 270_deg_per_s;
+    units::radians_per_second_squared_t DRIVE_MANUAL_MAX_ANG_ACCEL = 3.14_rad_per_s_sq;
 
     PreferencesDrive()
     {
@@ -111,7 +111,7 @@ static PreferencesSwerve PREFERENCE_SWERVE;
 struct PreferencesArm
 {
     PID_t PID;
-    double TARGET_ANGLE_THRESHOLD = 1;
+    double TARGET_ANGLE_THRESHOLD = 3;
     double PRESET_ANGLE_THRESHOLD = 3;
     PID_t AMP_PID; // Normal PID will not work when at the AMP position, use this to configure PID for AMP
     PID_t AMPEND_PID;

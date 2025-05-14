@@ -48,6 +48,7 @@ void Shamptake::configureShooterMotors() {
 
 void Shamptake::sendFeedback() {
     frc::SmartDashboard::PutNumber("Shamptake_shooterTimeout", autoPreheatTimeout.Get().value());
+    frc::SmartDashboard::PutBoolean("Shamptake_NoteSenesor", isNoteSensorTripped());
     frc::SmartDashboard::PutNumber("Shamptake_intakeTimeout", autoIntakeTimeout.Get().value());
     frc::SmartDashboard::PutString("Shamptake_intakeMode", intakeModeString());
     frc::SmartDashboard::PutNumber("Shamptake_shooterLeftRPM", shooterMotorLeftEncoder.GetVelocity());

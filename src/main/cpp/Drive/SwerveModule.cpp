@@ -91,16 +91,16 @@ void SwerveModule::setState(frc::SwerveModuleState targetState) {
     frc::SwerveModuleState optimizedState;
 
     // Turn off optimization in crater mode to help with configuration.
-    if (settings.isCraterMode) {
-        optimizedState = targetState;
-    }
-    else {
+    // if (settings.isCraterMode) {
+    //     optimizedState = targetState;
+    // }
+    // else {
         /**
          * Optimize the target state by flipping motor directions and adjusting
          * rotations in order to turn the least amount of distance possible.
          */
         optimizedState = frc::SwerveModuleState::Optimize(targetState, currentState.angle);
-    }
+    // }
 
     /**
      * Only handle turning when the robot is actually driving (Stops the modules

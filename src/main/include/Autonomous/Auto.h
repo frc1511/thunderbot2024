@@ -27,17 +27,18 @@ private:
     enum class AutoMode
     {
         DO_NOTHING   = 0,
-        SPEAKER_1_GP = 1,
-        SPEAKER_2_GP = 2,
-        HAVOC        = 3,
-        BASIC_LOC_1  = 4,
-        BASIC_LOC_2  = 5,
-        BASIC_LOC_3  = 6,
-        SQUARE       = 7,
-        TEST         = 8,
-        LEAVE        = 9,
-        MIDDLE_LOC_2 = 10,
-        LINE2_LOC_1  = 11
+        ONE_NOTE     = 1,
+        SPEAKER_1_GP = 2,
+        SPEAKER_2_GP = 3,
+        HAVOC        = 4,
+        BASIC_LOC_1  = 5,
+        BASIC_LOC_2  = 6,
+        BASIC_LOC_3  = 7,
+        SQUARE       = 8,
+        TEST         = 9,
+        LEAVE        = 10,
+        MIDDLE_LOC_2 = 11,
+        LINE2_LOC_1  = 12
     };
     Drive *drive;
     Shamptake *shamptake;
@@ -50,6 +51,7 @@ private:
 
 
     void doNothing();
+    void oneNote();
     void test();
     void speaker1();
     void speaker2();
@@ -63,7 +65,8 @@ private:
     void line2_loc_1();
 
     const std::map<AutoMode, const char*> autoModeNames {
-        { AutoMode::DO_NOTHING,     "1 Note"            },
+        { AutoMode::DO_NOTHING,     "Do Nothing"        },
+        { AutoMode::ONE_NOTE,       "1 Note"            },
         { AutoMode::SPEAKER_1_GP,   "1 GP Speaker"      },
         { AutoMode::SPEAKER_2_GP,   "2 GP Speaker"      },
         { AutoMode::HAVOC,          "Hail Mary"         },
