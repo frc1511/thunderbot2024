@@ -113,10 +113,10 @@ class Shamptake : public Mechanism{
     };
     double presetShooterSpeeds [ShooterSpeed::MAX_SHOOTER_SPEED] = {
         0,
-        3500,          // FIRE SHOOTER
+        2500,          // FIRE SHOOTER
         1000,          // AMP SHOOTER
         4500,          // AUTO_FIRE SHOOTER
-        2000           // HALF_COURT SHOOTER
+        5000           // HALF_COURT SHOOTER
     };
     void configureShooterMotors();
 };

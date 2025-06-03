@@ -31,6 +31,7 @@ void Arm::process()
         }
         if (degrees >= -1_deg && degrees <= 101_deg) {
             double power = armPIDController.Calculate(degrees, targetAngle);
+            power += cosf((degrees / 180_deg) * M_PI) * 0.08;
             setPower(-power);
         } else {
             setPower(0);
