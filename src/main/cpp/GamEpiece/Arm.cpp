@@ -1,7 +1,7 @@
 #include <GamEpiece/Arm.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <Util/Preferences.h>
-#include <basic/Settings.h>
+#include <Basic/Settings.h>
 
 Arm::Arm() {
     configureMotors();
