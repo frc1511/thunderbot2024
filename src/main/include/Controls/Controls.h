@@ -52,6 +52,7 @@ private:
     bool shouldStrobe = false;
     bool hangModeControls = false;
     bool driveRobotCentric = false;
+    bool turboMode = false;
     bool balanceControlOff = false;
     bool armBrakeDissable = false;
     bool sourceLight = false;

@@ -300,7 +300,7 @@ void Controls::doAux() {
     }
 
     //SHAMPTAKE
-    bool halfCourt = driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE;
+    bool halfCourt = (driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE) || turboMode;
     shamptake->controlProcess(intake, outtake, fire, shooter, overrideGamePieceYes, overrideGamePieceNo, halfCourt);
 }
 
@@ -319,7 +319,7 @@ void Controls::doAuxManual() {
 #define SWITCH_MANUAL_AUX 7
 #define SWITCH_CRATER_MODE 8
 #define SWITCH_ARM_BRAKE 9
-#define SWITCH_UNUSED 10
+#define SWITCH_TURBO 10
 #define SWITCH_DEBUG_MODE 11
 
 void Controls::doSwitchPanel(bool isDissabled) {
@@ -331,6 +331,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
     settings.isCraterMode = switchPanel.GetRawButton(SWITCH_CRATER_MODE);
     balanceControlOff = switchPanel.GetRawButton(SWITCH_BALANCE_CONTROL);
     armBrakeDissable = switchPanel.GetRawButton(SWITCH_ARM_BRAKE);
+    turboMode = switchPanel.GetRawButton(SWITCH_TURBO);
     *debugMode = switchPanel.GetRawButton(SWITCH_DEBUG_MODE);
 
     limelight->limelightEnabled = switchPanel.GetRawButton(SWITCH_LIMELIGHT_ENABLE);
