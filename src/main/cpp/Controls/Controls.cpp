@@ -116,7 +116,11 @@ void Controls::doDrive() {
         //driveCtrlFlags |= Drive::ControlFlag::LOCK_Y;
     }
 
-    
+    if (driveRobotCentric && robotCentricFlipped) {
+        xVel *= -1.0;
+        yVel *= -1.0;
+        angVel *= -1.0;
+    }
 
     if (toggleRotation) {
         drive->resetPIDControllers();
@@ -312,7 +316,7 @@ void Controls::doAuxManual() {
 
 #define SWITCH_LED_ENABLE 1
 #define SWITCH_ROBOT_CENTRIC 2
-#define SWITCH_LIMELIGHT_ENABLE 3
+#define SWITCH_DRIVE_ROBOTCENTRIC_FLIP 3
 #define SWITCH_BALANCE_CONTROL 4
 #define SWITCH_CALLA_DISABLE 5
 #define SWITCH_SASHA_DISABLE 6
@@ -334,7 +338,7 @@ void Controls::doSwitchPanel(bool isDissabled) {
     turboMode = switchPanel.GetRawButton(SWITCH_TURBO);
     *debugMode = switchPanel.GetRawButton(SWITCH_DEBUG_MODE);
 
-    limelight->limelightEnabled = switchPanel.GetRawButton(SWITCH_LIMELIGHT_ENABLE);
+    robotCentricFlipped = switchPanel.GetRawButton(SWITCH_DRIVE_ROBOTCENTRIC_FLIP);
 
     if (armBrakeDissable) {
         if (isDissabled) {

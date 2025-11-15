@@ -57,6 +57,7 @@ private:
     bool armBrakeDissable = false;
     bool sourceLight = false;
     bool fire = false;
+    bool robotCentricFlipped = false;
     unsigned driveCtrlFlags = 0;
 
     bool driveAbsRotation = false;

@@ -139,10 +139,10 @@ struct PreferencesShamptake
     double VELOCITY_NOISE = 5;
     PreferencesShamptake()
     {
-        PID_LEFT.Kp = 0.0004;
+        PID_LEFT.Kp = 0.0003;
         PID_LEFT.Kff = 0.000170;
 
-        PID_RIGHT.Kp = 0.0004;
+        PID_RIGHT.Kp = 0.0003;
         PID_RIGHT.Kff = 0.000170;
     }
 };
