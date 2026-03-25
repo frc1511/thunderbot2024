@@ -116,7 +116,11 @@ void Controls::doDrive() {
         //driveCtrlFlags |= Drive::ControlFlag::LOCK_Y;
     }
 
-    
+    if (driveRobotCentric && robotCentricFlipped) {
+        xVel *= -1.0;
+        yVel *= -1.0;
+        angVel *= -1.0;
+    }
 
     if (toggleRotation) {
         drive->resetPIDControllers();
@@ -300,7 +304,7 @@ void Controls::doAux() {
     }
 
     //SHAMPTAKE
-    bool halfCourt = driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE;
+    bool halfCourt = (driveController.getRightTrigger() > PREFERENCE_CONTROLS.AXIS_DEADZONE) || turboMode;
     shamptake->controlProcess(intake, outtake, fire, shooter, overrideGamePieceYes, overrideGamePieceNo, halfCourt);
 }
 
@@ -312,14 +316,14 @@ void Controls::doAuxManual() {
 
 #define SWITCH_LED_ENABLE 1
 #define SWITCH_ROBOT_CENTRIC 2
-#define SWITCH_LIMELIGHT_ENABLE 3
+#define SWITCH_DRIVE_ROBOTCENTRIC_FLIP 3
 #define SWITCH_BALANCE_CONTROL 4
 #define SWITCH_CALLA_DISABLE 5
 #define SWITCH_SASHA_DISABLE 6
 #define SWITCH_MANUAL_AUX 7
 #define SWITCH_CRATER_MODE 8
 #define SWITCH_ARM_BRAKE 9
-#define SWITCH_UNUSED 10
+#define SWITCH_TURBO 10
 #define SWITCH_DEBUG_MODE 11
 
 void Controls::doSwitchPanel(bool isDissabled) {
@@ -331,9 +335,10 @@ void Controls::doSwitchPanel(bool isDissabled) {
     settings.isCraterMode = switchPanel.GetRawButton(SWITCH_CRATER_MODE);
     balanceControlOff = switchPanel.GetRawButton(SWITCH_BALANCE_CONTROL);
     armBrakeDissable = switchPanel.GetRawButton(SWITCH_ARM_BRAKE);
+    turboMode = switchPanel.GetRawButton(SWITCH_TURBO);
     *debugMode = switchPanel.GetRawButton(SWITCH_DEBUG_MODE);
 
-    limelight->limelightEnabled = switchPanel.GetRawButton(SWITCH_LIMELIGHT_ENABLE);
+    robotCentricFlipped = switchPanel.GetRawButton(SWITCH_DRIVE_ROBOTCENTRIC_FLIP);
 
     if (armBrakeDissable) {
         if (isDissabled) {

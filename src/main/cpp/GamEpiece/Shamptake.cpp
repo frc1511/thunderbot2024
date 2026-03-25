@@ -9,7 +9,7 @@ Shamptake::Shamptake(Arm* _arm)
   shooterMotorLeftPIDController(shooterMotorLeft.GetPIDController()),
   shooterMotorLeftEncoder(shooterMotorLeft.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, SHOOTER_LEFT_COUNTS_PER_REV)),
   arm(_arm) {
-    // configureShooterMotors();
+    configureShooterMotors();
     stop();
 }
 
@@ -37,6 +37,7 @@ void Shamptake::configureShooterMotors() {
     shooterMotorRightPIDController.SetIZone(PREFERENCE_SHAMPTAKE.PID_RIGHT.Kizone);
     shooterMotorRightPIDController.SetFF(PREFERENCE_SHAMPTAKE.PID_RIGHT.Kff);
     shooterMotorRightPIDController.SetOutputRange(0, 1);
+    shooterMotorRight.BurnFlash();
 
     shooterMotorLeftPIDController.SetP(PREFERENCE_SHAMPTAKE.PID_LEFT.Kp);
     shooterMotorLeftPIDController.SetI(PREFERENCE_SHAMPTAKE.PID_LEFT.Ki);
@@ -44,6 +45,7 @@ void Shamptake::configureShooterMotors() {
     shooterMotorLeftPIDController.SetIZone(PREFERENCE_SHAMPTAKE.PID_LEFT.Kizone);
     shooterMotorLeftPIDController.SetFF(PREFERENCE_SHAMPTAKE.PID_LEFT.Kff);
     shooterMotorLeftPIDController.SetOutputRange(0, 1);
+    shooterMotorLeft.BurnFlash();
 }
 
 void Shamptake::sendFeedback() {

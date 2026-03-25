@@ -52,10 +52,12 @@ private:
     bool shouldStrobe = false;
     bool hangModeControls = false;
     bool driveRobotCentric = false;
+    bool turboMode = false;
     bool balanceControlOff = false;
     bool armBrakeDissable = false;
     bool sourceLight = false;
     bool fire = false;
+    bool robotCentricFlipped = false;
     unsigned driveCtrlFlags = 0;
 
     bool driveAbsRotation = false;
